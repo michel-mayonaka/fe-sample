@@ -1,9 +1,10 @@
+// Package game は、UI から参照されるゲーム関連の
+// 基本定数や共有設定を提供します。
 package game
 
 const (
-    // レベルアップに必要な経験値
+    // LevelUpExp はレベルアップに必要な経験値です。
     LevelUpExp = 100
-    // レベル上限
+    // LevelCap は到達可能なレベルの上限値です。
     LevelCap   = 20
 )
-

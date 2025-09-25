@@ -117,7 +117,7 @@ type Growth struct {
 // SampleUnit はサンプルとなるユニットデータを生成します。
 func SampleUnit() Unit {
     // ユーザテーブル（usr_）のみで構築。失敗時はフォールバック。
-    if ut, err := user.LoadFromJSON("assets/usr_party.json"); err == nil {
+    if ut, err := user.LoadFromJSON("db/user/usr_characters.json"); err == nil {
         if uc, ok := ut.Find("iris"); ok {
             return unitFromUser(uc)
         }

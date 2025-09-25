@@ -9,8 +9,8 @@
 - `internal/model`: キャラクターマスタのスキーマとJSONローダー。
 - `internal/user`: ユーザ（セーブ）データのスキーマとJSONローダー。
 - `assets/`: 画像・フォント・音源等のアセット。
-- `assets/mst_characters.json`: キャラクターマスタ（ID索引, mst_プレフィックス）。
-- `assets/usr_party.json`: ユーザ状態（Lv/Exp/HP/耐久, usr_プレフィックス）。
+- `db/master/mst_characters.json`: キャラクターマスタ（ID索引, mst_プレフィックス）。
+- `db/user/usr_characters.json`: ユーザ状態（Lv/Exp/HP/耐久, usr_プレフィックス）。
 - `pkg/`: 複数バイナリ/ツールから再利用するライブラリ（必要時）。
 - `testdata/`: テスト専用アセット。
 
