@@ -68,23 +68,28 @@ type Unit struct {
 
     Portrait *ebiten.Image
 
-    Ranks WeaponRanks
+    Weapon WeaponRanks
+    Magic  MagicRanks
 }
 
 type Stats struct {
     Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
 }
 
-// 武器レベル（FE 風）
+// 武器レベル（物理系）
 type WeaponRanks struct {
     Sword string
     Lance string
     Axe   string
     Bow   string
-    Tome  string
-    Light string
-    Dark  string
-    Staff string
+}
+
+// 魔法レベル（魔法系）
+type MagicRanks struct {
+    Anima string // 理
+    Light string // 光
+    Dark  string // 闇
+    Staff string // 杖
 }
 
 // SampleUnit は画面用ダミーデータ。
@@ -98,7 +103,8 @@ func SampleUnit() Unit {
         HPMax: 26,
         Stats: Stats{Str: 9, Mag: 0, Skl: 12, Spd: 14, Lck: 8, Def: 6, Res: 7, Mov: 7},
         Equip: []string{"アイアンランス", "ジャベリン", "傷薬"},
-        Ranks: WeaponRanks{Sword: "D", Lance: "B", Axe: "-", Bow: "-", Tome: "-", Light: "-", Dark: "-", Staff: "-"},
+        Weapon: WeaponRanks{Sword: "D", Lance: "B", Axe: "-", Bow: "-"},
+        Magic:  MagicRanks{Anima: "-", Light: "-", Dark: "-", Staff: "-"},
     }
     if img, _, err := ebitenutil.NewImageFromFile("assets/01_iris.png"); err == nil {
         u.Portrait = img
@@ -149,19 +155,24 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
     drawStatLine(dst, faceMain, tx+1*colGap, statsTop+2*line, "魔防", u.Stats.Res)
     drawStatLine(dst, faceMain, tx+1*colGap, statsTop+3*line, "移動", u.Stats.Mov)
 
-    // 武器レベル（右側）
+    // 武器レベル（右側・上段）
     wrX := tx + 2*colGap + 64
     wrY := ty
     text.Draw(dst, "武器レベル", faceMain, wrX, wrY, colAccent)
     rline := 28
-    drawRankLine(dst, faceMain, wrX, wrY+1*rline, "剣", u.Ranks.Sword)
-    drawRankLine(dst, faceMain, wrX, wrY+2*rline, "槍", u.Ranks.Lance)
-    drawRankLine(dst, faceMain, wrX, wrY+3*rline, "斧", u.Ranks.Axe)
-    drawRankLine(dst, faceMain, wrX, wrY+4*rline, "弓", u.Ranks.Bow)
-    drawRankLine(dst, faceMain, wrX, wrY+5*rline, "魔道", u.Ranks.Tome)
-    drawRankLine(dst, faceMain, wrX, wrY+6*rline, "光", u.Ranks.Light)
-    drawRankLine(dst, faceMain, wrX, wrY+7*rline, "闇", u.Ranks.Dark)
-    drawRankLine(dst, faceMain, wrX, wrY+8*rline, "杖", u.Ranks.Staff)
+    drawRankLine(dst, faceMain, wrX, wrY+1*rline, "剣", u.Weapon.Sword)
+    drawRankLine(dst, faceMain, wrX, wrY+2*rline, "槍", u.Weapon.Lance)
+    drawRankLine(dst, faceMain, wrX, wrY+3*rline, "斧", u.Weapon.Axe)
+    drawRankLine(dst, faceMain, wrX, wrY+4*rline, "弓", u.Weapon.Bow)
+
+    // 魔法レベル（右側・下段）
+    mrX := wrX
+    mrY := wrY + (4+1)*rline + 16 // 見出し1行 + 武器4行 + 余白
+    text.Draw(dst, "魔法レベル", faceMain, mrX, mrY, colAccent)
+    drawRankLine(dst, faceMain, mrX, mrY+1*rline, "理", u.Magic.Anima)
+    drawRankLine(dst, faceMain, mrX, mrY+2*rline, "光", u.Magic.Light)
+    drawRankLine(dst, faceMain, mrX, mrY+3*rline, "闇", u.Magic.Dark)
+    drawRankLine(dst, faceMain, mrX, mrY+4*rline, "杖", u.Magic.Staff)
 
     // 装備（ポートレートの下段）
     equipTitleY := int(py + ph + 48)
