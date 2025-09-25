@@ -82,6 +82,8 @@ type WeaponRanks struct {
     Axe   string
     Bow   string
     Tome  string
+    Light string
+    Dark  string
     Staff string
 }
 
@@ -96,7 +98,7 @@ func SampleUnit() Unit {
         HPMax: 26,
         Stats: Stats{Str: 9, Mag: 0, Skl: 12, Spd: 14, Lck: 8, Def: 6, Res: 7, Mov: 7},
         Equip: []string{"アイアンランス", "ジャベリン", "傷薬"},
-        Ranks: WeaponRanks{Sword: "D", Lance: "B", Axe: "-", Bow: "-", Tome: "-", Staff: "-"},
+        Ranks: WeaponRanks{Sword: "D", Lance: "B", Axe: "-", Bow: "-", Tome: "-", Light: "-", Dark: "-", Staff: "-"},
     }
     if img, _, err := ebitenutil.NewImageFromFile("assets/01_iris.png"); err == nil {
         u.Portrait = img
@@ -132,7 +134,7 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
 
     // HP
     text.Draw(dst, fmt.Sprintf("HP %d/%d", u.HP, u.HPMax), faceMain, tx, ty+40+30+40, colText)
-    drawHPBar(dst, tx, ty+40+30+46, 600, 14, u.HP, u.HPMax)
+    drawHPBar(dst, tx, ty+40+30+46, 300, 14, u.HP, u.HPMax)
 
     // 能力値（2カラム）
     statsTop := ty + 40 + 30 + 46 + 40
@@ -157,11 +159,13 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
     drawRankLine(dst, faceMain, wrX, wrY+3*rline, "斧", u.Ranks.Axe)
     drawRankLine(dst, faceMain, wrX, wrY+4*rline, "弓", u.Ranks.Bow)
     drawRankLine(dst, faceMain, wrX, wrY+5*rline, "魔道", u.Ranks.Tome)
-    drawRankLine(dst, faceMain, wrX, wrY+6*rline, "杖", u.Ranks.Staff)
+    drawRankLine(dst, faceMain, wrX, wrY+6*rline, "光", u.Ranks.Light)
+    drawRankLine(dst, faceMain, wrX, wrY+7*rline, "闇", u.Ranks.Dark)
+    drawRankLine(dst, faceMain, wrX, wrY+8*rline, "杖", u.Ranks.Staff)
 
     // 装備（ポートレートの下段）
     equipTitleY := int(py + ph + 48)
-    text.Draw(dst, "Equipment", faceMain, int(px), equipTitleY, colAccent)
+    text.Draw(dst, "装備", faceMain, int(px), equipTitleY, colAccent)
     for i, it := range u.Equip {
         text.Draw(dst, fmt.Sprintf("- %s", it), faceSmall, int(px)+14, equipTitleY+30+i*26, colText)
     }
