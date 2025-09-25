@@ -10,6 +10,7 @@ import (
     resourceFonts "github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
     "github.com/hajimehoshi/ebiten/v2/text"
     "github.com/hajimehoshi/ebiten/v2/vector"
+    "ui_sample/internal/game"
     "golang.org/x/image/font"
     "golang.org/x/image/font/basicfont"
     "golang.org/x/image/font/opentype"
@@ -143,7 +144,7 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
     ty := int(py + 44)
     text.Draw(dst, u.Name, faceTitle, tx, ty, colAccent)
     text.Draw(dst, u.Class, faceMain, tx, ty+40, colText)
-    text.Draw(dst, fmt.Sprintf("Lv %d  経験値 %02d", u.Level, u.Exp), faceMain, tx, ty+40+30, colText)
+    text.Draw(dst, fmt.Sprintf("Lv %d / %d    経験値 %02d / %d", u.Level, game.LevelCap, u.Exp, game.LevelUpExp), faceMain, tx, ty+40+30, colText)
 
     // HP（行間は少し広め）
     text.Draw(dst, fmt.Sprintf("HP %d/%d", u.HP, u.HPMax), faceMain, tx, ty+40+30+40, colText)
