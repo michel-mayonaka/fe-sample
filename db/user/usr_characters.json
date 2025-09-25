@@ -4,48 +4,163 @@
     "name": "アイリス",
     "class": "ペガサスナイト",
     "portrait": "assets/01_iris.png",
-    "level": 7,
+    "level": 20,
     "hp_max": 26,
-    "stats": {"Str": 9, "Mag": 0, "Skl": 12, "Spd": 14, "Lck": 8, "Def": 6, "Res": 7, "Mov": 7},
-    "growth": {"Str": 45, "Mag": 10, "Skl": 55, "Spd": 65, "Lck": 50, "Def": 20, "Res": 35, "Mov": 0},
-    "weapon": {"sword": "D", "lance": "B", "axe": "-", "bow": "-"},
-    "magic": {"anima": "-", "light": "-", "dark": "-", "staff": "-"},
+    "stats": {
+      "Str": 17,
+      "Mag": 3,
+      "Skl": 16,
+      "Spd": 21,
+      "Lck": 14,
+      "Def": 9,
+      "Res": 13,
+      "Mov": 7
+    },
+    "growth": {
+      "HP": 70,
+      "Str": 45,
+      "Mag": 10,
+      "Skl": 55,
+      "Spd": 65,
+      "Lck": 50,
+      "Def": 20,
+      "Res": 35,
+      "Mov": 0
+    },
+    "weapon": {
+      "sword": "D",
+      "lance": "B",
+      "axe": "-",
+      "bow": "-"
+    },
+    "magic": {
+      "anima": "-",
+      "light": "-",
+      "dark": "-",
+      "staff": "-"
+    },
     "equip": [
-      {"name": "アイアンランス", "uses": 35, "max": 45},
-      {"name": "ジャベリン", "uses": 12, "max": 20},
-      {"name": "傷薬", "uses": 3, "max": 3}
+      {
+        "name": "アイアンランス",
+        "uses": 35,
+        "max": 45
+      },
+      {
+        "name": "ジャベリン",
+        "uses": 12,
+        "max": 20
+      },
+      {
+        "name": "傷薬",
+        "uses": 3,
+        "max": 3
+      }
     ]
   },
   {
     "id": "mercenary",
     "name": "ロイド",
     "class": "傭兵",
-    "portrait": "",
+    "portrait": "assets/02_loyd.png",
     "level": 5,
     "hp_max": 24,
-    "stats": {"Str": 10, "Mag": 0, "Skl": 11, "Spd": 12, "Lck": 6, "Def": 7, "Res": 3, "Mov": 5},
-    "growth": {"Str": 50, "Mag": 0, "Skl": 55, "Spd": 55, "Lck": 45, "Def": 30, "Res": 25, "Mov": 0},
-    "weapon": {"sword": "C", "lance": "-", "axe": "-", "bow": "-"},
-    "magic": {"anima": "-", "light": "-", "dark": "-", "staff": "-"},
+    "stats": {
+      "Str": 10,
+      "Mag": 0,
+      "Skl": 11,
+      "Spd": 12,
+      "Lck": 6,
+      "Def": 7,
+      "Res": 3,
+      "Mov": 5
+    },
+    "growth": {
+      "HP": 70,
+      "Str": 50,
+      "Mag": 0,
+      "Skl": 55,
+      "Spd": 55,
+      "Lck": 45,
+      "Def": 30,
+      "Res": 25,
+      "Mov": 0
+    },
+    "weapon": {
+      "sword": "C",
+      "lance": "-",
+      "axe": "-",
+      "bow": "-"
+    },
+    "magic": {
+      "anima": "-",
+      "light": "-",
+      "dark": "-",
+      "staff": "-"
+    },
     "equip": [
-      {"name": "アイアンソード", "uses": 40, "max": 45},
-      {"name": "傷薬", "uses": 3, "max": 3}
+      {
+        "name": "アイアンソード",
+        "uses": 40,
+        "max": 45
+      },
+      {
+        "name": "傷薬",
+        "uses": 3,
+        "max": 3
+      }
     ]
   },
   {
     "id": "kenshi",
     "name": "ハヤテ",
     "class": "剣士",
-    "portrait": "",
+    "portrait": "assets/03_hayate.png",
     "level": 6,
     "hp_max": 22,
-    "stats": {"Str": 8, "Mag": 0, "Skl": 13, "Spd": 16, "Lck": 9, "Def": 4, "Res": 5, "Mov": 5},
-    "growth": {"Str": 40, "Mag": 0, "Skl": 60, "Spd": 70, "Lck": 50, "Def": 20, "Res": 30, "Mov": 0},
-    "weapon": {"sword": "B", "lance": "-", "axe": "-", "bow": "-"},
-    "magic": {"anima": "-", "light": "-", "dark": "-", "staff": "-"},
+    "stats": {
+      "Str": 8,
+      "Mag": 0,
+      "Skl": 13,
+      "Spd": 16,
+      "Lck": 9,
+      "Def": 4,
+      "Res": 5,
+      "Mov": 5
+    },
+    "growth": {
+      "HP": 70,
+      "Str": 40,
+      "Mag": 0,
+      "Skl": 60,
+      "Spd": 70,
+      "Lck": 50,
+      "Def": 20,
+      "Res": 30,
+      "Mov": 0
+    },
+    "weapon": {
+      "sword": "B",
+      "lance": "-",
+      "axe": "-",
+      "bow": "-"
+    },
+    "magic": {
+      "anima": "-",
+      "light": "-",
+      "dark": "-",
+      "staff": "-"
+    },
     "equip": [
-      {"name": "アイアンソード", "uses": 35, "max": 45},
-      {"name": "傷薬", "uses": 2, "max": 3}
+      {
+        "name": "アイアンソード",
+        "uses": 35,
+        "max": 45
+      },
+      {
+        "name": "傷薬",
+        "uses": 2,
+        "max": 3
+      }
     ]
   }
 ]
