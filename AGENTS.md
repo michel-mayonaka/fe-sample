@@ -25,6 +25,12 @@
 - エクスポート識別子: `UpperCamelCase`、GoDoc コメントを付与。
 - エラー: `fmt.Errorf("%w", err)` でラップ、文脈は `errors.Join` 等で付加。
 
+## Comments & Docs（コメント方針）
+- コメントは原則 Markdown で管理します。コード内は最小限（1〜2行）に留め、詳細は `docs/*.md` を更新してください。
+- 追加/変更した「型・関数・フィールド・定数」は `docs/API.md` に説明を必ず追記。
+- 用語は日本語で統一（例: HP/守備/魔防/理/光/闇）。英語表記が必要な場合は併記。
+- UIレイアウトや数値の意図（行間・余白・サイズ）は 1 行で簡潔に。
+
 ## Testing Guidelines
 - フレームワーク: 標準 `testing`。
 - 命名: テスト `TestXxx`、ベンチ `BenchmarkXxx`、例: `TestButtonHover`。
