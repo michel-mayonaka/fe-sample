@@ -65,7 +65,7 @@ type Unit struct {
     HPMax int
 
     Stats Stats
-    Equip []string
+    Equip []Item
 
     Portrait *ebiten.Image
 
@@ -76,6 +76,13 @@ type Unit struct {
 
 type Stats struct {
     Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
+}
+
+// 装備（耐久制）
+type Item struct {
+    Name string
+    Uses int // 残り使用回数
+    Max  int // 使用可能数上限
 }
 
 // 武器レベル（物理系）
@@ -108,8 +115,8 @@ func SampleUnit() Unit {
         Exp:   56,
         HP:    22,
         HPMax: 26,
-        Stats: Stats{Str: 9, Mag: 0, Skl: 12, Spd: 14, Lck: 8, Def: 6, Res: 7, Mov: 7},
-        Equip: []string{"アイアンランス", "ジャベリン", "傷薬"},
+        Stats:  Stats{Str: 9, Mag: 0, Skl: 12, Spd: 14, Lck: 8, Def: 6, Res: 7, Mov: 7},
+        Equip:  []Item{{Name: "アイアンランス", Uses: 35, Max: 45}, {Name: "ジャベリン", Uses: 12, Max: 20}, {Name: "傷薬", Uses: 3, Max: 3}},
         Weapon: WeaponRanks{Sword: "D", Lance: "B", Axe: "-", Bow: "-"},
         Magic:  MagicRanks{Anima: "-", Light: "-", Dark: "-", Staff: "-"},
         Growth: Growth{Str: 45, Mag: 10, Skl: 55, Spd: 65, Lck: 50, Def: 20, Res: 35, Mov: 0},
@@ -186,7 +193,13 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
     equipTitleY := int(py + ph + 56)
     text.Draw(dst, "装備", faceMain, int(px), equipTitleY, colAccent)
     for i, it := range u.Equip {
-        text.Draw(dst, fmt.Sprintf("- %s", it), faceSmall, int(px)+14, equipTitleY+30+i*30, colText)
+        lineY := equipTitleY + 30 + i*30
+        // 名称
+        text.Draw(dst, fmt.Sprintf("- %s", it.Name), faceSmall, int(px)+14, lineY, colText)
+        // 耐久（右寄せ目安のカラム位置）
+        uses := "-"
+        if it.Max > 0 { uses = fmt.Sprintf("%d/%d", it.Uses, it.Max) }
+        text.Draw(dst, uses, faceSmall, int(px)+300, lineY, colAccent)
     }
 }
 
