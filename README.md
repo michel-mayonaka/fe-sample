@@ -14,7 +14,7 @@ go version
 # 依存取得（go.sum 生成）
 go mod tidy
 
-# 実行
+# 実行（フルHD 1920x1080）
 go run ./cmd/ui_sample
 ```
 
@@ -24,14 +24,20 @@ go build -o bin/ui_sample ./cmd/ui_sample
 ```
 ※ Apple Silicon では `GOARCH=arm64` が既定です。意図しない `amd64` クロスビルドは避けてください。
 
+## 表示仕様（解像度）
+- 論理解像度: 1920×1080（`Layout`）
+- ウィンドウ: 1920×1080（可変リサイズ）
+- フォント: Go Regular（タイトル36px、本文24px、注釈18px）
+- ポートレート枠: 320×320（画像は等比縮小・線形補間）
+
 ## 操作
 - `H`: ヘルプ表示 / `Esc`: ヘルプを閉じる
 - `Backspace`: サンプル値を再読み込み
 
 ## 構成
 - `cmd/ui_sample/main.go`: エントリ・ゲームループ
-- `internal/ui/ui.go`: パネル/テキスト/HPバー/能力値の描画
-- `assets/`: 画像等を追加する場合に利用
+- `internal/ui/ui.go`: パネル/テキスト/HPバー/能力値の描画、ポートレート画像の表示
+- `assets/`: 画像等を追加する場合に利用（例: `assets/01_iris.png`）
 
 ## トラブルシューティング
 - go.mod の Go 版エラー（例:「go 1.22 だが最大 1.17」）
@@ -44,4 +50,8 @@ go build -o bin/ui_sample ./cmd/ui_sample
 - Linux でビルド失敗
   - 必要パッケージ例（Debian/Ubuntu）: `sudo apt-get install -y libx11-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev libasound2-dev`
 
-デザイン調整は `internal/ui/ui.go` の色・座標を編集してください。必要に応じて画像/TTF を `assets/` に追加し、`embed` で組み込み可能です。
+## 画像の追加（ポートレート表示）
+- `assets/01_iris.png` を配置すると、左上のポートレート枠に表示されます。
+- 別名で使う場合は `internal/ui/ui.go` の `SampleUnit()` で読み込みパスを変更してください。
+
+デザイン調整は `internal/ui/ui.go` の色・座標・フォントサイズを編集してください。必要に応じて画像/TTF を `assets/` に追加し、`embed` で組み込み可能です。
