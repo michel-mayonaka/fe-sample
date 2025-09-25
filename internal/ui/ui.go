@@ -131,6 +131,7 @@ func drawPortrait(dst *ebiten.Image, img *ebiten.Image, x, y, w, h float32) {
     tx := float64(x) + (float64(w)-sw)/2
     ty := float64(y) + (float64(h)-sh)/2
     var op ebiten.DrawImageOptions
+    op.Filter = ebiten.FilterLinear
     op.GeoM.Scale(s, s)
     op.GeoM.Translate(tx, ty)
     dst.DrawImage(img, &op)
