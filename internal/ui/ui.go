@@ -67,10 +67,22 @@ type Unit struct {
     Equip []string
 
     Portrait *ebiten.Image
+
+    Ranks WeaponRanks
 }
 
 type Stats struct {
     Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
+}
+
+// 武器レベル（FE 風）
+type WeaponRanks struct {
+    Sword string
+    Lance string
+    Axe   string
+    Bow   string
+    Tome  string
+    Staff string
 }
 
 // SampleUnit は画面用ダミーデータ。
@@ -84,6 +96,7 @@ func SampleUnit() Unit {
         HPMax: 26,
         Stats: Stats{Str: 9, Mag: 0, Skl: 12, Spd: 14, Lck: 8, Def: 6, Res: 7, Mov: 7},
         Equip: []string{"Iron Lance", "Javelin", "Vulnerary"},
+        Ranks: WeaponRanks{Sword: "D", Lance: "B", Axe: "-", Bow: "-", Tome: "-", Staff: "-"},
     }
     if img, _, err := ebitenutil.NewImageFromFile("assets/01_iris.png"); err == nil {
         u.Portrait = img
@@ -133,6 +146,18 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
     drawStatLine(dst, faceMain, tx+1*colGap, statsTop+1*line, "DEF", u.Stats.Def)
     drawStatLine(dst, faceMain, tx+1*colGap, statsTop+2*line, "RES", u.Stats.Res)
     drawStatLine(dst, faceMain, tx+1*colGap, statsTop+3*line, "MOV", u.Stats.Mov)
+
+    // 武器レベル（右側）
+    wrX := tx + 2*colGap + 64
+    wrY := ty
+    text.Draw(dst, "Weapon Rank", faceMain, wrX, wrY, colAccent)
+    rline := 28
+    drawRankLine(dst, faceMain, wrX, wrY+1*rline, "Sword", u.Ranks.Sword)
+    drawRankLine(dst, faceMain, wrX, wrY+2*rline, "Lance", u.Ranks.Lance)
+    drawRankLine(dst, faceMain, wrX, wrY+3*rline, "Axe", u.Ranks.Axe)
+    drawRankLine(dst, faceMain, wrX, wrY+4*rline, "Bow", u.Ranks.Bow)
+    drawRankLine(dst, faceMain, wrX, wrY+5*rline, "Tome", u.Ranks.Tome)
+    drawRankLine(dst, faceMain, wrX, wrY+6*rline, "Staff", u.Ranks.Staff)
 
     // 装備（ポートレートの下段）
     equipTitleY := int(py + ph + 48)
@@ -196,4 +221,10 @@ func drawHPBar(dst *ebiten.Image, x, y, w, h int, hp, max int) {
 func drawStatLine(dst *ebiten.Image, face font.Face, x, y int, label string, v int) {
     text.Draw(dst, label, face, x, y, colText)
     text.Draw(dst, fmt.Sprintf("%2d", v), face, x+64, y, colAccent)
+}
+
+func drawRankLine(dst *ebiten.Image, face font.Face, x, y int, label, rank string) {
+    if rank == "" { rank = "-" }
+    text.Draw(dst, label, face, x, y, colText)
+    text.Draw(dst, rank, face, x+120, y, colAccent)
 }
