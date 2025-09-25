@@ -182,6 +182,18 @@ func unitFromUser(c user.Character) Unit {
     return u
 }
 
+// LoadUnitsFromUser はユーザテーブル（usr_）から UI 用ユニット配列を生成します。
+func LoadUnitsFromUser(path string) ([]Unit, error) {
+    ut, err := user.LoadFromJSON(path)
+    if err != nil { return nil, err }
+    // 安全な順序で反復（ID昇順ではなく定義順）
+    units := make([]Unit, 0, len(ut.ByID()))
+    for _, c := range ut.Slice() {
+        units = append(units, unitFromUser(c))
+    }
+    return units, nil
+}
+
 // applyUserState はユーザ状態を UI ユニットに反映します。
 func applyUserState(u *Unit, uc user.Character) {
     if u == nil { return }
@@ -274,6 +286,78 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
         if it.Max > 0 { uses = fmt.Sprintf("%d/%d", it.Uses, it.Max) }
         text.Draw(dst, uses, faceSmall, int(px)+300, lineY, colAccent)
     }
+}
+
+// 一覧レイアウト定数
+const (
+    listMargin      = 24
+    listItemH       = 100
+    listItemGap     = 12
+    listPortraitSz  = 80
+    listTitleOffset = 44
+)
+
+// ListItemRect は一覧画面の i 番目の行の矩形を返します。
+func ListItemRect(sw, sh, i int) (x, y, w, h int) {
+    panelX, panelY := listMargin, listMargin
+    panelW := sw - listMargin*2
+    startY := panelY + listTitleOffset + 32
+    y = startY + i*(listItemH+listItemGap)
+    return panelX + 16, y, panelW - 32, listItemH
+}
+
+// DrawCharacterList はユニット一覧を描画します。
+func DrawCharacterList(dst *ebiten.Image, units []Unit, hover int) {
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    // パネル
+    drawPanel(dst, float32(listMargin), float32(listMargin), float32(sw-2*listMargin), float32(sh-2*listMargin))
+    text.Draw(dst, "ユニット一覧", faceTitle, listMargin+20, listMargin+listTitleOffset, colAccent)
+    for i, u := range units {
+        x, y, w, h := ListItemRect(sw, sh, i)
+        // カード背景
+        bg := color.RGBA{30, 45, 78, 255}
+        if i == hover { bg = color.RGBA{40, 60, 100, 255} }
+        vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), bg, false)
+        vector.DrawFilledRect(dst, float32(x-2), float32(y-2), float32(w+4), float32(h+4), colBorder, false)
+
+        // ポートレート
+        px := float32(x + 12)
+        py := float32(y + (h-listPortraitSz)/2)
+        drawFramedRect(dst, px-2, py-2, listPortraitSz+4, listPortraitSz+4)
+        if u.Portrait != nil {
+            drawPortrait(dst, u.Portrait, px, py, listPortraitSz, listPortraitSz)
+        } else {
+            drawPortraitPlaceholder(dst, px, py, listPortraitSz, listPortraitSz)
+        }
+
+        // テキスト
+        tx := x + 12 + listPortraitSz + 20
+        ty := y + 36
+        text.Draw(dst, u.Name, faceMain, tx, ty, colText)
+        text.Draw(dst, fmt.Sprintf("%s  Lv %d", u.Class, u.Level), faceSmall, tx, ty+26, colAccent)
+    }
+}
+
+// BackButtonRect はステータス画面に表示する戻るボタンの矩形を返します。
+func BackButtonRect(sw, sh int) (x, y, w, h int) {
+    panelX, panelY := listMargin, listMargin
+    panelW := sw - listMargin*2
+    x = panelX + panelW - 180
+    y = panelY + 24
+    w = 160
+    h = 48
+    return
+}
+
+// DrawBackButton は戻るボタンを描画します。
+func DrawBackButton(dst *ebiten.Image, hovered bool) {
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    x, y, w, h := BackButtonRect(sw, sh)
+    bg := color.RGBA{50, 70, 110, 255}
+    if hovered { bg = color.RGBA{70, 100, 150, 255} }
+    drawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
+    vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), bg, false)
+    text.Draw(dst, "＜ 一覧へ", faceMain, x+20, y+32, colText)
 }
 
 // drawPanel は立体感のあるパネル（外枠・影付き）を描画します。

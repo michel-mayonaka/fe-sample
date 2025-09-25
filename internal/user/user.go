@@ -60,6 +60,7 @@ type Character struct {
 // Table はユーザのキャラクター状態を ID で引ける索引です。
 type Table struct {
     byID map[string]Character
+    rows []Character
 }
 
 // LoadFromJSON はユーザテーブルJSONを読み込みます。
@@ -73,7 +74,7 @@ func LoadFromJSON(path string) (*Table, error) {
     if err := json.NewDecoder(f).Decode(&rows); err != nil {
         return nil, fmt.Errorf("decode user table: %w", err)
     }
-    t := &Table{byID: make(map[string]Character, len(rows))}
+    t := &Table{byID: make(map[string]Character, len(rows)), rows: rows}
     for _, c := range rows {
         t.byID[c.ID] = c
     }
@@ -86,3 +87,9 @@ func (t *Table) Find(id string) (Character, bool) {
     c, ok := t.byID[id]
     return c, ok
 }
+
+// ByID は内部マップを返します（読み取り専用の想定）。
+func (t *Table) ByID() map[string]Character { return t.byID }
+
+// Slice は定義順のスライスを返します。
+func (t *Table) Slice() []Character { return append([]Character(nil), t.rows...) }
