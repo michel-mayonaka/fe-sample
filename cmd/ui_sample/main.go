@@ -50,7 +50,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func main() {
     ebiten.SetWindowSize(screenW, screenH)
-    ebiten.SetWindowTitle("Ebiten UI Sample - FE Status Style")
+    ebiten.SetWindowTitle("Ebiten UI サンプル - ステータス画面")
     ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
     if err := ebiten.RunGame(NewGame()); err != nil {
         panic(err)

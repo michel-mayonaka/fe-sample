@@ -7,11 +7,11 @@ import (
 
     "github.com/hajimehoshi/ebiten/v2"
     "github.com/hajimehoshi/ebiten/v2/ebitenutil"
+    resourceFonts "github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
     "github.com/hajimehoshi/ebiten/v2/text"
     "github.com/hajimehoshi/ebiten/v2/vector"
     "golang.org/x/image/font"
     "golang.org/x/image/font/basicfont"
-    "golang.org/x/image/font/gofont/goregular"
     "golang.org/x/image/font/opentype"
 )
 
@@ -31,8 +31,8 @@ var (
 )
 
 func init() {
-    // Go Regular フォントを大きめサイズで初期化。失敗時は basicfont にフォールバック。
-    if ft, err := opentype.Parse(goregular.TTF); err == nil {
+    // 日本語を含む M+ 1p Regular を使用（Ebiten examples リソース）。
+    if ft, err := opentype.Parse(resourceFonts.MPlus1pRegular_ttf); err == nil {
         if f, err := opentype.NewFace(ft, &opentype.FaceOptions{Size: 36, DPI: 96, Hinting: font.HintingNone}); err == nil {
             faceTitle = f
         }
@@ -88,14 +88,14 @@ type WeaponRanks struct {
 // SampleUnit は画面用ダミーデータ。
 func SampleUnit() Unit {
     u := Unit{
-        Name:  "Iris",
-        Class: "Pegasus Knight",
+        Name:  "アイリス",
+        Class: "ペガサスナイト",
         Level: 7,
         Exp:   56,
         HP:    22,
         HPMax: 26,
         Stats: Stats{Str: 9, Mag: 0, Skl: 12, Spd: 14, Lck: 8, Def: 6, Res: 7, Mov: 7},
-        Equip: []string{"Iron Lance", "Javelin", "Vulnerary"},
+        Equip: []string{"アイアンランス", "ジャベリン", "傷薬"},
         Ranks: WeaponRanks{Sword: "D", Lance: "B", Axe: "-", Bow: "-", Tome: "-", Staff: "-"},
     }
     if img, _, err := ebitenutil.NewImageFromFile("assets/01_iris.png"); err == nil {
@@ -128,7 +128,7 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
     ty := int(py + 44)
     text.Draw(dst, u.Name, faceTitle, tx, ty, colAccent)
     text.Draw(dst, u.Class, faceMain, tx, ty+40, colText)
-    text.Draw(dst, fmt.Sprintf("Lv %d  EXP %02d", u.Level, u.Exp), faceMain, tx, ty+40+30, colText)
+    text.Draw(dst, fmt.Sprintf("Lv %d  経験値 %02d", u.Level, u.Exp), faceMain, tx, ty+40+30, colText)
 
     // HP
     text.Draw(dst, fmt.Sprintf("HP %d/%d", u.HP, u.HPMax), faceMain, tx, ty+40+30+40, colText)
@@ -138,26 +138,26 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
     statsTop := ty + 40 + 30 + 46 + 40
     line := 28
     colGap := 180
-    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+0*line, "STR", u.Stats.Str)
-    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+1*line, "MAG", u.Stats.Mag)
-    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+2*line, "SKL", u.Stats.Skl)
-    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+3*line, "SPD", u.Stats.Spd)
-    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+0*line, "LCK", u.Stats.Lck)
-    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+1*line, "DEF", u.Stats.Def)
-    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+2*line, "RES", u.Stats.Res)
-    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+3*line, "MOV", u.Stats.Mov)
+    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+0*line, "力", u.Stats.Str)
+    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+1*line, "魔力", u.Stats.Mag)
+    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+2*line, "技", u.Stats.Skl)
+    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+3*line, "速さ", u.Stats.Spd)
+    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+0*line, "幸運", u.Stats.Lck)
+    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+1*line, "守備", u.Stats.Def)
+    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+2*line, "魔防", u.Stats.Res)
+    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+3*line, "移動", u.Stats.Mov)
 
     // 武器レベル（右側）
     wrX := tx + 2*colGap + 64
     wrY := ty
-    text.Draw(dst, "Weapon Rank", faceMain, wrX, wrY, colAccent)
+    text.Draw(dst, "武器レベル", faceMain, wrX, wrY, colAccent)
     rline := 28
-    drawRankLine(dst, faceMain, wrX, wrY+1*rline, "Sword", u.Ranks.Sword)
-    drawRankLine(dst, faceMain, wrX, wrY+2*rline, "Lance", u.Ranks.Lance)
-    drawRankLine(dst, faceMain, wrX, wrY+3*rline, "Axe", u.Ranks.Axe)
-    drawRankLine(dst, faceMain, wrX, wrY+4*rline, "Bow", u.Ranks.Bow)
-    drawRankLine(dst, faceMain, wrX, wrY+5*rline, "Tome", u.Ranks.Tome)
-    drawRankLine(dst, faceMain, wrX, wrY+6*rline, "Staff", u.Ranks.Staff)
+    drawRankLine(dst, faceMain, wrX, wrY+1*rline, "剣", u.Ranks.Sword)
+    drawRankLine(dst, faceMain, wrX, wrY+2*rline, "槍", u.Ranks.Lance)
+    drawRankLine(dst, faceMain, wrX, wrY+3*rline, "斧", u.Ranks.Axe)
+    drawRankLine(dst, faceMain, wrX, wrY+4*rline, "弓", u.Ranks.Bow)
+    drawRankLine(dst, faceMain, wrX, wrY+5*rline, "魔道", u.Ranks.Tome)
+    drawRankLine(dst, faceMain, wrX, wrY+6*rline, "杖", u.Ranks.Staff)
 
     // 装備（ポートレートの下段）
     equipTitleY := int(py + ph + 48)
@@ -182,7 +182,7 @@ func drawFramedRect(dst *ebiten.Image, x, y, w, h float32) {
 }
 
 func drawPortraitPlaceholder(dst *ebiten.Image, x, y, w, h float32) {
-    text.Draw(dst, "No Portrait", faceSmall, int(x+10), int(y+h/2), colAccent)
+    text.Draw(dst, "画像なし", faceSmall, int(x+10), int(y+h/2), colAccent)
 }
 
 func drawPortrait(dst *ebiten.Image, img *ebiten.Image, x, y, w, h float32) {
