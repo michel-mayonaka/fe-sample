@@ -5,8 +5,10 @@
 ## Project Structure & Module Organization
 - `cmd/ui_sample/main.go`: エントリポイント。
 - `internal/ui`: UI レイアウト・入力イベント処理。
-- `internal/game`: ゲームループ（`Update/Draw/Layout`）や状態管理。
+- `internal/game`: ゲーム定数など共有設定。
+- `internal/model`: キャラクターマスタのスキーマとJSONローダー。
 - `assets/`: 画像・フォント・音源等のアセット。
+- `assets/master/characters.json`: キャラクターマスタ（ID索引）。
 - `pkg/`: 複数バイナリ/ツールから再利用するライブラリ（必要時）。
 - `testdata/`: テスト専用アセット。
 

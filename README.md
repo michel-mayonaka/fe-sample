@@ -38,6 +38,8 @@ go build -o bin/ui_sample ./cmd/ui_sample
 - `cmd/ui_sample/main.go`: エントリ・ゲームループ
 - `internal/ui/ui.go`: パネル/テキスト/HPバー/能力値の描画、ポートレート画像の表示
 - `assets/`: 画像等を追加する場合に利用（例: `assets/01_iris.png`）
+- `internal/model/`: キャラクターマスタのモデルとJSONローダー
+- `assets/master/characters.json`: キャラクターのマスタデータ（ID索引）
 
 ## トラブルシューティング
 - go.mod の Go 版エラー（例:「go 1.22 だが最大 1.17」）
@@ -53,5 +55,10 @@ go build -o bin/ui_sample ./cmd/ui_sample
 ## 画像の追加（ポートレート表示）
 - `assets/01_iris.png` を配置すると、左上のポートレート枠に表示されます。
 - 別名で使う場合は `internal/ui/ui.go` の `SampleUnit()` で読み込みパスを変更してください。
+
+## マスタデータ（キャラクター）
+- 形式: `assets/master/characters.json` にJSON配列で定義。
+- 読込: `internal/model.LoadFromJSON()` が取り込み、`id` で検索。
+- UI: `ui.SampleUnit()` は `id=iris` を読み、UI用データへ変換して表示。
 
 デザイン調整は `internal/ui/ui.go` の色・座標・フォントサイズを編集してください。必要に応じて画像/TTF を `assets/` に追加し、`embed` で組み込み可能です。

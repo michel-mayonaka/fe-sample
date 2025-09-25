@@ -1,0 +1,22 @@
+[
+  {
+    "id": "iris",
+    "name": "アイリス",
+    "class": "ペガサスナイト",
+    "portrait": "assets/01_iris.png",
+    "level": 7,
+    "exp": 56,
+    "hp": 22,
+    "hp_max": 26,
+    "stats": {"Str": 9, "Mag": 0, "Skl": 12, "Spd": 14, "Lck": 8, "Def": 6, "Res": 7, "Mov": 7},
+    "growth": {"Str": 45, "Mag": 10, "Skl": 55, "Spd": 65, "Lck": 50, "Def": 20, "Res": 35, "Mov": 0},
+    "weapon": {"sword": "D", "lance": "B", "axe": "-", "bow": "-"},
+    "magic": {"anima": "-", "light": "-", "dark": "-", "staff": "-"},
+    "equip": [
+      {"name": "アイアンランス", "uses": 35, "max": 45},
+      {"name": "ジャベリン", "uses": 12, "max": 20},
+      {"name": "傷薬", "uses": 3, "max": 3}
+    ]
+  }
+]
+

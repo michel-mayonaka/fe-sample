@@ -1,3 +1,5 @@
+// Package ui は、FE風ステータス画面のUI描画と
+// それに付随するデータモデルを提供します。
 package ui
 
 import (
@@ -10,13 +12,14 @@ import (
     resourceFonts "github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
     "github.com/hajimehoshi/ebiten/v2/text"
     "github.com/hajimehoshi/ebiten/v2/vector"
+    "ui_sample/internal/model"
     "ui_sample/internal/game"
     "golang.org/x/image/font"
     "golang.org/x/image/font/basicfont"
     "golang.org/x/image/font/opentype"
 )
 
-// パネル配色（FE風）
+// パネル配色（FE風）。コントラスト高めの青系を基調とします。
 var (
     colPanelBG   = color.RGBA{R: 0x20, G: 0x3b, B: 0x73, A: 0xFF}
     colPanelDark = color.RGBA{R: 0x14, G: 0x2a, B: 0x54, A: 0xFF}
@@ -25,12 +28,16 @@ var (
     colText      = color.RGBA{R: 0xff, G: 0xff, B: 0xff, A: 0xFF}
 )
 
+// 画面内で用いるフォントフェイス群。
+// Title: 見出し、Main: 本文、Small: 注釈やサブ情報に使用します。
 var (
     faceTitle font.Face
     faceMain  font.Face
     faceSmall font.Face
 )
 
+// init は日本語フォント（M+ 1p）を初期化します。
+// 失敗時は basicfont にフォールバックします。
 func init() {
     // 日本語を含む M+ 1p Regular を使用（Ebiten examples リソース）。
     if ft, err := opentype.Parse(resourceFonts.MPlus1pRegular_ttf); err == nil {
@@ -55,45 +62,46 @@ func init() {
     }
 }
 
-// Unit はステータス表示用の単純なデータ。
+// Unit は1ユニット分の表示用データモデルです。
 type Unit struct {
-    Name  string
-    Class string
-    Level int
-    Exp   int
-    HP    int
-    HPMax int
+    Name  string         // 名前
+    Class string         // クラス名
+    Level int            // 現在レベル
+    Exp   int            // 現在経験値
+    HP    int            // 現在HP
+    HPMax int            // 最大HP
 
-    Stats Stats
-    Equip []Item
+    Stats Stats          // 能力値
+    Equip []Item         // 装備（耐久制）
 
-    Portrait *ebiten.Image
+    Portrait *ebiten.Image // ポートレート画像（任意）
 
-    Weapon WeaponRanks
-    Magic  MagicRanks
-    Growth Growth
+    Weapon WeaponRanks   // 物理系武器ランク
+    Magic  MagicRanks    // 魔法系武器ランク
+    Growth Growth        // 成長率（%）
 }
 
+// Stats は各種能力値を表します。
 type Stats struct {
-    Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
+    Str, Mag, Skl, Spd, Lck, Def, Res, Mov int // 力/魔力/技/速さ/幸運/守備/魔防/移動
 }
 
-// 装備（耐久制）
+// Item は耐久制装備（武器・消耗品）を表します。
 type Item struct {
-    Name string
-    Uses int // 残り使用回数
-    Max  int // 使用可能数上限
+    Name string // 名称
+    Uses int    // 残り使用回数
+    Max  int    // 使用可能数上限
 }
 
-// 武器レベル（物理系）
+// WeaponRanks は物理系武器のランクを表します。
 type WeaponRanks struct {
-    Sword string
-    Lance string
-    Axe   string
-    Bow   string
+    Sword string // 剣
+    Lance string // 槍
+    Axe   string // 斧
+    Bow   string // 弓
 }
 
-// 魔法レベル（魔法系）
+// MagicRanks は魔法系のランクを表します。
 type MagicRanks struct {
     Anima string // 理
     Light string // 光
@@ -101,13 +109,20 @@ type MagicRanks struct {
     Staff string // 杖
 }
 
-// 成長率（%）
+// Growth は各能力の成長率（%）を表します。
 type Growth struct {
     Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
 }
 
-// SampleUnit は画面用ダミーデータ。
+// SampleUnit はサンプルとなるユニットデータを生成します。
 func SampleUnit() Unit {
+    // マスタから読めれば優先。失敗時は内蔵の簡易データを返す。
+    if t, err := model.LoadFromJSON("assets/master/characters.json"); err == nil {
+        if c, ok := t.Find("iris"); ok {
+            return unitFromCharacter(c)
+        }
+    }
+    // フォールバック
     u := Unit{
         Name:  "アイリス",
         Class: "ペガサスナイト",
@@ -127,7 +142,45 @@ func SampleUnit() Unit {
     return u
 }
 
-// DrawStatus はメインのステータス画面を描画。
+// unitFromCharacter はマスタの Character を UI 用 Unit に変換します。
+func unitFromCharacter(c model.Character) Unit {
+    u := Unit{
+        Name:  c.Name,
+        Class: c.Class,
+        Level: c.Level,
+        Exp:   c.Exp,
+        HP:    c.HP,
+        HPMax: c.HPMax,
+        Stats: Stats(c.Stats),
+        Weapon: WeaponRanks{
+            Sword: c.Weapon.Sword,
+            Lance: c.Weapon.Lance,
+            Axe:   c.Weapon.Axe,
+            Bow:   c.Weapon.Bow,
+        },
+        Magic: MagicRanks{
+            Anima: c.Magic.Anima,
+            Light: c.Magic.Light,
+            Dark:  c.Magic.Dark,
+            Staff: c.Magic.Staff,
+        },
+        Growth: Growth(c.Growth),
+    }
+    // 装備変換
+    for _, it := range c.Equip {
+        u.Equip = append(u.Equip, Item{Name: it.Name, Uses: it.Uses, Max: it.Max})
+    }
+    // 画像
+    if c.Portrait != "" {
+        if img, _, err := ebitenutil.NewImageFromFile(c.Portrait); err == nil {
+            u.Portrait = img
+        }
+    }
+    return u
+}
+
+// DrawStatus はユニットのステータス画面を描画します。
+// 渡された画像サイズ（例: 1920x1080）に合わせてレイアウトされます。
 func DrawStatus(dst *ebiten.Image, u Unit) {
     // 画面サイズに合わせたパネル
     sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
@@ -203,6 +256,7 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
     }
 }
 
+// drawPanel は立体感のあるパネル（外枠・影付き）を描画します。
 func drawPanel(dst *ebiten.Image, x, y, w, h float32) {
     // 外枠
     vector.DrawFilledRect(dst, x-2, y-2, w+4, h+4, colBorder, false)
@@ -212,15 +266,19 @@ func drawPanel(dst *ebiten.Image, x, y, w, h float32) {
     vector.DrawFilledRect(dst, x, y, w, h, colPanelBG, false)
 }
 
+// drawFramedRect は金色の縁取りを持つ矩形を描画します。
 func drawFramedRect(dst *ebiten.Image, x, y, w, h float32) {
     vector.DrawFilledRect(dst, x-2, y-2, w+4, h+4, colBorder, false)
     vector.DrawFilledRect(dst, x, y, w, h, color.RGBA{30, 45, 78, 255}, false)
 }
 
+// drawPortraitPlaceholder は画像未設定時のプレースホルダテキストを描画します。
 func drawPortraitPlaceholder(dst *ebiten.Image, x, y, w, h float32) {
     text.Draw(dst, "画像なし", faceSmall, int(x+10), int(y+h/2), colAccent)
 }
 
+// drawPortrait はポートレート画像を枠内に等比縮小して描画します。
+// 線形補間により縮小時のジャギーを低減します。
 func drawPortrait(dst *ebiten.Image, img *ebiten.Image, x, y, w, h float32) {
     iw, ih := img.Size()
     if iw == 0 || ih == 0 { return }
@@ -238,6 +296,8 @@ func drawPortrait(dst *ebiten.Image, img *ebiten.Image, x, y, w, h float32) {
     dst.DrawImage(img, &op)
 }
 
+// drawHPBar はHP割合に応じたカラーで水平バーを描画します。
+// x,y: 左上座標, w,h: バーサイズ, hp/max: 現在HP/最大HP。
 func drawHPBar(dst *ebiten.Image, x, y, w, h int, hp, max int) {
     if max <= 0 { max = 1 }
     // 背景
@@ -254,17 +314,20 @@ func drawHPBar(dst *ebiten.Image, x, y, w, h int, hp, max int) {
     vector.DrawFilledRect(dst, float32(x), float32(y), bw, float32(h), col, false)
 }
 
+// drawStatLine は単一の能力値ラベルと数値を描画します。
 func drawStatLine(dst *ebiten.Image, face font.Face, x, y int, label string, v int) {
     text.Draw(dst, label, face, x, y, colText)
     text.Draw(dst, fmt.Sprintf("%2d", v), face, x+64, y, colAccent)
 }
 
+// drawStatLineWithGrowth は能力値と成長率(%)を並べて描画します。
 func drawStatLineWithGrowth(dst *ebiten.Image, face font.Face, x, y int, label string, v int, g int) {
     text.Draw(dst, label, face, x, y, colText)
     text.Draw(dst, fmt.Sprintf("%2d", v), face, x+64, y, colAccent)
     text.Draw(dst, fmt.Sprintf("%d%%", g), faceSmall, x+120, y, colAccent)
 }
 
+// drawRankLine は武器/魔法ランクのラベルと値を描画します。
 func drawRankLine(dst *ebiten.Image, face font.Face, x, y int, label, rank string) {
     if rank == "" { rank = "-" }
     text.Draw(dst, label, face, x, y, colText)
