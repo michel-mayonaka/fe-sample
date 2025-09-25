@@ -1,0 +1,17 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Go build
+bin/
+dist/
+build/
+coverage.out
+
+# Modules / workspace
+go.work
+
+# Env / logs
+.env
+*.log
