@@ -32,7 +32,13 @@
 - 実行: `go test ./...` を基本、描画依存は条件付きスキップを使用。
 
 ## Commit & Pull Request Guidelines
-- コミット: Conventional Commits を推奨（例: `feat(ui): add button hover`）。
+- 言語: 以後、コミットメッセージと PR タイトル/本文は日本語で記述してください。
+- コミット規約: Conventional Commits 準拠（日本語サマリ）。種別例: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`。
+- 形式例:
+  - `feat(ui): ステータス画面にHPバーを追加`
+  - `fix(input): Gamepad 接続時の初期化クラッシュを回避`
+  - `docs(readme): トラブルシューティングを追記`
+- 本文: なぜ必要か、影響範囲、検証手順を簡潔に（72字程度で改行推奨）。
 - PR 要件:
   - 目的/背景と主要変更点（箇条書き可）。
   - UI 変更はスクリーンショット/GIF を添付。
@@ -44,4 +50,3 @@
 - アセットは `embed` 利用を推奨（例: `//go:embed assets/*`）。
 - 秘密情報は環境変数や `.env` を使用（リポジトリへコミット不可）。
 - 開発時は `-tags=ebitendebug` などのデバッグビルドタグを検討。
-
