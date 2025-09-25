@@ -9,8 +9,8 @@ import (
 )
 
 const (
-    screenW = 320
-    screenH = 240
+    screenW = 1920
+    screenH = 1080
 )
 
 type Game struct {
@@ -40,7 +40,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
     screen.Fill(color.RGBA{12, 18, 30, 255})
     ui.DrawStatus(screen, g.unit)
     if g.showHelp {
-        ebitenutil.DebugPrintAt(screen, "H: ヘルプ表示切替 / ESC: 閉じる\nBackspace: サンプル値を再読み込み", 8, screenH-36)
+        ebitenutil.DebugPrintAt(screen, "H: ヘルプ表示切替 / ESC: 閉じる\nBackspace: サンプル値を再読み込み", 16, screenH-64)
     }
 }
 
@@ -49,11 +49,10 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func main() {
-    ebiten.SetWindowSize(screenW*2, screenH*2)
+    ebiten.SetWindowSize(screenW, screenH)
     ebiten.SetWindowTitle("Ebiten UI Sample - FE Status Style")
     ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
     if err := ebiten.RunGame(NewGame()); err != nil {
         panic(err)
     }
 }
-

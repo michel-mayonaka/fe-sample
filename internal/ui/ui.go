@@ -9,7 +9,10 @@ import (
     "github.com/hajimehoshi/ebiten/v2/ebitenutil"
     "github.com/hajimehoshi/ebiten/v2/text"
     "github.com/hajimehoshi/ebiten/v2/vector"
+    "golang.org/x/image/font"
     "golang.org/x/image/font/basicfont"
+    "golang.org/x/image/font/gofont/goregular"
+    "golang.org/x/image/font/opentype"
 )
 
 // パネル配色（FE風）
@@ -20,6 +23,36 @@ var (
     colAccent    = color.RGBA{R: 0x7a, G: 0xc0, B: 0xff, A: 0xFF}
     colText      = color.RGBA{R: 0xff, G: 0xff, B: 0xff, A: 0xFF}
 )
+
+var (
+    faceTitle font.Face
+    faceMain  font.Face
+    faceSmall font.Face
+)
+
+func init() {
+    // Go Regular フォントを大きめサイズで初期化。失敗時は basicfont にフォールバック。
+    if ft, err := opentype.Parse(goregular.TTF); err == nil {
+        if f, err := opentype.NewFace(ft, &opentype.FaceOptions{Size: 36, DPI: 96, Hinting: font.HintingNone}); err == nil {
+            faceTitle = f
+        }
+        if f, err := opentype.NewFace(ft, &opentype.FaceOptions{Size: 24, DPI: 96, Hinting: font.HintingNone}); err == nil {
+            faceMain = f
+        }
+        if f, err := opentype.NewFace(ft, &opentype.FaceOptions{Size: 18, DPI: 96, Hinting: font.HintingNone}); err == nil {
+            faceSmall = f
+        }
+    }
+    if faceTitle == nil {
+        faceTitle = basicfont.Face7x13
+    }
+    if faceMain == nil {
+        faceMain = basicfont.Face7x13
+    }
+    if faceSmall == nil {
+        faceSmall = basicfont.Face7x13
+    }
+}
 
 // Unit はステータス表示用の単純なデータ。
 type Unit struct {
@@ -60,44 +93,52 @@ func SampleUnit() Unit {
 
 // DrawStatus はメインのステータス画面を描画。
 func DrawStatus(dst *ebiten.Image, u Unit) {
-    // メインパネル
-    drawPanel(dst, 8, 8, 304, 224)
+    // 画面サイズに合わせたパネル
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    margin := float32(24)
+    panelX, panelY := margin, margin
+    panelW, panelH := float32(sw)-margin*2, float32(sh)-margin*2
+    drawPanel(dst, panelX, panelY, panelW, panelH)
 
-    // 左: ポートレート枠（ダミー）
-    drawFramedRect(dst, 16, 20, 96, 96)
+    // 左: ポートレート
+    px, py := panelX+24, panelY+24
+    pw, ph := float32(320), float32(320)
+    drawFramedRect(dst, px, py, pw, ph)
     if u.Portrait != nil {
-        drawPortrait(dst, u.Portrait, 16, 20, 96, 96)
+        drawPortrait(dst, u.Portrait, px, py, pw, ph)
     } else {
-        drawPortraitPlaceholder(dst, 16, 20, 96, 96)
+        drawPortraitPlaceholder(dst, px, py, pw, ph)
     }
 
     // 上: 名前/クラス/レベル
-    face := basicfont.Face7x13
-    text.Draw(dst, u.Name, face, 128, 36, colAccent)
-    text.Draw(dst, u.Class, face, 128, 52, colText)
-    text.Draw(dst, fmt.Sprintf("Lv %d  EXP %02d", u.Level, u.Exp), face, 128, 68, colText)
+    tx := int(px + pw + 32)
+    ty := int(py + 44)
+    text.Draw(dst, u.Name, faceTitle, tx, ty, colAccent)
+    text.Draw(dst, u.Class, faceMain, tx, ty+40, colText)
+    text.Draw(dst, fmt.Sprintf("Lv %d  EXP %02d", u.Level, u.Exp), faceMain, tx, ty+40+30, colText)
 
-    // HP バー
-    text.Draw(dst, fmt.Sprintf("HP %d/%d", u.HP, u.HPMax), face, 128, 88, colText)
-    drawHPBar(dst, 128, 94, 168, 8, u.HP, u.HPMax)
+    // HP
+    text.Draw(dst, fmt.Sprintf("HP %d/%d", u.HP, u.HPMax), faceMain, tx, ty+40+30+40, colText)
+    drawHPBar(dst, tx, ty+40+30+46, 600, 14, u.HP, u.HPMax)
 
-    // 右: 能力値
-    left := 128
-    top := 120
-    line := 14
-    drawStatLine(dst, left, top+0*line, "STR", u.Stats.Str)
-    drawStatLine(dst, left, top+1*line, "MAG", u.Stats.Mag)
-    drawStatLine(dst, left, top+2*line, "SKL", u.Stats.Skl)
-    drawStatLine(dst, left, top+3*line, "SPD", u.Stats.Spd)
-    drawStatLine(dst, left, top+4*line, "LCK", u.Stats.Lck)
-    drawStatLine(dst, left, top+5*line, "DEF", u.Stats.Def)
-    drawStatLine(dst, left, top+6*line, "RES", u.Stats.Res)
-    drawStatLine(dst, left, top+7*line, "MOV", u.Stats.Mov)
+    // 能力値（2カラム）
+    statsTop := ty + 40 + 30 + 46 + 40
+    line := 28
+    colGap := 180
+    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+0*line, "STR", u.Stats.Str)
+    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+1*line, "MAG", u.Stats.Mag)
+    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+2*line, "SKL", u.Stats.Skl)
+    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+3*line, "SPD", u.Stats.Spd)
+    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+0*line, "LCK", u.Stats.Lck)
+    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+1*line, "DEF", u.Stats.Def)
+    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+2*line, "RES", u.Stats.Res)
+    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+3*line, "MOV", u.Stats.Mov)
 
-    // 下: 装備
-    text.Draw(dst, "Equipment", face, 16, 132, colAccent)
+    // 装備（ポートレートの下段）
+    equipTitleY := int(py + ph + 48)
+    text.Draw(dst, "Equipment", faceMain, int(px), equipTitleY, colAccent)
     for i, it := range u.Equip {
-        text.Draw(dst, fmt.Sprintf("- %s", it), face, 24, 150+i*14, colText)
+        text.Draw(dst, fmt.Sprintf("- %s", it), faceSmall, int(px)+14, equipTitleY+30+i*26, colText)
     }
 }
 
@@ -116,8 +157,7 @@ func drawFramedRect(dst *ebiten.Image, x, y, w, h float32) {
 }
 
 func drawPortraitPlaceholder(dst *ebiten.Image, x, y, w, h float32) {
-    face := basicfont.Face7x13
-    text.Draw(dst, "No Portrait", face, int(x+10), int(y+h/2), colAccent)
+    text.Draw(dst, "No Portrait", faceSmall, int(x+10), int(y+h/2), colAccent)
 }
 
 func drawPortrait(dst *ebiten.Image, img *ebiten.Image, x, y, w, h float32) {
@@ -153,8 +193,7 @@ func drawHPBar(dst *ebiten.Image, x, y, w, h int, hp, max int) {
     vector.DrawFilledRect(dst, float32(x), float32(y), bw, float32(h), col, false)
 }
 
-func drawStatLine(dst *ebiten.Image, x, y int, label string, v int) {
-    face := basicfont.Face7x13
+func drawStatLine(dst *ebiten.Image, face font.Face, x, y int, label string, v int) {
     text.Draw(dst, label, face, x, y, colText)
     text.Draw(dst, fmt.Sprintf("%2d", v), face, x+64, y, colAccent)
 }
