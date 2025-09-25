@@ -3,8 +3,10 @@ package ui
 import (
     "fmt"
     "image/color"
+    "math"
 
     "github.com/hajimehoshi/ebiten/v2"
+    "github.com/hajimehoshi/ebiten/v2/ebitenutil"
     "github.com/hajimehoshi/ebiten/v2/text"
     "github.com/hajimehoshi/ebiten/v2/vector"
     "golang.org/x/image/font/basicfont"
@@ -30,6 +32,8 @@ type Unit struct {
 
     Stats Stats
     Equip []string
+
+    Portrait *ebiten.Image
 }
 
 type Stats struct {
@@ -38,7 +42,7 @@ type Stats struct {
 
 // SampleUnit は画面用ダミーデータ。
 func SampleUnit() Unit {
-    return Unit{
+    u := Unit{
         Name:  "Iris",
         Class: "Pegasus Knight",
         Level: 7,
@@ -48,6 +52,10 @@ func SampleUnit() Unit {
         Stats: Stats{Str: 9, Mag: 0, Skl: 12, Spd: 14, Lck: 8, Def: 6, Res: 7, Mov: 7},
         Equip: []string{"Iron Lance", "Javelin", "Vulnerary"},
     }
+    if img, _, err := ebitenutil.NewImageFromFile("assets/01_iris.png"); err == nil {
+        u.Portrait = img
+    }
+    return u
 }
 
 // DrawStatus はメインのステータス画面を描画。
@@ -57,7 +65,11 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
 
     // 左: ポートレート枠（ダミー）
     drawFramedRect(dst, 16, 20, 96, 96)
-    drawPortraitPlaceholder(dst, 16, 20, 96, 96)
+    if u.Portrait != nil {
+        drawPortrait(dst, u.Portrait, 16, 20, 96, 96)
+    } else {
+        drawPortraitPlaceholder(dst, 16, 20, 96, 96)
+    }
 
     // 上: 名前/クラス/レベル
     face := basicfont.Face7x13
@@ -108,6 +120,22 @@ func drawPortraitPlaceholder(dst *ebiten.Image, x, y, w, h float32) {
     text.Draw(dst, "No Portrait", face, int(x+10), int(y+h/2), colAccent)
 }
 
+func drawPortrait(dst *ebiten.Image, img *ebiten.Image, x, y, w, h float32) {
+    iw, ih := img.Size()
+    if iw == 0 || ih == 0 { return }
+    sx := float64(w) / float64(iw)
+    sy := float64(h) / float64(ih)
+    s := math.Min(sx, sy)
+    sw := float64(iw) * s
+    sh := float64(ih) * s
+    tx := float64(x) + (float64(w)-sw)/2
+    ty := float64(y) + (float64(h)-sh)/2
+    var op ebiten.DrawImageOptions
+    op.GeoM.Scale(s, s)
+    op.GeoM.Translate(tx, ty)
+    dst.DrawImage(img, &op)
+}
+
 func drawHPBar(dst *ebiten.Image, x, y, w, h int, hp, max int) {
     if max <= 0 { max = 1 }
     // 背景
@@ -129,4 +157,3 @@ func drawStatLine(dst *ebiten.Image, x, y int, label string, v int) {
     text.Draw(dst, label, face, x, y, colText)
     text.Draw(dst, fmt.Sprintf("%2d", v), face, x+64, y, colAccent)
 }
-
