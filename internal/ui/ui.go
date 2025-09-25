@@ -149,7 +149,6 @@ func unitFromUser(c user.Character) Unit {
         Class: c.Class,
         Level: c.Level,
         Exp:   c.Exp,
-        HP:    c.HP,
         HPMax: c.HPMax,
         Stats: Stats(c.Stats),
         Weapon: WeaponRanks{
@@ -173,6 +172,12 @@ func unitFromUser(c user.Character) Unit {
         if img, _, err := ebitenutil.NewImageFromFile(c.Portrait); err == nil {
             u.Portrait = img
         }
+    }
+    // HPが未指定（0）の場合は最大値を初期値として採用
+    if u.HP == 0 && u.HPMax > 0 {
+        u.HP = u.HPMax
+    } else {
+        u.HP = c.HP
     }
     return u
 }
