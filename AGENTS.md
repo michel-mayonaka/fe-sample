@@ -9,8 +9,8 @@
 - `internal/model`: キャラクターマスタのスキーマとJSONローダー。
 - `internal/user`: ユーザ（セーブ）データのスキーマとJSONローダー。
 - `assets/`: 画像・フォント・音源等のアセット。
-- `assets/master/characters.json`: キャラクターマスタ（ID索引）。
-- `assets/user/party.json`: ユーザ状態（Lv/Exp/HP/耐久）。
+- `assets/mst_characters.json`: キャラクターマスタ（ID索引, mst_プレフィックス）。
+- `assets/usr_party.json`: ユーザ状態（Lv/Exp/HP/耐久, usr_プレフィックス）。
 - `pkg/`: 複数バイナリ/ツールから再利用するライブラリ（必要時）。
 - `testdata/`: テスト専用アセット。
 
@@ -38,6 +38,7 @@
 ### 将来のデータベース移行
 - JSON は暫定。最終的に SQLite へ移行予定（`docs/DB_NOTES.md` 参照）。
 - 変更時はマスタ→ユーザの上書きモデルを維持してください。
+- テーブル命名規約: マスタは `mst_*`、ユーザは `usr_*` を接頭辞にします。
 
 ## Testing Guidelines
 - フレームワーク: 標準 `testing`。

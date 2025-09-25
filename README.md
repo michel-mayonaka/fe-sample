@@ -39,9 +39,9 @@ go build -o bin/ui_sample ./cmd/ui_sample
 - `internal/ui/ui.go`: パネル/テキスト/HPバー/能力値の描画、ポートレート画像の表示
 - `assets/`: 画像等を追加する場合に利用（例: `assets/01_iris.png`）
 - `internal/model/`: キャラクターマスタのモデルとJSONローダー
-- `assets/master/characters.json`: キャラクターのマスタデータ（ID索引）
+- `assets/mst_characters.json`: キャラクターのマスタデータ（ID索引, mst_プレフィックス）
 - `internal/user/`: ユーザ（セーブ）データのモデルとJSONローダー
-- `assets/user/party.json`: 現在のユーザ状態（上書き用）
+- `assets/usr_party.json`: 現在のユーザ状態（usr_プレフィックス）
 
 ## トラブルシューティング
 - go.mod の Go 版エラー（例:「go 1.22 だが最大 1.17」）
@@ -58,13 +58,13 @@ go build -o bin/ui_sample ./cmd/ui_sample
 - `assets/01_iris.png` を配置すると、左上のポートレート枠に表示されます。
 - 別名で使う場合は `internal/ui/ui.go` の `SampleUnit()` で読み込みパスを変更してください。
 
-## データ構成（マスタ/ユーザ）
-- マスタ: `assets/master/characters.json`
+## データ構成（mst_/usr_）
+- マスタ: `assets/mst_characters.json`
   - 役割: 初期値のみを保持（名前/クラス/成長率/初期装備の上限 など）
   - 注意: レベルごとの能力は保持しない（成長率に依存し可変のため）
-- ユーザ: `assets/user/party.json`
+- ユーザ: `assets/usr_party.json`
   - 役割: 現在値を保持（Lv/Exp/HP/能力値/装備残耐久 など）
-- 合成: UI はマスタを読み、ユーザ値があれば上書きして表示
+- 表示: UI はユーザテーブルのみで構築（usr_）。マスタは初期投入用。
 
 将来: SQLite へ移行予定（`docs/DB_NOTES.md` 参照）
 

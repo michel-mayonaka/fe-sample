@@ -11,6 +11,27 @@ type Stats struct {
     Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
 }
 
+// Growth は成長率（%）を表します。
+type Growth struct {
+    Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
+}
+
+// WeaponRanks は物理武器のランクを表します。
+type WeaponRanks struct {
+    Sword string `json:"sword"`
+    Lance string `json:"lance"`
+    Axe   string `json:"axe"`
+    Bow   string `json:"bow"`
+}
+
+// MagicRanks は魔法系のランクを表します。
+type MagicRanks struct {
+    Anima string `json:"anima"`
+    Light string `json:"light"`
+    Dark  string `json:"dark"`
+    Staff string `json:"staff"`
+}
+
 // Item はユーザセーブにおける装備の残耐久を表します。
 type Item struct {
     Name string `json:"name"`
@@ -22,11 +43,17 @@ type Item struct {
 // マスタの ID に対応するスナップショットを保持します。
 type Character struct {
     ID    string `json:"id"`
+    Name  string `json:"name"`
+    Class string `json:"class"`
+    Portrait string `json:"portrait"`
     Level int    `json:"level"`
     Exp   int    `json:"exp"`
     HP    int    `json:"hp"`
     HPMax int    `json:"hp_max"`
     Stats Stats  `json:"stats"`
+    Growth Growth `json:"growth"`
+    Weapon WeaponRanks `json:"weapon"`
+    Magic  MagicRanks  `json:"magic"`
     Equip []Item `json:"equip"`
 }
 

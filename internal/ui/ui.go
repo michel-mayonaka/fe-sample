@@ -12,7 +12,6 @@ import (
     resourceFonts "github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
     "github.com/hajimehoshi/ebiten/v2/text"
     "github.com/hajimehoshi/ebiten/v2/vector"
-    "ui_sample/internal/model"
     "ui_sample/internal/game"
     "ui_sample/internal/user"
     "golang.org/x/image/font"
@@ -117,16 +116,10 @@ type Growth struct {
 
 // SampleUnit はサンプルとなるユニットデータを生成します。
 func SampleUnit() Unit {
-    // マスタ＋ユーザ（上書き）で合成。失敗時はフォールバック。
-    if mt, err := model.LoadFromJSON("assets/master/characters.json"); err == nil {
-        if mc, ok := mt.Find("iris"); ok {
-            u := unitFromCharacter(mc)
-            if ut, err := user.LoadFromJSON("assets/user/party.json"); err == nil {
-                if uc, ok := ut.Find("iris"); ok {
-                    applyUserState(&u, uc)
-                }
-            }
-            return u
+    // ユーザテーブル（usr_）のみで構築。失敗時はフォールバック。
+    if ut, err := user.LoadFromJSON("assets/usr_party.json"); err == nil {
+        if uc, ok := ut.Find("iris"); ok {
+            return unitFromUser(uc)
         }
     }
     // フォールバック
@@ -149,8 +142,8 @@ func SampleUnit() Unit {
     return u
 }
 
-// unitFromCharacter はマスタの Character を UI 用 Unit に変換します。
-func unitFromCharacter(c model.Character) Unit {
+// unitFromUser はユーザテーブルのキャラクタを UI 用へ変換します。
+func unitFromUser(c user.Character) Unit {
     u := Unit{
         Name:  c.Name,
         Class: c.Class,
@@ -173,11 +166,9 @@ func unitFromCharacter(c model.Character) Unit {
         },
         Growth: Growth(c.Growth),
     }
-    // 装備変換
     for _, it := range c.Equip {
         u.Equip = append(u.Equip, Item{Name: it.Name, Uses: it.Uses, Max: it.Max})
     }
-    // 画像
     if c.Portrait != "" {
         if img, _, err := ebitenutil.NewImageFromFile(c.Portrait); err == nil {
             u.Portrait = img

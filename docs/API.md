@@ -6,14 +6,14 @@
 - `const LevelUpExp = 100`: レベルアップに必要な経験値。
 - `const LevelCap = 20`: レベル上限。
 
-## internal/model（マスタデータ）
+## internal/model（マスタデータ / mst_）
 - `type Character`
   - 初期値のみ保持（`Name`, `Class`, `Portrait`, `Stats`, `Growth`, `Weapon`, `Magic`, `Equip(max)` など）。
 - `func LoadFromJSON(path string) (*Table, error)`: JSON 読込。
 - `func (*Table) Find(id string) (Character, bool)`: 取得。
-備考: マスタは初期値のみ。レベルごとの能力は保持しない（成長率に依存し可変）。
+備考: マスタは初期値のみ。レベルごとの能力は保持しない（成長率に依存し可変）。ファイル名は `mst_*.json`。
 
-## internal/user（ユーザデータ）
+## internal/user（ユーザデータ / usr_）
 - `type Character`
   - 現在値を保持（`Level`, `Exp`, `HP`, `HPMax`, `Stats`, `Equip(uses/max)` など）。
 - `func LoadFromJSON(path string) (*Table, error)`: JSON 読込。
@@ -34,7 +34,7 @@
 - `type WeaponRanks`: 物理武器ランク。
 - `type MagicRanks`: 魔法系ランク。
 - `func SampleUnit() Unit`
-  - サンプルデータを返す。`assets/01_iris.png` があれば画像を読み込み、無ければプレースホルダ表示。
+  - ユーザテーブル（`assets/usr_*.json`）のみから読み込み、UI用データに変換。
 - `func DrawStatus(dst *ebiten.Image, u Unit)`
   - 1920×1080 を想定。左にポートレート、中央に基本情報/HP/能力値+成長率、右に「武器レベル」「魔法レベル」、下部に装備（耐久）を描画。
 - ヘルパー（内部利用）
