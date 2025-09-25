@@ -70,6 +70,7 @@ type Unit struct {
 
     Weapon WeaponRanks
     Magic  MagicRanks
+    Growth Growth
 }
 
 type Stats struct {
@@ -92,6 +93,11 @@ type MagicRanks struct {
     Staff string // 杖
 }
 
+// 成長率（%）
+type Growth struct {
+    Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
+}
+
 // SampleUnit は画面用ダミーデータ。
 func SampleUnit() Unit {
     u := Unit{
@@ -105,6 +111,7 @@ func SampleUnit() Unit {
         Equip: []string{"アイアンランス", "ジャベリン", "傷薬"},
         Weapon: WeaponRanks{Sword: "D", Lance: "B", Axe: "-", Bow: "-"},
         Magic:  MagicRanks{Anima: "-", Light: "-", Dark: "-", Staff: "-"},
+        Growth: Growth{Str: 45, Mag: 10, Skl: 55, Spd: 65, Lck: 50, Def: 20, Res: 35, Mov: 0},
     }
     if img, _, err := ebitenutil.NewImageFromFile("assets/01_iris.png"); err == nil {
         u.Portrait = img
@@ -138,28 +145,28 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
     text.Draw(dst, u.Class, faceMain, tx, ty+40, colText)
     text.Draw(dst, fmt.Sprintf("Lv %d  経験値 %02d", u.Level, u.Exp), faceMain, tx, ty+40+30, colText)
 
-    // HP
+    // HP（行間は少し広め）
     text.Draw(dst, fmt.Sprintf("HP %d/%d", u.HP, u.HPMax), faceMain, tx, ty+40+30+40, colText)
     drawHPBar(dst, tx, ty+40+30+46, 300, 14, u.HP, u.HPMax)
 
     // 能力値（2カラム）
-    statsTop := ty + 40 + 30 + 46 + 40
-    line := 28
+    statsTop := ty + 40 + 30 + 46 + 48
+    line := 34
     colGap := 180
-    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+0*line, "力", u.Stats.Str)
-    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+1*line, "魔力", u.Stats.Mag)
-    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+2*line, "技", u.Stats.Skl)
-    drawStatLine(dst, faceMain, tx+0*colGap, statsTop+3*line, "速さ", u.Stats.Spd)
-    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+0*line, "幸運", u.Stats.Lck)
-    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+1*line, "守備", u.Stats.Def)
-    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+2*line, "魔防", u.Stats.Res)
-    drawStatLine(dst, faceMain, tx+1*colGap, statsTop+3*line, "移動", u.Stats.Mov)
+    drawStatLineWithGrowth(dst, faceMain, tx+0*colGap, statsTop+0*line, "力", u.Stats.Str, u.Growth.Str)
+    drawStatLineWithGrowth(dst, faceMain, tx+0*colGap, statsTop+1*line, "魔力", u.Stats.Mag, u.Growth.Mag)
+    drawStatLineWithGrowth(dst, faceMain, tx+0*colGap, statsTop+2*line, "技", u.Stats.Skl, u.Growth.Skl)
+    drawStatLineWithGrowth(dst, faceMain, tx+0*colGap, statsTop+3*line, "速さ", u.Stats.Spd, u.Growth.Spd)
+    drawStatLineWithGrowth(dst, faceMain, tx+1*colGap, statsTop+0*line, "幸運", u.Stats.Lck, u.Growth.Lck)
+    drawStatLineWithGrowth(dst, faceMain, tx+1*colGap, statsTop+1*line, "守備", u.Stats.Def, u.Growth.Def)
+    drawStatLineWithGrowth(dst, faceMain, tx+1*colGap, statsTop+2*line, "魔防", u.Stats.Res, u.Growth.Res)
+    drawStatLineWithGrowth(dst, faceMain, tx+1*colGap, statsTop+3*line, "移動", u.Stats.Mov, u.Growth.Mov)
 
     // 武器レベル（右側・上段）
     wrX := tx + 2*colGap + 64
     wrY := ty
     text.Draw(dst, "武器レベル", faceMain, wrX, wrY, colAccent)
-    rline := 28
+    rline := 32
     drawRankLine(dst, faceMain, wrX, wrY+1*rline, "剣", u.Weapon.Sword)
     drawRankLine(dst, faceMain, wrX, wrY+2*rline, "槍", u.Weapon.Lance)
     drawRankLine(dst, faceMain, wrX, wrY+3*rline, "斧", u.Weapon.Axe)
@@ -175,10 +182,10 @@ func DrawStatus(dst *ebiten.Image, u Unit) {
     drawRankLine(dst, faceMain, mrX, mrY+4*rline, "杖", u.Magic.Staff)
 
     // 装備（ポートレートの下段）
-    equipTitleY := int(py + ph + 48)
+    equipTitleY := int(py + ph + 56)
     text.Draw(dst, "装備", faceMain, int(px), equipTitleY, colAccent)
     for i, it := range u.Equip {
-        text.Draw(dst, fmt.Sprintf("- %s", it), faceSmall, int(px)+14, equipTitleY+30+i*26, colText)
+        text.Draw(dst, fmt.Sprintf("- %s", it), faceSmall, int(px)+14, equipTitleY+30+i*30, colText)
     }
 }
 
@@ -236,6 +243,12 @@ func drawHPBar(dst *ebiten.Image, x, y, w, h int, hp, max int) {
 func drawStatLine(dst *ebiten.Image, face font.Face, x, y int, label string, v int) {
     text.Draw(dst, label, face, x, y, colText)
     text.Draw(dst, fmt.Sprintf("%2d", v), face, x+64, y, colAccent)
+}
+
+func drawStatLineWithGrowth(dst *ebiten.Image, face font.Face, x, y int, label string, v int, g int) {
+    text.Draw(dst, label, face, x, y, colText)
+    text.Draw(dst, fmt.Sprintf("%2d", v), face, x+64, y, colAccent)
+    text.Draw(dst, fmt.Sprintf("%d%%", g), faceSmall, x+120, y, colAccent)
 }
 
 func drawRankLine(dst *ebiten.Image, face font.Face, x, y int, label, rank string) {
