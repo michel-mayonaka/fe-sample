@@ -7,8 +7,10 @@
 - `internal/ui`: UI レイアウト・入力イベント処理。
 - `internal/game`: ゲーム定数など共有設定。
 - `internal/model`: キャラクターマスタのスキーマとJSONローダー。
+- `internal/user`: ユーザ（セーブ）データのスキーマとJSONローダー。
 - `assets/`: 画像・フォント・音源等のアセット。
 - `assets/master/characters.json`: キャラクターマスタ（ID索引）。
+- `assets/user/party.json`: ユーザ状態（Lv/Exp/HP/耐久）。
 - `pkg/`: 複数バイナリ/ツールから再利用するライブラリ（必要時）。
 - `testdata/`: テスト専用アセット。
 
@@ -32,6 +34,10 @@
 - 追加/変更した「型・関数・フィールド・定数」は `docs/API.md` に説明を必ず追記。
 - 用語は日本語で統一（例: HP/守備/魔防/理/光/闇）。英語表記が必要な場合は併記。
 - UIレイアウトや数値の意図（行間・余白・サイズ）は 1 行で簡潔に。
+
+### 将来のデータベース移行
+- JSON は暫定。最終的に SQLite へ移行予定（`docs/DB_NOTES.md` 参照）。
+- 変更時はマスタ→ユーザの上書きモデルを維持してください。
 
 ## Testing Guidelines
 - フレームワーク: 標準 `testing`。

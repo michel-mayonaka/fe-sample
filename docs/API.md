@@ -6,6 +6,19 @@
 - `const LevelUpExp = 100`: レベルアップに必要な経験値。
 - `const LevelCap = 20`: レベル上限。
 
+## internal/model（マスタデータ）
+- `type Character`
+  - 初期値のみ保持（`Name`, `Class`, `Portrait`, `Stats`, `Growth`, `Weapon`, `Magic`, `Equip(max)` など）。
+- `func LoadFromJSON(path string) (*Table, error)`: JSON 読込。
+- `func (*Table) Find(id string) (Character, bool)`: 取得。
+備考: マスタは初期値のみ。レベルごとの能力は保持しない（成長率に依存し可変）。
+
+## internal/user（ユーザデータ）
+- `type Character`
+  - 現在値を保持（`Level`, `Exp`, `HP`, `HPMax`, `Stats`, `Equip(uses/max)` など）。
+- `func LoadFromJSON(path string) (*Table, error)`: JSON 読込。
+- `func (*Table) Find(id string) (Character, bool)`: 取得。
+
 ## internal/ui（UI描画とデータモデル）
 - `type Unit`
   - `Name`, `Class`, `Level`, `Exp`, `HP`, `HPMax`: 基本情報。

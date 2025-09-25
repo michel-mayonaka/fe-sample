@@ -1,0 +1,15 @@
+[
+  {
+    "id": "iris",
+    "level": 7,
+    "exp": 56,
+    "hp": 22,
+    "hp_max": 26,
+    "stats": {"Str": 9, "Mag": 0, "Skl": 12, "Spd": 14, "Lck": 8, "Def": 6, "Res": 7, "Mov": 7},
+    "equip": [
+      {"name": "アイアンランス", "uses": 35, "max": 45},
+      {"name": "ジャベリン", "uses": 12, "max": 20},
+      {"name": "傷薬", "uses": 3, "max": 3}
+    ]
+  }
+]

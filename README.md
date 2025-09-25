@@ -40,6 +40,8 @@ go build -o bin/ui_sample ./cmd/ui_sample
 - `assets/`: 画像等を追加する場合に利用（例: `assets/01_iris.png`）
 - `internal/model/`: キャラクターマスタのモデルとJSONローダー
 - `assets/master/characters.json`: キャラクターのマスタデータ（ID索引）
+- `internal/user/`: ユーザ（セーブ）データのモデルとJSONローダー
+- `assets/user/party.json`: 現在のユーザ状態（上書き用）
 
 ## トラブルシューティング
 - go.mod の Go 版エラー（例:「go 1.22 だが最大 1.17」）
@@ -56,9 +58,14 @@ go build -o bin/ui_sample ./cmd/ui_sample
 - `assets/01_iris.png` を配置すると、左上のポートレート枠に表示されます。
 - 別名で使う場合は `internal/ui/ui.go` の `SampleUnit()` で読み込みパスを変更してください。
 
-## マスタデータ（キャラクター）
-- 形式: `assets/master/characters.json` にJSON配列で定義。
-- 読込: `internal/model.LoadFromJSON()` が取り込み、`id` で検索。
-- UI: `ui.SampleUnit()` は `id=iris` を読み、UI用データへ変換して表示。
+## データ構成（マスタ/ユーザ）
+- マスタ: `assets/master/characters.json`
+  - 役割: 初期値のみを保持（名前/クラス/成長率/初期装備の上限 など）
+  - 注意: レベルごとの能力は保持しない（成長率に依存し可変のため）
+- ユーザ: `assets/user/party.json`
+  - 役割: 現在値を保持（Lv/Exp/HP/能力値/装備残耐久 など）
+- 合成: UI はマスタを読み、ユーザ値があれば上書きして表示
+
+将来: SQLite へ移行予定（`docs/DB_NOTES.md` 参照）
 
 デザイン調整は `internal/ui/ui.go` の色・座標・フォントサイズを編集してください。必要に応じて画像/TTF を `assets/` に追加し、`embed` で組み込み可能です。

@@ -14,6 +14,7 @@ import (
     "github.com/hajimehoshi/ebiten/v2/vector"
     "ui_sample/internal/model"
     "ui_sample/internal/game"
+    "ui_sample/internal/user"
     "golang.org/x/image/font"
     "golang.org/x/image/font/basicfont"
     "golang.org/x/image/font/opentype"
@@ -116,10 +117,16 @@ type Growth struct {
 
 // SampleUnit はサンプルとなるユニットデータを生成します。
 func SampleUnit() Unit {
-    // マスタから読めれば優先。失敗時は内蔵の簡易データを返す。
-    if t, err := model.LoadFromJSON("assets/master/characters.json"); err == nil {
-        if c, ok := t.Find("iris"); ok {
-            return unitFromCharacter(c)
+    // マスタ＋ユーザ（上書き）で合成。失敗時はフォールバック。
+    if mt, err := model.LoadFromJSON("assets/master/characters.json"); err == nil {
+        if mc, ok := mt.Find("iris"); ok {
+            u := unitFromCharacter(mc)
+            if ut, err := user.LoadFromJSON("assets/user/party.json"); err == nil {
+                if uc, ok := ut.Find("iris"); ok {
+                    applyUserState(&u, uc)
+                }
+            }
+            return u
         }
     }
     // フォールバック
@@ -177,6 +184,23 @@ func unitFromCharacter(c model.Character) Unit {
         }
     }
     return u
+}
+
+// applyUserState はユーザ状態を UI ユニットに反映します。
+func applyUserState(u *Unit, uc user.Character) {
+    if u == nil { return }
+    if uc.Level > 0 { u.Level = uc.Level }
+    if uc.Exp >= 0 { u.Exp = uc.Exp }
+    if uc.HP > 0 { u.HP = uc.HP }
+    if uc.HPMax > 0 { u.HPMax = uc.HPMax }
+    // ステータス（0が有効値の項目もあるため、全フィールド置換）
+    u.Stats = Stats(uc.Stats)
+    if len(uc.Equip) > 0 {
+        u.Equip = u.Equip[:0]
+        for _, it := range uc.Equip {
+            u.Equip = append(u.Equip, Item{Name: it.Name, Uses: it.Uses, Max: it.Max})
+        }
+    }
 }
 
 // DrawStatus はユニットのステータス画面を描画します。
