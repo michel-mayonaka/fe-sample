@@ -3,7 +3,7 @@
 ファイアーエムブレムのステータス画面風 UI を Ebiten で描画する最小サンプルです。画像や外部フォントは使わず、`basicfont` とベクタ描画のみで構成しています。
 
 ## 要件
-- Go 1.22 以上（推奨: 1.25 系）
+- Go 1.25 以上（推奨: 最新 1.25 系）
 - 初回は依存取得のためネットワーク接続が必要
 
 ## セットアップ & 実行
@@ -24,6 +24,11 @@ go build -o bin/ui_sample ./cmd/ui_sample
 ```
 ※ Apple Silicon では `GOARCH=arm64` が既定です。意図しない `amd64` クロスビルドは避けてください。
 
+## Lint（golangci-lint）
+- インストール（macOS/Homebrew 例）: `brew install golangci-lint`
+- 実行: `make lint` または `golangci-lint run`
+- 整形: `make fmt`
+
 ## 表示仕様（解像度）
 - 論理解像度: 1920×1080（`Layout`）
 - ウィンドウ: 1920×1080（可変リサイズ）
@@ -40,6 +45,9 @@ go build -o bin/ui_sample ./cmd/ui_sample
 - `assets/`: 画像等を追加する場合に利用（例: `assets/01_iris.png`）
 - `internal/model/`: キャラクターマスタのモデルとJSONローダー
 - `db/master/mst_characters.json`: キャラクターのマスタデータ（ID索引, mst_プレフィックス）
+- `db/master/mst_class_caps.json`: クラスごとの能力上限
+- `db/master/mst_weapons.json`: 武器の基本性能
+- `db/master/mst_items.json`: アイテムの基本性能
 - `internal/user/`: ユーザ（セーブ）データのモデルとJSONローダー
 - `db/user/usr_characters.json`: 現在のユーザ状態（usr_プレフィックス）
 
@@ -67,5 +75,10 @@ go build -o bin/ui_sample ./cmd/ui_sample
 - 表示: UI はユーザテーブルのみで構築（usr_）。マスタは初期投入用。
 
 将来: SQLite へ移行予定（`docs/DB_NOTES.md` 参照）
+
+## 戦闘画面（簡易）
+- ステータス画面右下の「戦闘へ」→ 戦闘プレビュー
+- 「戦闘開始」で1ラウンド（攻撃→反撃）を解決し、HP/耐久を `db/user/usr_characters.json` に保存
+- ダメージ計算: `攻撃 = 力 + 武器威力 - 相手守備`（命中は簡易式）
 
 デザイン調整は `internal/ui/ui.go` の色・座標・フォントサイズを編集してください。必要に応じて画像/TTF を `assets/` に追加し、`embed` で組み込み可能です。

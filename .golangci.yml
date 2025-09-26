@@ -1,0 +1,34 @@
+version: 1.54
+run:
+  timeout: 3m
+  go: "1.25"
+
+linters:
+  enable:
+    - govet
+    - staticcheck
+    - revive
+    - gocritic
+    - gosimple
+    - ineffassign
+    - typecheck
+    - unused
+    - gofmt
+    - gofumpt
+    - misspell
+
+linters-settings:
+  revive:
+    rules:
+      - name: exported
+        arguments: ["disableStutteringCheck"]
+  gofumpt:
+    extra-rules: true
+  misspell:
+    locale: US
+
+issues:
+  exclude-use-default: false
+
+output:
+  sort-results: true
