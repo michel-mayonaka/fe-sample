@@ -42,7 +42,7 @@
     "equip": [
       {
         "name": "アイアンランス",
-        "uses": 35,
+        "uses": 30,
         "max": 45
       },
       {
@@ -62,16 +62,17 @@
     "name": "ロイド",
     "class": "傭兵",
     "portrait": "assets/02_loyd.png",
-    "level": 5,
-    "hp_max": 24,
+    "level": 20,
+    "hp": 35,
+    "hp_max": 35,
     "stats": {
-      "Str": 10,
+      "Str": 17,
       "Mag": 0,
-      "Skl": 11,
-      "Spd": 12,
-      "Lck": 6,
-      "Def": 7,
-      "Res": 3,
+      "Skl": 18,
+      "Spd": 21,
+      "Lck": 17,
+      "Def": 9,
+      "Res": 6,
       "Mov": 5
     },
     "growth": {
@@ -115,16 +116,17 @@
     "name": "ハヤテ",
     "class": "剣士",
     "portrait": "assets/03_hayate.png",
-    "level": 6,
-    "hp_max": 22,
+    "level": 20,
+    "hp": 15,
+    "hp_max": 31,
     "stats": {
-      "Str": 8,
+      "Str": 12,
       "Mag": 0,
-      "Skl": 13,
-      "Spd": 16,
-      "Lck": 9,
-      "Def": 4,
-      "Res": 5,
+      "Skl": 23,
+      "Spd": 26,
+      "Lck": 17,
+      "Def": 8,
+      "Res": 10,
       "Mov": 5
     },
     "growth": {
@@ -153,7 +155,7 @@
     "equip": [
       {
         "name": "アイアンソード",
-        "uses": 35,
+        "uses": 29,
         "max": 45
       },
       {

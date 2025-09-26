@@ -13,6 +13,10 @@
 - `func (*Table) Find(id string) (Character, bool)`: 取得。
 備考: マスタは初期値のみ。レベルごとの能力は保持しない（成長率に依存し可変）。ファイル名は `mst_*.json`。パスは `db/master/`。
 
+- `type ClassCaps`, `LoadClassCapsJSON`: クラス能力上限（`mst_class_caps.json`）
+- `type Weapon`, `LoadWeaponsJSON`: 武器性能（`mst_weapons.json`）
+- `type Item`, `LoadItemsJSON`: アイテム性能（`mst_items.json`）
+
 ## internal/user（ユーザデータ / usr_）
 - `type Character`
   - 現在値を保持（`Level`, `Exp`, `HP`, `HPMax`, `Stats`, `Growth`, `Weapon`, `Magic`, `Equip(uses/max)` など）。
@@ -38,6 +42,9 @@
   - ユーザテーブル（`db/user/usr_*.json`）のみから読み込み、UI用データに変換。
 - `func DrawStatus(dst *ebiten.Image, u Unit)`
   - 1920×1080 を想定。左にポートレート、中央に基本情報/HP/能力値+成長率、右に「武器レベル」「魔法レベル」、下部に装備（耐久）を描画。
+- 戦闘関連:
+  - `DrawBattle(atk, def)`: 簡易プレビューを描画
+  - `RollLevelUp/ApplyGains`: 成長抽選/反映（クラス上限でクランプ）
 - ヘルパー（内部利用）
   - `drawPanel`: 影付きパネル。
   - `drawFramedRect`: 金縁の矩形。

@@ -13,7 +13,7 @@ type Stats struct {
 
 // Growth は成長率（%）を表します。
 type Growth struct {
-    Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
+    HP, Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
 }
 
 // WeaponRanks は物理武器のランクを表します。
@@ -47,8 +47,8 @@ type Character struct {
     Class string `json:"class"`
     Portrait string `json:"portrait"`
     Level int    `json:"level"`
-    Exp   int    `json:"exp"`
-    HP    int    `json:"hp"`
+    Exp   int    `json:"exp,omitempty"`
+    HP    int    `json:"hp,omitempty"`
     HPMax int    `json:"hp_max"`
     Stats Stats  `json:"stats"`
     Growth Growth `json:"growth"`
@@ -93,3 +93,24 @@ func (t *Table) ByID() map[string]Character { return t.byID }
 
 // Slice は定義順のスライスを返します。
 func (t *Table) Slice() []Character { return append([]Character(nil), t.rows...) }
+
+// UpdateCharacter は ID が一致するレコードを更新します。
+func (t *Table) UpdateCharacter(c Character) {
+    if t == nil { return }
+    if _, ok := t.byID[c.ID]; !ok { return }
+    t.byID[c.ID] = c
+    for i := range t.rows {
+        if t.rows[i].ID == c.ID {
+            t.rows[i] = c
+            break
+        }
+    }
+}
+
+// Save はテーブル内容を JSON (インデント付き) で保存します。
+func (t *Table) Save(path string) error {
+    if t == nil { return fmt.Errorf("nil table") }
+    b, err := json.MarshalIndent(t.rows, "", "  ")
+    if err != nil { return err }
+    return os.WriteFile(path, b, 0644)
+}

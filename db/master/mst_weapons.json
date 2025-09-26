@@ -1,0 +1,6 @@
+[
+  {"name":"アイアンランス","type":"Lance","rank":"E","might":7,"hit":80,"crit":0,"weight":8,"rmin":1,"rmax":1},
+  {"name":"ジャベリン","type":"Lance","rank":"D","might":6,"hit":65,"crit":0,"weight":11,"rmin":1,"rmax":2},
+  {"name":"アイアンソード","type":"Sword","rank":"E","might":5,"hit":90,"crit":0,"weight":5,"rmin":1,"rmax":1}
+]
+

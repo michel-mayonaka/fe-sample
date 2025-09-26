@@ -21,6 +21,8 @@
 - `go test ./... -race -cover`: 競合検出＋カバレッジ計測。
 - `go fmt ./...`: 公式フォーマッタで整形。
 - `golangci-lint run`: Lint 実行（導入済みの場合）。
+ - `make lint`: golangci-lint 実行。
+ - `make fmt`: gofumpt + gofmt で整形。
 
 ## Coding Style & Naming Conventions
 - インデント: タブ（Go 標準）。行長は 120 目安。
@@ -39,6 +41,11 @@
 - JSON は暫定。最終的に SQLite へ移行予定（`docs/DB_NOTES.md` 参照）。
 - 変更時はマスタ→ユーザの上書きモデルを維持してください。
 - テーブル命名規約: マスタは `mst_*`、ユーザは `usr_*` を接頭辞にします。
+
+## Lint 方針
+- ツール: `golangci-lint`（設定は `.golangci.yml`）。
+- 主要ルール: `govet`, `staticcheck`, `revive`, `gocritic`, `gofumpt`, `unused` など。
+- CI 追加時は同設定を用い、PR で lint を必須化してください。
 
 ## Testing Guidelines
 - フレームワーク: 標準 `testing`。
