@@ -3,8 +3,8 @@
 package game
 
 const (
-    // LevelUpExp はレベルアップに必要な経験値です。
-    LevelUpExp = 100
-    // LevelCap は到達可能なレベルの上限値です。
-    LevelCap   = 20
+	// LevelUpExp はレベルアップに必要な経験値です。
+	LevelUpExp = 100
+	// LevelCap は到達可能なレベルの上限値です。
+	LevelCap = 20
 )

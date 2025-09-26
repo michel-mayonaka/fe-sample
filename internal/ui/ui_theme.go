@@ -1,0 +1,13 @@
+package ui
+
+import "image/color"
+
+// テーマ色（FE風）
+var (
+    colPanelBG   = color.RGBA{R: 0x20, G: 0x3b, B: 0x73, A: 0xFF}
+    colPanelDark = color.RGBA{R: 0x14, G: 0x2a, B: 0x54, A: 0xFF}
+    colBorder    = color.RGBA{R: 0xd9, G: 0xb9, B: 0x6e, A: 0xFF}
+    colAccent    = color.RGBA{R: 0x7a, G: 0xc0, B: 0xff, A: 0xFF}
+    colText      = color.RGBA{R: 0xff, G: 0xff, B: 0xff, A: 0xFF}
+)
+
