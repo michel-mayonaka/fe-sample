@@ -12,6 +12,7 @@ import (
     resourceFonts "github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
     "github.com/hajimehoshi/ebiten/v2/text"
     "github.com/hajimehoshi/ebiten/v2/vector"
+    "ui_sample/internal/model"
     "ui_sample/internal/game"
     "ui_sample/internal/user"
     "golang.org/x/image/font"
@@ -64,6 +65,7 @@ func init() {
 
 // Unit は1ユニット分の表示用データモデルです。
 type Unit struct {
+    ID    string         // 識別子（ユーザテーブル ID）
     Name  string         // 名前
     Class string         // クラス名
     Level int            // 現在レベル
@@ -111,7 +113,7 @@ type MagicRanks struct {
 
 // Growth は各能力の成長率（%）を表します。
 type Growth struct {
-    Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
+    HP, Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
 }
 
 // SampleUnit はサンプルとなるユニットデータを生成します。
@@ -145,6 +147,7 @@ func SampleUnit() Unit {
 // unitFromUser はユーザテーブルのキャラクタを UI 用へ変換します。
 func unitFromUser(c user.Character) Unit {
     u := Unit{
+        ID:    c.ID,
         Name:  c.Name,
         Class: c.Class,
         Level: c.Level,
@@ -192,23 +195,6 @@ func LoadUnitsFromUser(path string) ([]Unit, error) {
         units = append(units, unitFromUser(c))
     }
     return units, nil
-}
-
-// applyUserState はユーザ状態を UI ユニットに反映します。
-func applyUserState(u *Unit, uc user.Character) {
-    if u == nil { return }
-    if uc.Level > 0 { u.Level = uc.Level }
-    if uc.Exp >= 0 { u.Exp = uc.Exp }
-    if uc.HP > 0 { u.HP = uc.HP }
-    if uc.HPMax > 0 { u.HPMax = uc.HPMax }
-    // ステータス（0が有効値の項目もあるため、全フィールド置換）
-    u.Stats = Stats(uc.Stats)
-    if len(uc.Equip) > 0 {
-        u.Equip = u.Equip[:0]
-        for _, it := range uc.Equip {
-            u.Equip = append(u.Equip, Item{Name: it.Name, Uses: it.Uses, Max: it.Max})
-        }
-    }
 }
 
 // DrawStatus はユニットのステータス画面を描画します。
@@ -360,6 +346,183 @@ func DrawBackButton(dst *ebiten.Image, hovered bool) {
     text.Draw(dst, "＜ 一覧へ", faceMain, x+20, y+32, colText)
 }
 
+// ToBattleButtonRect はステータス画面の「戦闘へ」ボタンの矩形を返します。
+func ToBattleButtonRect(sw, sh int) (x, y, w, h int) {
+    // レベルアップボタンの左隣に配置
+    rx, ry, _, rh := LevelUpButtonRect(sw, sh)
+    w, h = 220, rh
+    x = rx - 20 - w
+    y = ry
+    return
+}
+
+// DrawToBattleButton は「戦闘へ」ボタンを描画します。
+func DrawToBattleButton(dst *ebiten.Image, hovered, enabled bool) {
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    x, y, w, h := ToBattleButtonRect(sw, sh)
+    base := color.RGBA{90, 90, 130, 255}
+    if !enabled { base = color.RGBA{70, 70, 70, 255} }
+    if hovered && enabled { base = color.RGBA{110, 110, 170, 255} }
+    drawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
+    vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), base, false)
+    text.Draw(dst, "戦闘へ", faceMain, x+70, y+36, colText)
+}
+
+// LevelUpButtonRect はレベルアップボタンの矩形を返します。
+func LevelUpButtonRect(sw, sh int) (x, y, w, h int) {
+    // 右下に配置
+    w, h = 220, 56
+    x = sw - listMargin - w
+    y = sh - listMargin - h
+    return
+}
+
+// DrawLevelUpButton はレベルアップボタンを描画します。
+func DrawLevelUpButton(dst *ebiten.Image, hovered bool, enabled bool) {
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    x, y, w, h := LevelUpButtonRect(sw, sh)
+    base := color.RGBA{80, 130, 60, 255}
+    if !enabled { base = color.RGBA{70, 70, 70, 255} }
+    if hovered && enabled { base = color.RGBA{100, 170, 80, 255} }
+    drawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
+    vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), base, false)
+    label := "レベルアップ"
+    if !enabled { label = "最大レベル" }
+    text.Draw(dst, label, faceMain, x+24, y+36, colText)
+}
+
+// LevelUpGains はレベルアップで上昇した値を表します。
+type LevelUpGains struct {
+    Inc Stats
+    HPGain int
+}
+
+// RollLevelUp は成長率に基づき上昇値を抽選します（各+1固定）。
+func RollLevelUp(u Unit, rnd func() float64) LevelUpGains {
+    g := LevelUpGains{}
+    prob := func(p int) bool { return p > 0 && rnd()*100 < float64(p) }
+    if prob(u.Growth.HP) { g.HPGain++ }
+    if prob(u.Growth.Str) { g.Inc.Str++ }
+    if prob(u.Growth.Mag) { g.Inc.Mag++ }
+    if prob(u.Growth.Skl) { g.Inc.Skl++ }
+    if prob(u.Growth.Spd) { g.Inc.Spd++ }
+    if prob(u.Growth.Lck) { g.Inc.Lck++ }
+    if prob(u.Growth.Def) { g.Inc.Def++ }
+    if prob(u.Growth.Res) { g.Inc.Res++ }
+    if prob(u.Growth.Mov) { g.Inc.Mov++ }
+    return g
+}
+
+// ApplyGains は抽選結果をユニットへ反映します（Level+1, HP系は上限に合わせる）。
+func ApplyGains(u *Unit, gains LevelUpGains, levelCap int) {
+    if u.Level < levelCap { u.Level++ }
+    u.HPMax += gains.HPGain
+    u.HP += gains.HPGain
+    if u.HP > u.HPMax { u.HP = u.HPMax }
+    u.Stats.Str += gains.Inc.Str
+    u.Stats.Mag += gains.Inc.Mag
+    u.Stats.Skl += gains.Inc.Skl
+    u.Stats.Spd += gains.Inc.Spd
+    u.Stats.Lck += gains.Inc.Lck
+    u.Stats.Def += gains.Inc.Def
+    u.Stats.Res += gains.Inc.Res
+    u.Stats.Mov += gains.Inc.Mov
+    // クラス上限でクランプ
+    if caps, err := model.LoadClassCapsJSON("db/master/mst_class_caps.json"); err == nil {
+        if c, ok := caps.Find(u.Class); ok {
+            clamp := func(v, m int) int { if m>0 && v>m { return m }; if v<0 { return 0 }; return v }
+            u.HPMax = clamp(u.HPMax, c.HPMax)
+            u.HP = clamp(u.HP, u.HPMax)
+            u.Stats.Str = clamp(u.Stats.Str, c.Str)
+            u.Stats.Mag = clamp(u.Stats.Mag, c.Mag)
+            u.Stats.Skl = clamp(u.Stats.Skl, c.Skl)
+            u.Stats.Spd = clamp(u.Stats.Spd, c.Spd)
+            u.Stats.Lck = clamp(u.Stats.Lck, c.Lck)
+            u.Stats.Def = clamp(u.Stats.Def, c.Def)
+            u.Stats.Res = clamp(u.Stats.Res, c.Res)
+            u.Stats.Mov = clamp(u.Stats.Mov, c.Mov)
+        }
+    }
+}
+
+// --- 戦闘画面（簡易） ---
+
+// BattleStartButtonRect は戦闘開始ボタンの矩形を返します。
+func BattleStartButtonRect(sw, sh int) (x, y, w, h int) {
+    w, h = 240, 60
+    x = (sw - w) / 2
+    y = sh - listMargin - h
+    return
+}
+
+// DrawBattle は簡易な戦闘プレビュー画面を描画します。
+// attacker/defender はUIのUnit。武器は先頭装備を使用します。
+func DrawBattle(dst *ebiten.Image, attacker, defender Unit) {
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    drawPanel(dst, listMargin, listMargin, float32(sw-2*listMargin), float32(sh-2*listMargin))
+    // 左右にユニット
+    leftX := listMargin + 40
+    rightX := sw - listMargin - 560
+    topY := listMargin + 80
+
+    drawBattleSide(dst, attacker, leftX, topY)
+    drawBattleSide(dst, defender, rightX, topY)
+
+    // 中央見出し
+    text.Draw(dst, "戦闘プレビュー", faceTitle, sw/2-120, listMargin+56, colAccent)
+
+    // ボタン
+    bx, by, bw, bh := BattleStartButtonRect(sw, sh)
+    drawFramedRect(dst, float32(bx), float32(by), float32(bw), float32(bh))
+    vector.DrawFilledRect(dst, float32(bx), float32(by), float32(bw), float32(bh), color.RGBA{110,90,40,255}, false)
+    text.Draw(dst, "戦闘開始", faceMain, bx+70, by+38, colText)
+}
+
+func drawBattleSide(dst *ebiten.Image, u Unit, x, y int) {
+    // 顔 + 基本
+    drawFramedRect(dst, float32(x), float32(y), 320, 320)
+    if u.Portrait != nil { drawPortrait(dst, u.Portrait, float32(x), float32(y), 320, 320) }
+    text.Draw(dst, u.Name, faceTitle, x, y-16, colText)
+    text.Draw(dst, fmt.Sprintf("%s  Lv %d", u.Class, u.Level), faceMain, x, y+350, colAccent)
+    text.Draw(dst, fmt.Sprintf("HP %d/%d", u.HP, u.HPMax), faceMain, x, y+384, colText)
+    drawHPBar(dst, x, y+390, 320, 14, u.HP, u.HPMax)
+    // 武器（先頭）
+    wepName := "-"
+    if len(u.Equip) > 0 { wepName = u.Equip[0].Name }
+    text.Draw(dst, fmt.Sprintf("武器: %s", wepName), faceMain, x, y+420, colText)
+}
+
+// DrawLevelUpPopup はレベルアップ結果をポップアップ表示します。
+func DrawLevelUpPopup(dst *ebiten.Image, u Unit, gains LevelUpGains) {
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    // 半透明オーバーレイ
+    overlay := color.RGBA{0, 0, 0, 160}
+    vector.DrawFilledRect(dst, float32(0), float32(0), float32(sw), float32(sh), overlay, false)
+    // パネル
+    pw, ph := 520, 480
+    px := (sw-pw)/2
+    py := (sh-ph)/2
+    drawPanel(dst, float32(px), float32(py), float32(pw), float32(ph))
+    text.Draw(dst, "レベルアップ!", faceTitle, px+24, py+56, colAccent)
+    text.Draw(dst, fmt.Sprintf("Lv %d", u.Level), faceMain, px+24, py+96, colText)
+
+    // 上昇した項目のみを表示
+    y := py + 140
+    line := 34
+    drawInc := func(label string, v int) { if v > 0 { text.Draw(dst, fmt.Sprintf("%s +%d", label, v), faceMain, px+40, y, colAccent); y += line } }
+    if gains.HPGain > 0 { drawInc("HP", gains.HPGain) }
+    drawInc("力", gains.Inc.Str)
+    drawInc("魔力", gains.Inc.Mag)
+    drawInc("技", gains.Inc.Skl)
+    drawInc("速さ", gains.Inc.Spd)
+    drawInc("幸運", gains.Inc.Lck)
+    drawInc("守備", gains.Inc.Def)
+    drawInc("魔防", gains.Inc.Res)
+    drawInc("移動", gains.Inc.Mov)
+
+    text.Draw(dst, "クリックで閉じる", faceSmall, px+pw-180, py+ph-24, colText)
+}
+
 // drawPanel は立体感のあるパネル（外枠・影付き）を描画します。
 func drawPanel(dst *ebiten.Image, x, y, w, h float32) {
     // 外枠
@@ -416,12 +579,6 @@ func drawHPBar(dst *ebiten.Image, x, y, w, h int, hp, max int) {
         col = color.RGBA{240, 200, 80, 255}
     }
     vector.DrawFilledRect(dst, float32(x), float32(y), bw, float32(h), col, false)
-}
-
-// drawStatLine は単一の能力値ラベルと数値を描画します。
-func drawStatLine(dst *ebiten.Image, face font.Face, x, y int, label string, v int) {
-    text.Draw(dst, label, face, x, y, colText)
-    text.Draw(dst, fmt.Sprintf("%2d", v), face, x+64, y, colAccent)
 }
 
 // drawStatLineWithGrowth は能力値と成長率(%)を並べて描画します。

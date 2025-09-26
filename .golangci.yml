@@ -1,20 +1,17 @@
-version: 1.54
+version: 2
 run:
   timeout: 3m
   go: "1.25"
 
 linters:
+  disable-all: true
   enable:
     - govet
     - staticcheck
     - revive
     - gocritic
-    - gosimple
     - ineffassign
-    - typecheck
-    - unused
-    - gofmt
-    - gofumpt
+    - errcheck
     - misspell
 
 linters-settings:
@@ -22,8 +19,6 @@ linters-settings:
     rules:
       - name: exported
         arguments: ["disableStutteringCheck"]
-  gofumpt:
-    extra-rules: true
   misspell:
     locale: US
 
