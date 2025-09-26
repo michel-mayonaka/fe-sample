@@ -23,6 +23,7 @@
 - `golangci-lint run`: Lint 実行（導入済みの場合）。
  - `make lint`: golangci-lint 実行。
  - `make fmt`: gofumpt + gofmt で整形。
+ - `make check`: `go vet` と `go build` でコンパイル検証（バイナリは `/dev/null` へ破棄）。
 
 ## Coding Style & Naming Conventions
 - インデント: タブ（Go 標準）。行長は 120 目安。

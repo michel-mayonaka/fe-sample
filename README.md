@@ -24,6 +24,12 @@ go build -o bin/ui_sample ./cmd/ui_sample
 ```
 ※ Apple Silicon では `GOARCH=arm64` が既定です。意図しない `amd64` クロスビルドは避けてください。
 
+## コンパイルチェック
+- 依存含めて静的検査＋ビルド検証（バイナリは残さない）
+```sh
+make check
+```
+
 ## Lint（golangci-lint）
 - インストール（macOS/Homebrew 例）: `brew install golangci-lint`
 - 実行: `make lint` または `golangci-lint run`
