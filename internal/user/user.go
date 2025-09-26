@@ -1,3 +1,4 @@
+// Package user はユーザ（セーブ）データのスキーマとローダーを提供します。
 package user
 
 import (
@@ -69,7 +70,7 @@ func LoadFromJSON(path string) (*Table, error) {
     if err != nil {
         return nil, fmt.Errorf("open user table: %w", err)
     }
-    defer f.Close()
+    defer func() { _ = f.Close() }()
     var rows []Character
     if err := json.NewDecoder(f).Decode(&rows); err != nil {
         return nil, fmt.Errorf("decode user table: %w", err)

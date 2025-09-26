@@ -1,3 +1,4 @@
+// Package model はマスターデータのスキーマとローダーを提供します。
 package model
 
 import (
@@ -67,7 +68,7 @@ func LoadFromJSON(path string) (*Table, error) {
     if err != nil {
         return nil, fmt.Errorf("open master: %w", err)
     }
-    defer f.Close()
+    defer func() { _ = f.Close() }()
     var rows []Character
     if err := json.NewDecoder(f).Decode(&rows); err != nil {
         return nil, fmt.Errorf("decode master: %w", err)
@@ -85,4 +86,3 @@ func (t *Table) Find(id string) (Character, bool) {
     c, ok := t.byID[id]
     return c, ok
 }
-

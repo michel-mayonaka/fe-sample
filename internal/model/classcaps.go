@@ -1,3 +1,4 @@
+// Package model はマスターデータのスキーマとローダーを提供します。
 package model
 
 import (
@@ -20,8 +21,10 @@ type ClassCaps struct {
     Mov   int    `json:"Mov"`
 }
 
+// ClassCapsTable はクラス名から能力上限を引ける簡易テーブルです。
 type ClassCapsTable struct { byClass map[string]ClassCaps }
 
+// LoadClassCapsJSON はクラス能力上限の JSON を読み込みます。
 func LoadClassCapsJSON(path string) (*ClassCapsTable, error) {
     b, err := os.ReadFile(path)
     if err != nil { return nil, fmt.Errorf("open class caps: %w", err) }
@@ -32,9 +35,9 @@ func LoadClassCapsJSON(path string) (*ClassCapsTable, error) {
     return t, nil
 }
 
+// Find はクラス名に対応する上限を返します。
 func (t *ClassCapsTable) Find(class string) (ClassCaps, bool) {
     if t == nil { return ClassCaps{}, false }
     c, ok := t.byClass[class]
     return c, ok
 }
-

@@ -10,7 +10,7 @@ import (
     "github.com/hajimehoshi/ebiten/v2"
     "github.com/hajimehoshi/ebiten/v2/ebitenutil"
     resourceFonts "github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
-    "github.com/hajimehoshi/ebiten/v2/text"
+    text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2 へ移行
     "github.com/hajimehoshi/ebiten/v2/vector"
     "ui_sample/internal/model"
     "ui_sample/internal/game"
@@ -284,7 +284,7 @@ const (
 )
 
 // ListItemRect は一覧画面の i 番目の行の矩形を返します。
-func ListItemRect(sw, sh, i int) (x, y, w, h int) {
+func ListItemRect(sw, _ , i int) (x, y, w, h int) {
     panelX, panelY := listMargin, listMargin
     panelW := sw - listMargin*2
     startY := panelY + listTitleOffset + 32
@@ -325,7 +325,7 @@ func DrawCharacterList(dst *ebiten.Image, units []Unit, hover int) {
 }
 
 // BackButtonRect はステータス画面に表示する戻るボタンの矩形を返します。
-func BackButtonRect(sw, sh int) (x, y, w, h int) {
+func BackButtonRect(sw, _ int) (x, y, w, h int) {
     panelX, panelY := listMargin, listMargin
     panelW := sw - listMargin*2
     x = panelX + panelW - 180
@@ -540,14 +540,15 @@ func drawFramedRect(dst *ebiten.Image, x, y, w, h float32) {
 }
 
 // drawPortraitPlaceholder は画像未設定時のプレースホルダテキストを描画します。
-func drawPortraitPlaceholder(dst *ebiten.Image, x, y, w, h float32) {
+func drawPortraitPlaceholder(dst *ebiten.Image, x, y, _, h float32) {
     text.Draw(dst, "画像なし", faceSmall, int(x+10), int(y+h/2), colAccent)
 }
 
 // drawPortrait はポートレート画像を枠内に等比縮小して描画します。
 // 線形補間により縮小時のジャギーを低減します。
 func drawPortrait(dst *ebiten.Image, img *ebiten.Image, x, y, w, h float32) {
-    iw, ih := img.Size()
+    b := img.Bounds()
+    iw, ih := b.Dx(), b.Dy()
     if iw == 0 || ih == 0 { return }
     sx := float64(w) / float64(iw)
     sy := float64(h) / float64(ih)
@@ -565,12 +566,12 @@ func drawPortrait(dst *ebiten.Image, img *ebiten.Image, x, y, w, h float32) {
 
 // drawHPBar はHP割合に応じたカラーで水平バーを描画します。
 // x,y: 左上座標, w,h: バーサイズ, hp/max: 現在HP/最大HP。
-func drawHPBar(dst *ebiten.Image, x, y, w, h int, hp, max int) {
-    if max <= 0 { max = 1 }
+func drawHPBar(dst *ebiten.Image, x, y, w, h int, hp, maxHP int) {
+    if maxHP <= 0 { maxHP = 1 }
     // 背景
     vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), color.RGBA{50, 50, 50, 255}, false)
     // 値
-    ratio := float32(hp) / float32(max)
+    ratio := float32(hp) / float32(maxHP)
     bw := float32(w) * ratio
     col := color.RGBA{80, 220, 100, 255}
     if ratio < 0.33 {

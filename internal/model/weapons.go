@@ -1,3 +1,4 @@
+// Package model はマスターデータのスキーマとローダーを提供します。
 package model
 
 import (
@@ -19,8 +20,10 @@ type Weapon struct {
     RangeMax int    `json:"rmax"`
 }
 
+// WeaponTable は武器名から基本性能を引ける簡易テーブルです。
 type WeaponTable struct { byName map[string]Weapon }
 
+// LoadWeaponsJSON は武器定義の JSON を読み込みます。
 func LoadWeaponsJSON(path string) (*WeaponTable, error) {
     b, err := os.ReadFile(path)
     if err != nil { return nil, fmt.Errorf("open weapons: %w", err) }
@@ -31,9 +34,9 @@ func LoadWeaponsJSON(path string) (*WeaponTable, error) {
     return t, nil
 }
 
+// Find は武器名に一致する定義を返します。
 func (t *WeaponTable) Find(name string) (Weapon, bool) {
     if t == nil { return Weapon{}, false }
     w, ok := t.byName[name]
     return w, ok
 }
-

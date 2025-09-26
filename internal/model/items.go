@@ -1,3 +1,4 @@
+// Package model はマスターデータのスキーマとローダーを提供します。
 package model
 
 import (
@@ -14,8 +15,10 @@ type ItemDef struct {
     Power  int    `json:"power"`  // 効果量（例: heal=10）
 }
 
+// ItemDefTable はアイテム名から定義を引ける簡易テーブルです。
 type ItemDefTable struct { byName map[string]ItemDef }
 
+// LoadItemsJSON はアイテム定義の JSON を読み込みます。
 func LoadItemsJSON(path string) (*ItemDefTable, error) {
     b, err := os.ReadFile(path)
     if err != nil { return nil, fmt.Errorf("open items: %w", err) }
@@ -26,6 +29,7 @@ func LoadItemsJSON(path string) (*ItemDefTable, error) {
     return t, nil
 }
 
+// Find は名称に一致するアイテム定義を返します。
 func (t *ItemDefTable) Find(name string) (ItemDef, bool) {
     if t == nil { return ItemDef{}, false }
     it, ok := t.byName[name]

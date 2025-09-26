@@ -280,7 +280,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 // Layout は論理解像度（内部解像度）を返します。
-func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+func (g *Game) Layout(_, _ int) (int, int) {
     return screenW, screenH
 }
 
