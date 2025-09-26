@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: lint fmt check build run
+.PHONY: lint fmt check build run mcp
 
 lint:
 	golangci-lint run -c .golangci.yml
@@ -27,3 +27,6 @@ build:
 # 実行（開発用）
 run:
 	go run ./cmd/ui_sample
+
+# MCP: 変更前チェック（必須）
+mcp: check lint
