@@ -85,6 +85,10 @@ type Game struct {
     // 抽象入力（移行中）
     ginput *gamesvc.Input
 
+    // Scene 運用（最小導入）
+    useScenes bool
+    stack     game.SceneStack
+
     // 一覧（武器/アイテム）
     weapons   []ui.WeaponRow
     items     []ui.ItemRow
@@ -191,6 +195,9 @@ func NewGame() *Game {
     }
     // メトリクス初期化（論理解像度）
     uicore.SetBaseResolution(screenW, screenH)
+    // SceneStack 最小導入（一覧→模擬戦の遷移のみ）
+    g.useScenes = true
+    g.stack.Push(&listScene{g: g})
     return g
 }
 
@@ -212,8 +219,19 @@ func (g *Game) Update() error {
     if g.ginput != nil { g.ginput.Snapshot() }
     g.updateGlobalToggles()
 
-	// 入力（マウス）
-	mx, my := ebiten.CursorPosition()
+    if g.useScenes {
+        // Scene 駆動
+        ctx := &game.Ctx{ScreenW: screenW, ScreenH: screenH, Input: g.ginput}
+        if sc := g.stack.Current(); sc != nil {
+            if next, _ := sc.Update(ctx); next != nil { g.stack.Push(next) }
+            // Pop 条件: simScene で一覧へ戻ったらポップ
+            if _, ok := sc.(*simScene); ok && g.mode == modeList { g.stack.Pop() }
+        }
+        return nil
+    }
+
+    // 入力（マウス）
+    mx, my := ebiten.CursorPosition()
     switch g.mode {
     case modeList:
         g.updateListMode(mx, my)
@@ -632,6 +650,131 @@ func (g *Game) updateStatusMode(mx, my int) {
     if g.ginput != nil && g.ginput.Press(gamesvc.Cancel) { g.mode = modeList }
 }
 
+// closeSimLogIfRequested は模擬戦ログポップアップの閉じ操作を処理します。
+func (g *Game) closeSimLogIfRequested() bool {
+    if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || (g.ginput != nil && g.ginput.Press(gamesvc.Confirm)) {
+        g.simLogPopup = false
+        g.simAutoEnded = false
+        g.simLogScroll = 0
+        return true
+    }
+    return false
+}
+
+// handleSimBack は模擬戦画面の戻る操作を処理します。
+func (g *Game) handleSimBack() {
+    mx, my := ebiten.CursorPosition()
+    bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+    if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+        g.mode = modeList
+        g.simActive = false
+    }
+    if g.ginput != nil && g.ginput.Press(gamesvc.Cancel) {
+        g.mode = modeList
+        g.simActive = false
+    }
+}
+
+// updateSimBattleCore は模擬戦画面の主要更新（開始/自動実行/地形選択）を処理します。
+func (g *Game) updateSimBattleCore() {
+    // 戦闘開始（コピーでシミュレーション）
+    mx, my := ebiten.CursorPosition()
+    bx2, by2, bw2, bh2 := ui.BattleStartButtonRect(screenW, screenH)
+    // 自動実行ボタン
+    ax, ay, aw, ah := ui.AutoRunButtonRect(screenW, screenH)
+    aHovered := pointIn(mx, my, ax, ay, aw, ah)
+    if aHovered && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+        g.simAuto = !g.simAuto
+        if g.simAuto { g.simLogPopup = false }
+    }
+    // 実行可能条件: 両者HP>0
+    canStart := g.simAtk.HP > 0 && g.simDef.HP > 0
+    leftFirst := (g.simTurn%2 == 1)
+    if canStart && pointIn(mx, my, bx2, by2, bw2, bh2) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+        if leftFirst {
+            a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simAtk, g.simDef, g.attTerrain, g.defTerrain, g.rng)
+            g.simAtk, g.simDef = a, d
+            g.simLogs = append([]string{fmt.Sprintf("ターン %d 先攻: %s", g.simTurn, g.simAtk.Name)}, logs...)
+        } else {
+            a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simDef, g.simAtk, g.defTerrain, g.attTerrain, g.rng)
+            g.simDef, g.simAtk = a, d
+            g.simLogs = append([]string{fmt.Sprintf("ターン %d 先攻: %s", g.simTurn, g.simDef.Name)}, logs...)
+        }
+        g.simLogPopup = true
+        g.simTurn++
+    }
+    if canStart && g.ginput != nil && g.ginput.Press(gamesvc.Confirm) {
+        if leftFirst {
+            a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simAtk, g.simDef, g.attTerrain, g.defTerrain, g.rng)
+            g.simAtk, g.simDef = a, d
+            g.simLogs = append([]string{fmt.Sprintf("ターン %d 先攻: %s", g.simTurn, g.simAtk.Name)}, logs...)
+        } else {
+            a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simDef, g.simAtk, g.defTerrain, g.attTerrain, g.rng)
+            g.simDef, g.simAtk = a, d
+            g.simLogs = append([]string{fmt.Sprintf("ターン %d 先攻: %s", g.simTurn, g.simDef.Name)}, logs...)
+        }
+        g.simLogPopup = true
+        g.simTurn++
+    }
+    // 自動実行: 一定クールダウンで連続ターンを再生（決着で停止）
+    if g.simAuto && canStart && !g.simLogPopup {
+        if g.simAutoCooldown > 0 {
+            g.simAutoCooldown--
+        } else {
+            if leftFirst {
+                a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simAtk, g.simDef, g.attTerrain, g.defTerrain, g.rng)
+                g.simAtk, g.simDef = a, d
+                g.simLogs = append(g.simLogs, append([]string{fmt.Sprintf("ターン %d 先攻: %s", g.simTurn, g.simAtk.Name)}, logs...)...)
+            } else {
+                a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simDef, g.simAtk, g.defTerrain, g.attTerrain, g.rng)
+                g.simDef, g.simAtk = a, d
+                g.simLogs = append(g.simLogs, append([]string{fmt.Sprintf("ターン %d 先攻: %s", g.simTurn, g.simDef.Name)}, logs...)...)
+            }
+            g.simTurn++
+            g.simAutoCooldown = 10
+            if g.simAtk.HP <= 0 || g.simDef.HP <= 0 {
+                g.simAuto = false
+                g.simLogPopup = true
+                g.simAutoEnded = true
+            }
+        }
+    }
+    // 自動実行ポップアップのスクロール（ホイール/矢印/PgUp/PgDn）
+    if g.simAuto {
+        _, wy := ebiten.Wheel()
+        if wy != 0 { g.simLogScroll -= int(wy) }
+        if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) { g.simLogScroll++ }
+        if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) { if g.simLogScroll > 0 { g.simLogScroll-- } }
+        if inpututil.IsKeyJustPressed(ebiten.KeyPageUp) { g.simLogScroll += 5 }
+        if inpututil.IsKeyJustPressed(ebiten.KeyPageDown) { g.simLogScroll -= 5; if g.simLogScroll < 0 { g.simLogScroll = 0 } }
+        if g.simLogScroll < 0 { g.simLogScroll = 0 }
+    }
+    // 地形ボタン（クリック選択）
+    mx, my = ebiten.CursorPosition()
+    for i := 0; i < 3; i++ {
+        ax, ay, aw, ah := ui.TerrainButtonRect(screenW, screenH, true, i)
+        if pointIn(mx, my, ax, ay, aw, ah) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            g.attTerrainSel = i
+            switch i { case 0: g.attTerrain = terrainPlain(); case 1: g.attTerrain = terrainForest(); case 2: g.attTerrain = terrainFort() }
+        }
+        dx, dy, dw, dh := ui.TerrainButtonRect(screenW, screenH, false, i)
+        if pointIn(mx, my, dx, dy, dw, dh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            g.defTerrainSel = i
+            switch i { case 0: g.defTerrain = terrainPlain(); case 1: g.defTerrain = terrainForest(); case 2: g.defTerrain = terrainFort() }
+        }
+    }
+    // キー（互換操作）: 1/2/3 = 攻、Shift+1/2/3 = 防（暫定: 直接キー）
+    if inpututil.IsKeyJustPressed(ebiten.Key1) {
+        if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrainSel = 0; g.defTerrain = terrainPlain() } else { g.attTerrainSel = 0; g.attTerrain = terrainPlain() }
+    }
+    if inpututil.IsKeyJustPressed(ebiten.Key2) {
+        if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrainSel = 1; g.defTerrain = terrainForest() } else { g.attTerrainSel = 1; g.attTerrain = terrainForest() }
+    }
+    if inpututil.IsKeyJustPressed(ebiten.Key3) {
+        if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrainSel = 2; g.defTerrain = terrainFort() } else { g.attTerrainSel = 2; g.attTerrain = terrainFort() }
+    }
+}
+
 // updateInventory は在庫タブ画面の入力処理をまとめたものです。
 func (g *Game) updateInventory() {
     screenW, screenH := screenW, screenH
@@ -760,7 +903,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
     uicore.UpdateMetricsFromWindow()
     uicore.MaybeUpdateFontFaces()
     screen.Fill(color.RGBA{12, 18, 30, 255})
-	switch g.mode {
+    if g.useScenes {
+        if sc := g.stack.Current(); sc != nil {
+            sc.Draw(screen)
+        }
+        if g.showHelp {
+            ebitenutil.DebugPrintAt(screen, "H: ヘルプ表示切替 / ESC: 閉じる\nBackspace: サンプル値を再読み込み", 16, screenH-64)
+        }
+        return
+    }
+    switch g.mode {
     case modeList:
         g.drawList(screen)
     case modeStatus:

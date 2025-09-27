@@ -475,3 +475,14 @@ func (b *Battle) Update(ctx *game.Ctx) (game.Scene, error) {
     - 採用: Scene/Actor/Service の最小 API、Update 順序契約、抽象入力
     - 保留: ECS 本格導入、TSV/CSV への全面移行、Hotloader 実装、`embed` 化
   - Hotloader 現状: 実装はプレースホルダ（no-op）。今後、`tables/*.tsv`/`maps/*.json` の監視→通知に対応予定。
+
+進捗ログ（2025-09-28 午後・SceneStack 最小導入）
+
+- SceneStack を導入（旧UIと併存）：
+  - `cmd/ui_sample/scenes.go`: `listScene` と `simScene` を追加（`game.Scene` 実装）。
+  - `Game` に `useScenes` と `stack` を追加。`NewGame` で `listScene` をプッシュ。
+  - `Update/Draw` を Scene 優先に分岐。Scene 使用時は旧 `mode` の分岐をスキップ。
+  - 遷移: 一覧→模擬戦は `updateListMode` 内の既存遷移フラグ（`modeSimBattle`）を勘案し、Scene をプッシュ。戻るは `modeList` への復帰を検知してポップ。
+- 重複ロジックの抽出：
+  - `closeSimLogIfRequested`/`handleSimBack`/`updateSimBattleCore` を追加し、Scene更新から利用。
+- ビルド確認: `go build ./cmd/ui_sample` 成功。
