@@ -3,6 +3,7 @@
 package main
 
 import (
+    "fmt"
     "image/color"
     "math/rand"
     "time"
@@ -57,6 +58,7 @@ type Game struct {
     simSelecting bool
     simSelectStep int // 0=攻撃側選択,1=防御側選択
     chooseHover int
+    simTurn int // 1始まり。奇数=左先攻, 偶数=右先攻
     // 地形選択
     attTerrainSel int
     defTerrainSel int
@@ -257,6 +259,7 @@ func (g *Game) Update() error {
                             g.simActive = true
                             g.mode = modeSimBattle
                             g.simSelecting = false
+                            g.simTurn = 1
                         }
                     }
                 }
@@ -383,15 +386,33 @@ func (g *Game) Update() error {
         bx2, by2, bw2, bh2 := ui.BattleStartButtonRect(screenW, screenH)
         // 実行可能条件: 両者HP>0
         canStart := g.simAtk.HP > 0 && g.simDef.HP > 0
+        leftFirst := (g.simTurn%2 == 1)
         if canStart && pointIn(mx, my, bx2, by2, bw2, bh2) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-            a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simAtk, g.simDef, g.attTerrain, g.defTerrain, g.rng)
-            g.simAtk, g.simDef, g.simLogs = a, d, logs
+            if leftFirst {
+                a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simAtk, g.simDef, g.attTerrain, g.defTerrain, g.rng)
+                g.simAtk, g.simDef = a, d
+                g.simLogs = append([]string{fmt.Sprintf("ターン %d 先攻: %s", g.simTurn, g.simAtk.Name)}, logs...)
+            } else {
+                a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simDef, g.simAtk, g.defTerrain, g.attTerrain, g.rng)
+                // a=右, d=左
+                g.simDef, g.simAtk = a, d
+                g.simLogs = append([]string{fmt.Sprintf("ターン %d 先攻: %s", g.simTurn, g.simDef.Name)}, logs...)
+            }
             g.simLogPopup = true
+            g.simTurn++
         }
         if canStart && (inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyZ)) {
-            a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simAtk, g.simDef, g.attTerrain, g.defTerrain, g.rng)
-            g.simAtk, g.simDef, g.simLogs = a, d, logs
+            if leftFirst {
+                a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simAtk, g.simDef, g.attTerrain, g.defTerrain, g.rng)
+                g.simAtk, g.simDef = a, d
+                g.simLogs = append([]string{fmt.Sprintf("ターン %d 先攻: %s", g.simTurn, g.simAtk.Name)}, logs...)
+            } else {
+                a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simDef, g.simAtk, g.defTerrain, g.attTerrain, g.rng)
+                g.simDef, g.simAtk = a, d
+                g.simLogs = append([]string{fmt.Sprintf("ターン %d 先攻: %s", g.simTurn, g.simDef.Name)}, logs...)
+            }
             g.simLogPopup = true
+            g.simTurn++
         }
         // 地形ボタン（クリック選択）
         mx, my := ebiten.CursorPosition()
@@ -467,6 +488,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
         attIdx := g.attTerrainSel
         defIdx := g.defTerrainSel
         ui.DrawTerrainButtons(screen, attIdx, defIdx)
+        // 先攻表示（ヘッダ下）
+        if g.simTurn <= 0 { g.simTurn = 1 }
+        leftFirst := (g.simTurn%2 == 1)
+        label := "先攻: "
+        if leftFirst { label += g.simAtk.Name } else { label += g.simDef.Name }
+        ebitenutil.DebugPrintAt(screen, label, uicore.ListMarginPx()+uicore.S(40), uicore.ListMarginPx()+uicore.S(56))
         if g.simLogPopup {
             ui.DrawBattleLogOverlay(screen, g.simLogs)
         }
