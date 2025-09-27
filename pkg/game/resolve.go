@@ -8,7 +8,18 @@ func ResolveRound(att, def Unit, rng *rand.Rand) (Unit, Unit, string) {
 	fr := Forecast(att, def)
 	hitTrue := (rng.Intn(100) + rng.Intn(100)) / 2
 	if hitTrue < fr.HitDisp {
+		// クリティカル（簡易）
+		crit := att.W.Crit + att.S.Skl/2 - def.S.Lck
+		if crit < 0 {
+			crit = 0
+		}
+		if crit > 100 {
+			crit = 100
+		}
 		dmg := fr.Dmg
+		if rng.Intn(100) < crit {
+			dmg *= 2
+		}
 		if dmg < 0 {
 			dmg = 0
 		}
