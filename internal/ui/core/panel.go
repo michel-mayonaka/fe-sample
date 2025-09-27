@@ -30,12 +30,12 @@ func DrawHPBar(dst *ebiten.Image, x, y, w, h int, hp, maxHP int) {
     // 背景
     vector.DrawFilledRect(dst, bx, by, bw, bh, color.RGBA{40, 48, 64, 255}, false)
     ratio := float32(hp) / float32(maxHP)
-    bw := float32(w) * ratio
+    fw := float32(w) * ratio
     col := color.RGBA{80, 220, 100, 255}
     if ratio < 0.33 {
         col = color.RGBA{220, 80, 80, 255}
     } else if ratio < 0.66 {
         col = color.RGBA{240, 200, 80, 255}
     }
-    vector.DrawFilledRect(dst, bx, by, bw, bh, col, false)
+    vector.DrawFilledRect(dst, bx, by, fw, bh, col, false)
 }

@@ -5,7 +5,7 @@ import (
     text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2
     "github.com/hajimehoshi/ebiten/v2/vector"
     "image/color"
-    "ui_sample/internal/ui/core"
+    uicore "ui_sample/internal/ui/core"
 )
 
 func ListItemRect(sw, _ int, i int) (x, y, w, h int) {

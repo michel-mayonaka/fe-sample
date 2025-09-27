@@ -6,7 +6,7 @@ import (
     text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck
     "golang.org/x/image/font"
     "ui_sample/internal/game"
-    "ui_sample/internal/ui/core"
+    uicore "ui_sample/internal/ui/core"
 )
 
 func DrawStatus(dst *ebiten.Image, u uicore.Unit) {

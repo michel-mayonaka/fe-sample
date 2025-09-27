@@ -8,7 +8,7 @@ import (
     "image/color"
     "ui_sample/internal/adapter"
     "ui_sample/internal/model"
-    "ui_sample/internal/ui/core"
+    uicore "ui_sample/internal/ui/core"
     gcore "ui_sample/pkg/game"
 )
 
