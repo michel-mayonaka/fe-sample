@@ -28,19 +28,17 @@ func SimulateBattleCopyWithTerrain(atk, def uicore.Unit, attT, defT gcore.Terrai
     if wt == nil { return a, d, append(logs, "[エラー] 武器定義を読み込めませんでした") }
     ga := adapter.UIToGame(wt, a)
     gd := adapter.UIToGame(wt, d)
-    // 攻→反→追
-    logs = append(logs, a.Name+" の攻撃")
+    // 攻→反→追（結果を同一行に出力）
     ga2, gd2, line1 := gcore.ResolveRoundAt(ga, gd, attT, defT, rng)
-    if line1 != "" { logs = append(logs, line1) }
+    if line1 != "" { logs = append(logs, a.Name+" の攻撃 → "+line1) } else { logs = append(logs, a.Name+" の攻撃") }
     d.HP = gd2.S.HP
     if d.HP < 0 { d.HP = 0 }
     // 反撃（射程チェック）
     dist := 1
     canCounter := gd2.W.RMin <= dist && dist <= gd2.W.RMax
     if d.HP > 0 && canCounter {
-        logs = append(logs, d.Name+" の反撃")
         gd3, ga3, line2 := gcore.ResolveRoundAt(gd2, ga2, defT, attT, rng)
-        if line2 != "" { logs = append(logs, line2) }
+        if line2 != "" { logs = append(logs, d.Name+" の反撃 → "+line2) } else { logs = append(logs, d.Name+" の反撃") }
         a.HP = ga3.S.HP
         if a.HP < 0 { a.HP = 0 }
         ga2, gd2 = ga3, gd3
@@ -49,23 +47,26 @@ func SimulateBattleCopyWithTerrain(atk, def uicore.Unit, attT, defT gcore.Terrai
     }
     // 追撃（AS差>=3）
     if d.HP > 0 && gcore.DoubleAdvantage(ga, gd) {
-        logs = append(logs, a.Name+" の追撃")
         ga4, gd4, line3 := gcore.ResolveRoundAt(ga2, gd2, attT, defT, rng)
-        if line3 != "" { logs = append(logs, line3) }
+        if line3 != "" { logs = append(logs, a.Name+" の追撃 → "+line3) } else { logs = append(logs, a.Name+" の追撃") }
         d.HP = gd4.S.HP
         if d.HP < 0 { d.HP = 0 }
         a.HP = ga4.S.HP
     } else if a.HP > 0 && canCounter && gcore.DoubleAdvantage(gd, ga) {
-        logs = append(logs, d.Name+" の追撃")
         gd4, ga4, line4 := gcore.ResolveRoundAt(gd2, ga2, defT, attT, rng)
-        if line4 != "" { logs = append(logs, line4) }
+        if line4 != "" { logs = append(logs, d.Name+" の追撃 → "+line4) } else { logs = append(logs, d.Name+" の追撃") }
         a.HP = ga4.S.HP
         if a.HP < 0 { a.HP = 0 }
         d.HP = gd4.S.HP
     }
-    if a.HP <= 0 { logs = append(logs, a.Name+" は倒れた") }
-    if d.HP <= 0 { logs = append(logs, d.Name+" は倒れた") }
+    // 勝利ログ
+    if a.HP <= 0 && d.HP <= 0 {
+        logs = append(logs, "相打ち")
+    } else if a.HP <= 0 {
+        logs = append(logs, "勝利: "+d.Name)
+    } else if d.HP <= 0 {
+        logs = append(logs, "勝利: "+a.Name)
+    }
     logs = append(logs, "模擬戦終了")
     return a, d, logs
 }
-
