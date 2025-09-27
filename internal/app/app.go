@@ -8,6 +8,7 @@ import (
     "ui_sample/internal/repo"
     uicore "ui_sample/internal/ui/core"
     "ui_sample/internal/user"
+    "ui_sample/internal/assets"
     gcore "ui_sample/pkg/game"
 )
 
@@ -89,7 +90,9 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
 // ReloadData は JSON バックエンドのキャッシュを再読み込みします。
 func (a *App) ReloadData() error {
     if a == nil { return nil }
-    if a.Weapons != nil { return a.Weapons.Reload() }
+    if a.Weapons != nil { if err := a.Weapons.Reload(); err != nil { return err } }
+    // 画像キャッシュもここでクリア（UI層の依存を薄く保ちつつ、利便性を優先）
+    assets.Clear()
     return nil
 }
 

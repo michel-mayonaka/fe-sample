@@ -33,10 +33,11 @@ func DrawBattle(dst *ebiten.Image, attacker, defender uicore.Unit) {
 // startEnabled が false の場合、開始ボタンはグレーアウト表示になります。
 func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, attT, defT gcore.Terrain, startEnabled bool) {
     sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
-    uicore.DrawPanel(dst, uicore.ListMargin, uicore.ListMargin, float32(sw-2*uicore.ListMargin), float32(sh-2*uicore.ListMargin))
-    leftX := uicore.ListMargin + 40
-    rightX := sw - uicore.ListMargin - 560
-    topY := uicore.ListMargin + 80
+    lm := uicore.ListMarginPx()
+    uicore.DrawPanel(dst, float32(lm), float32(lm), float32(sw-2*lm), float32(sh-2*lm))
+    leftX := lm + uicore.S(40)
+    rightX := sw - lm - uicore.S(560)
+    topY := lm + uicore.S(80)
     drawBattleSide(dst, attacker, leftX, topY)
     drawBattleSide(dst, defender, rightX, topY)
     text.Draw(dst, "戦闘プレビュー", uicore.FaceTitle, sw/2-uicore.S(120), uicore.ListMarginPx()+uicore.S(56), uicore.ColAccent)
@@ -70,53 +71,70 @@ func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, at
         }
         // 右側（反撃側の予測）
         dx := rightX
-        dy := topY + 460
+        dy := topY + uicore.S(460)
+        // 折返し幅（右列）
+        wrapRight := dynamicWrap(sw, lm, false)
         if canCounter {
             baseLineR := fmt.Sprintf("(反撃) 命中 %d%%  与ダメ %d  必殺 %d%%", frDef.HitDisp, frDef.Dmg, frDef.Crit)
-            _ = uicore.DrawWrapped(dst, uicore.FaceMain, baseLineR, dx, dy, uicore.ColText, 520, uicore.LineHMain)
+            _ = uicore.DrawWrapped(dst, uicore.FaceMain, baseLineR, dx, dy, uicore.ColText, wrapRight, uicore.LineHMainPx())
         } else {
-            _ = uicore.DrawWrapped(dst, uicore.FaceMain, "(反撃不可) 命中 -  与ダメ -  必殺 -", dx, dy, color.RGBA{180,180,180,255}, 520, uicore.LineHMain)
+            _ = uicore.DrawWrapped(dst, uicore.FaceMain, "(反撃不可) 命中 -  与ダメ -  必殺 -", dx, dy, color.RGBA{180,180,180,255}, wrapRight, uicore.LineHMainPx())
         }
         // 地形表示
-        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, terrainLine(attT), ax, ay+26, color.RGBA{200,220,255,255}, 820, uicore.LineHSmall)
-        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, terrainLine(defT), dx, dy+26, color.RGBA{200,220,255,255}, 520, uicore.LineHSmall)
+        wrapLeft := dynamicWrap(sw, lm, true)
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, terrainLine(attT), ax, ay+uicore.S(26), color.RGBA{200,220,255,255}, wrapLeft, uicore.LineHSmallPx())
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, terrainLine(defT), dx, dy+uicore.S(26), color.RGBA{200,220,255,255}, wrapRight, uicore.LineHSmallPx())
         // 内訳（簡潔表示）: 折り返し描画
         leftHitLine := fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
             frAtkBk.WeapHit, frAtkBk.Skl2, frAtkBk.LckHalf, frAtkBk.AttTileHit,
             frAtkBk.DefSpd2, frAtkBk.DefLck, frAtkBk.DefTileAvoid, frAtkBk.TriangleHit, frAtkBk.HitDisp)
-        y2 := uicore.DrawWrapped(dst, uicore.FaceSmall, leftHitLine, ax, ay+uicore.S(50), color.RGBA{210,230,255,255}, uicore.S(820), uicore.LineHSmallPx())
+        y2 := uicore.DrawWrapped(dst, uicore.FaceSmall, leftHitLine, ax, ay+uicore.S(50), color.RGBA{210,230,255,255}, wrapLeft, uicore.LineHSmallPx())
         leftDmgLine := fmt.Sprintf("[与ダメ内訳] 力:%d + 威力:%d + 相性:%+d - 守備合計:%d = %d",
             frAtkBk.AtkStr, frAtkBk.WpnMt, frAtkBk.TriangleMt, frAtkBk.DefTotal, frAtkBk.Dmg)
-        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, leftDmgLine, ax, y2, color.RGBA{210,230,255,255}, uicore.S(820), uicore.LineHSmallPx())
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, leftDmgLine, ax, y2, color.RGBA{210,230,255,255}, wrapLeft, uicore.LineHSmallPx())
         if canCounter {
             rightHit := fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
                 frDefBk.WeapHit, frDefBk.Skl2, frDefBk.LckHalf, frDefBk.AttTileHit,
                 frDefBk.DefSpd2, frDefBk.DefLck, frDefBk.DefTileAvoid, frDefBk.TriangleHit, frDefBk.HitDisp)
-            yR := uicore.DrawWrapped(dst, uicore.FaceSmall, rightHit, dx, dy+50, color.RGBA{210,230,255,255}, 520, uicore.LineHSmall)
+            yR := uicore.DrawWrapped(dst, uicore.FaceSmall, rightHit, dx, dy+uicore.S(50), color.RGBA{210,230,255,255}, wrapRight, uicore.LineHSmallPx())
             rightDmg := fmt.Sprintf("[与ダメ内訳] 力:%d + 威力:%d + 相性:%+d - 守備合計:%d = %d",
                 frDefBk.AtkStr, frDefBk.WpnMt, frDefBk.TriangleMt, frDefBk.DefTotal, frDefBk.Dmg)
-            _ = uicore.DrawWrapped(dst, uicore.FaceSmall, rightDmg, dx, yR, color.RGBA{210,230,255,255}, 520, uicore.LineHSmall)
+            _ = uicore.DrawWrapped(dst, uicore.FaceSmall, rightDmg, dx, yR, color.RGBA{210,230,255,255}, wrapRight, uicore.LineHSmallPx())
         }
     }
 
     // ヘルプ: 地形切替（下部寄せ）
-    text.Draw(dst, "[地形切替] 攻: 1=平地 2=森 3=砦 / 防: Shift+1/2/3", uicore.FaceSmall, leftX, sh-uicore.ListMargin-190, color.RGBA{190,200,210,255})
+    text.Draw(dst, "[地形切替] 攻: 1=平地 2=森 3=砦 / 防: Shift+1/2/3", uicore.FaceSmall, leftX, sh-uicore.ListMarginPx()-uicore.S(190), color.RGBA{190,200,210,255})
 }
 
 func drawBattleSide(dst *ebiten.Image, u uicore.Unit, x, y int) {
-	uicore.DrawFramedRect(dst, float32(x), float32(y), 320, 320)
-	if u.Portrait != nil {
-		uicore.DrawPortrait(dst, u.Portrait, float32(x), float32(y), 320, 320)
-	}
-	text.Draw(dst, u.Name, uicore.FaceTitle, x, y-16, uicore.ColText)
-	text.Draw(dst, u.Class+"  Lv "+uicore.Itoa(u.Level), uicore.FaceMain, x, y+350, uicore.ColAccent)
-	text.Draw(dst, uicore.Itoa(u.HP)+"/"+uicore.Itoa(u.HPMax), uicore.FaceMain, x, y+384, uicore.ColText)
-	uicore.DrawHPBar(dst, x, y+390, 320, 14, u.HP, u.HPMax)
+    sz := uicore.S(320)
+    uicore.DrawFramedRect(dst, float32(x), float32(y), float32(sz), float32(sz))
+    if u.Portrait != nil {
+        uicore.DrawPortrait(dst, u.Portrait, float32(x), float32(y), float32(sz), float32(sz))
+    }
+    text.Draw(dst, u.Name, uicore.FaceTitle, x, y-uicore.S(16), uicore.ColText)
+    text.Draw(dst, u.Class+"  Lv "+uicore.Itoa(u.Level), uicore.FaceMain, x, y+uicore.S(350), uicore.ColAccent)
+    text.Draw(dst, uicore.Itoa(u.HP)+"/"+uicore.Itoa(u.HPMax), uicore.FaceMain, x, y+uicore.S(384), uicore.ColText)
+    uicore.DrawHPBar(dst, x, y+uicore.S(390), sz, uicore.S(14), u.HP, u.HPMax)
 	wep := "-"
 	if len(u.Equip) > 0 {
 		wep = u.Equip[0].Name
 	}
     text.Draw(dst, "武器: "+wep, uicore.FaceMain, x, y+420, uicore.ColText)
+}
+
+// dynamicWrap は左右列の折返し幅をウィンドウ幅とマージンから決めます。
+// 左右で若干の差をつけ、最小/最大幅を設けます。
+func dynamicWrap(sw, lm int, left bool) int {
+    panelW := sw - 2*lm
+    base := panelW/2 - uicore.S(100)
+    if !left {
+        base = panelW/2 - uicore.S(140)
+    }
+    if base < uicore.S(420) { base = uicore.S(420) }
+    if base > uicore.S(900) { base = uicore.S(900) }
+    return base
 }
 
 // forecastBoth は UI ユニット2体から /pkg/game の予測結果を返します。
