@@ -13,6 +13,7 @@ import (
     "ui_sample/internal/app"
     "ui_sample/internal/config"
     "ui_sample/internal/repo"
+    "ui_sample/internal/assets"
     "ui_sample/internal/game"
     "ui_sample/internal/ui"
     "ui_sample/internal/user"
@@ -145,6 +146,8 @@ func NewGame() *Game {
     if ur, err := appInitUserRepo(g.userPath); err == nil {
         if wr, err2 := appInitWeaponsRepo(config.DefaultWeaponsPath); err2 == nil {
             g.app = app.New(ur, wr, g.rng)
+            // UIへ武器テーブルを共有
+            ui.SetWeaponTable(wr.Table())
         }
     }
     return g
@@ -160,10 +163,10 @@ func appInitWeaponsRepo(path string) (*repo.JSONWeaponsRepo, error) {
 
 // Update は毎フレームの更新処理を行います。
 func (g *Game) Update() error {
-	if ebiten.IsKeyPressed(ebiten.KeyBackspace) {
-		// データ再読み込み
-		if us, err := ui.LoadUnitsFromUser("db/user/usr_characters.json"); err == nil && len(us) > 0 {
-			g.units = us
+    if ebiten.IsKeyPressed(ebiten.KeyBackspace) {
+        // データ再読み込み
+        if us, err := ui.LoadUnitsFromUser("db/user/usr_characters.json"); err == nil && len(us) > 0 {
+            g.units = us
 			if g.selIndex >= len(us) {
 				g.selIndex = 0
 			}
@@ -349,6 +352,9 @@ func (g *Game) Update() error {
             g.mode = modeList
             g.simActive = false
         }
+        // Repo/キャッシュ再読込
+        if g.app != nil && g.app.Weapons != nil { _ = g.app.Weapons.Reload(); ui.SetWeaponTable(g.app.Weapons.Table()) }
+        assets.Clear()
     }
     return nil
 }

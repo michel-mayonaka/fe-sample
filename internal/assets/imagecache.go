@@ -33,3 +33,9 @@ func LoadImage(path string) (*ebiten.Image, error) {
     return img, nil
 }
 
+// Clear はキャッシュを破棄します。
+func Clear() {
+    DefaultImageCache.mu.Lock()
+    DefaultImageCache.m = make(map[string]*ebiten.Image)
+    DefaultImageCache.mu.Unlock()
+}

@@ -7,6 +7,7 @@ import (
     uipopup "ui_sample/internal/ui/popup"
     uiscreens "ui_sample/internal/ui/screens"
     uiwidgets "ui_sample/internal/ui/widgets"
+    "ui_sample/internal/model"
     gcore "ui_sample/pkg/game"
 )
 
@@ -42,8 +43,8 @@ func DrawSimulationBattle(dst *ebiten.Image, atk, def Unit, logs []string) {
 	uiscreens.DrawSimulationBattle(dst, atk, def, logs)
 }
 func SimulateBattleCopy(atk, def Unit, rng *rand.Rand) (Unit, Unit, []string) {
-	a, d, l := uiscreens.SimulateBattleCopy(atk, def, rng)
-	return a, d, l
+    a, d, l := uiscreens.SimulateBattleCopy(atk, def, rng)
+    return a, d, l
 }
 func SimBattleButtonRect(sw, sh int) (int, int, int, int) {
 	return uiwidgets.SimBattleButtonRect(sw, sh)
@@ -62,7 +63,7 @@ func DrawLevelUpButton(dst *ebiten.Image, hovered, enabled bool) {
 }
 func ToBattleButtonRect(sw, sh int) (int, int, int, int) { return uiwidgets.ToBattleButtonRect(sw, sh) }
 func DrawToBattleButton(dst *ebiten.Image, hovered, enabled bool) {
-	uiwidgets.DrawToBattleButton(dst, hovered, enabled)
+    uiwidgets.DrawToBattleButton(dst, hovered, enabled)
 }
 func BattleStartButtonRect(sw, sh int) (int, int, int, int) {
 	return uiscreens.BattleStartButtonRect(sw, sh)
@@ -72,3 +73,6 @@ func BattleStartButtonRect(sw, sh int) (int, int, int, int) {
 func RollLevelUp(u Unit, rnd func() float64) LevelUpGains        { return uipopup.RollLevelUp(u, rnd) }
 func ApplyGains(u *Unit, g LevelUpGains, cap int)                { uipopup.ApplyGains(u, g, cap) }
 func DrawLevelUpPopup(dst *ebiten.Image, u Unit, g LevelUpGains) { uipopup.DrawLevelUpPopup(dst, u, g) }
+
+// 依存注入（武器テーブル共有）
+func SetWeaponTable(wt *model.WeaponTable) { uiscreens.SetWeaponTable(wt) }

@@ -10,6 +10,8 @@ type WeaponsRepo interface {
     Find(name string) (model.Weapon, bool)
     // Table は内部テーブルへの参照を返します（読み取り専用の想定）。
     Table() *model.WeaponTable
+    // Reload は基のJSONを再読み込みし、キャッシュを更新します。
+    Reload() error
 }
 
 // JSONWeaponsRepo は JSON から読み込む簡易実装です（起動時に1度ロード）。
@@ -36,3 +38,9 @@ func (r *JSONWeaponsRepo) Find(name string) (model.Weapon, bool) {
 
 func (r *JSONWeaponsRepo) Table() *model.WeaponTable { return r.table }
 
+func (r *JSONWeaponsRepo) Reload() error {
+    wt, err := model.LoadWeaponsJSON(r.path)
+    if err != nil { return err }
+    r.table = wt
+    return nil
+}

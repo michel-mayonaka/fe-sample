@@ -12,6 +12,11 @@ import (
     gcore "ui_sample/pkg/game"
 )
 
+// 共有武器テーブル（Repo注入で設定）。未設定時は初回アクセスで読み込みキャッシュ。
+var wtShared *model.WeaponTable
+
+func SetWeaponTable(wt *model.WeaponTable) { wtShared = wt }
+
 func BattleStartButtonRect(sw, sh int) (x, y, w, h int) {
 	w, h = 240, 60
 	x = (sw - w) / 2
@@ -54,7 +59,7 @@ func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, at
         baseLine := fmt.Sprintf("命中 %d%%  与ダメ %d  必殺 %d%%", frAtk.HitDisp, frAtk.Dmg, frAtk.Crit)
         text.Draw(dst, baseLine, uicore.FaceMain, ax, ay, uicore.ColText)
         // 相性を同一行の末尾に配置
-        if wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json"); err == nil {
+        if wt := weaponTable(); wt != nil {
             aType := weaponTypeOf(wt, attacker)
             dType := weaponTypeOf(wt, defender)
             lbl, col := triangleLabel(aType, dType)
@@ -136,8 +141,8 @@ func forecastBoth(atk, def uicore.Unit) (gcore.ForecastResult, gcore.ForecastRes
 
 // forecastBothWithTerrain は指定地形で予測します。
 func forecastBothWithTerrain(atk, def uicore.Unit, attT, defT gcore.Terrain) (gcore.ForecastResult, gcore.ForecastResult, bool, bool) {
-    wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json")
-    if err != nil {
+    wt := weaponTable()
+    if wt == nil {
         return gcore.ForecastResult{}, gcore.ForecastResult{}, false, false
     }
     ga := adapter.UIToGame(wt, atk)
@@ -153,8 +158,8 @@ func forecastBothWithTerrain(atk, def uicore.Unit, attT, defT gcore.Terrain) (gc
 
 // explain 版
 func forecastBothWithTerrainExplain(atk, def uicore.Unit, attT, defT gcore.Terrain) (gcore.ForecastResult, gcore.ForecastBreakdown, gcore.ForecastResult, gcore.ForecastBreakdown, bool, bool) {
-    wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json")
-    if err != nil {
+    wt := weaponTable()
+    if wt == nil {
         return gcore.ForecastResult{}, gcore.ForecastBreakdown{}, gcore.ForecastResult{}, gcore.ForecastBreakdown{}, false, false
     }
     ga := adapter.UIToGame(wt, atk)
@@ -195,6 +200,16 @@ func weaponTypeOf(wt *model.WeaponTable, u uicore.Unit) string {
         return w.Type
     }
     return ""
+}
+
+func weaponTable() *model.WeaponTable {
+    if wtShared != nil { return wtShared }
+    // フォールバック: 直接JSON読込（初回のみ）。
+    if wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json"); err == nil {
+        wtShared = wt
+        return wtShared
+    }
+    return nil
 }
 
 func triangleLabel(attType, defType string) (string, color.Color) {

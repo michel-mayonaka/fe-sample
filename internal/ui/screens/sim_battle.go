@@ -1,15 +1,14 @@
 package uiscreens
 
 import (
-	"fmt"
-	"github.com/hajimehoshi/ebiten/v2"
-	text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2
-	"github.com/hajimehoshi/ebiten/v2/vector"
-	"image/color"
-	"math/rand"
-	"ui_sample/internal/model"
-	uicore "ui_sample/internal/ui/core"
-	gcore "ui_sample/pkg/game"
+    "fmt"
+    "github.com/hajimehoshi/ebiten/v2"
+    text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2
+    "github.com/hajimehoshi/ebiten/v2/vector"
+    "image/color"
+    "math/rand"
+    uicore "ui_sample/internal/ui/core"
+    gcore "ui_sample/pkg/game"
 )
 
 // ボタンRectは widgets パッケージ側に統一しています。
@@ -44,15 +43,13 @@ func SimulateBattleCopy(atk, def uicore.Unit, rng *rand.Rand) (uicore.Unit, uico
 }
 
 func simulateHit(atk, def uicore.Unit, rng *rand.Rand) (uicore.Unit, uicore.Unit, string) {
-	// 武器威力
-	might := 0
-	if len(atk.Equip) > 0 {
-		if wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json"); err == nil {
-			if w, ok := wt.Find(atk.Equip[0].Name); ok {
-				might = w.Might
-			}
-		}
-	}
+    // 武器威力（共有テーブル）
+    might := 0
+    if len(atk.Equip) > 0 {
+        if wt := weaponTable(); wt != nil {
+            if w, ok := wt.Find(atk.Equip[0].Name); ok { might = w.Might }
+        }
+    }
 	ga := gcore.Unit{ID: atk.ID, Name: atk.Name, Class: atk.Class, Lv: atk.Level,
 		S: gcore.Stats{HP: atk.HP, Str: atk.Stats.Str, Skl: atk.Stats.Skl, Spd: atk.Stats.Spd, Lck: atk.Stats.Lck, Def: atk.Stats.Def, Res: atk.Stats.Res, Mov: atk.Stats.Mov},
 		W: gcore.Weapon{MT: might}}
