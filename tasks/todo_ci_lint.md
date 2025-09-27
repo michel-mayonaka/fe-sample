@@ -12,6 +12,8 @@
 - Makefile更新: `lint` を全体対象に、`lint-ci`（厳格）を追加。`mcp` は CI 上で `lint-ci` を使うよう切替。
 - CI導入: `.github/workflows/ci.yml` を追加（Go 1.25.x固定、モジュール/ビルドキャッシュ、`make mcp`）。GUI依存のビルドはスキップ条件維持。
 - 検証: `golangci-lint run`=0件、`make check-all` ビルドOK、`cmd/ui_sample` ビルドOK。
+- CIキャッシュ強化: Actions のキャッシュキーに `**/go.mod` を追加（既存の `**/go.sum` / `.golangci.yml` と併用）し、依存更新検知を安定化。
+- 段階導入オプション: `workflow_dispatch` の `extra_linters` 入力を追加し、`EXTRA_LINTERS` 経由で厳格ルール（例: `funlen/gocognit/cyclop`）を手動トグル可能に（Makefile の `lint-ci` と連携）。
 - PR1: `Update` のモード別抽出を実施。`updateListMode(mx,my)` と `updateStatusMode(mx,my)` を追加し、`Update` 内の該当処理を移設（挙動不変）。`make mcp`=OK（build/lint 0件）。
 
 ## 未了/保留

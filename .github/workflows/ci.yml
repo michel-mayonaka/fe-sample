@@ -5,6 +5,12 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      extra_linters:
+        description: "EXTRA_LINTERS（例: -E funlen -E gocognit -E cyclop）"
+        required: false
+        default: ""
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -37,7 +43,7 @@ jobs:
           path: |
             .gocache
             .gomodcache
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-${{ hashFiles('.golangci.yml') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-${{ hashFiles('.golangci.yml') }}
           restore-keys: |
             ${{ runner.os }}-go-
 
@@ -50,6 +56,8 @@ jobs:
           echo "$PWD/bin" >> $GITHUB_PATH
 
       - name: Make MCP (vet/build/lint)
+        env:
+          EXTRA_LINTERS: ${{ github.event.inputs.extra_linters }}
         run: |
           # 追加の厳格ルールは必要時に有効化できます（例: funlen/gocognit/cyclop）
           # EXTRA_LINTERS='-E funlen -E gocognit -E cyclop' make mcp
