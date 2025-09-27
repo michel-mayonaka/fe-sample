@@ -93,3 +93,4 @@ func (s *List) Draw(dst *ebiten.Image) {
         scpopup.DrawChooseUnitPopup(dst, title, s.E.Units, s.chooseHover)
     }
 }
+
