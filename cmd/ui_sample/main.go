@@ -366,6 +366,7 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
     // ウィンドウサイズからスケール更新
     uicore.UpdateMetricsFromWindow()
+    uicore.MaybeUpdateFontFaces()
     screen.Fill(color.RGBA{12, 18, 30, 255})
 	switch g.mode {
 	case modeList:

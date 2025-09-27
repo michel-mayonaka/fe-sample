@@ -30,3 +30,5 @@ func ListTitleOffsetPx() int { return S(ListTitleOffset) }
 func LineHMainPx() int       { return S(LineHMain) }
 func LineHSmallPx() int      { return S(LineHSmall) }
 
+// CurrentScale は現在のスケール値を返します。
+func CurrentScale() float32 { return scale }

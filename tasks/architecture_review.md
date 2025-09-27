@@ -53,3 +53,5 @@
 - 2025-09-27: レベルアップ保存処理を `App.PersistUnit` へ委譲。`internal/ui/screens/battle.go` の変換を `adapter.UIToGame` に統一。画像キャッシュ `internal/assets` を導入し `ui/core` の読み込みを置換。
 - 2025-09-27: 三すくみ関係/地形名を `pkg/game` に昇格（`TriangleRelationOf`, `TerrainPresetName`）。UIは表示のみ担当。Backspaceで Repo リロード＋画像キャッシュクリアを App API 経由に変更。
 - 2025-09-27: スケーリング基盤（`uicore.Metrics`）を追加。`一覧/ボタン/戦闘/模擬戦` の主要レイアウトに適用し、ウィンドウサイズから毎フレーム更新。
+- 2025-09-27: ステータス画面・レベルアップポップアップのスケール適用を追加（portrait/HPバー/行高/余白）。バトル開始ボタン/模擬戦サイド枠も拡張。
+- 2025-09-27: フォントのスケール連動を実装（`uicore.MaybeUpdateFontFaces`）。ウィンドウサイズに応じて FaceTitle/Main/Small を再生成。
