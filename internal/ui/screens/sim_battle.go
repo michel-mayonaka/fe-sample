@@ -92,12 +92,13 @@ func DrawSimulationBattle(dst *ebiten.Image, atk, def uicore.Unit, logs []string
 }
 
 func drawSide(dst *ebiten.Image, u uicore.Unit, x, y int) {
-	uicore.DrawFramedRect(dst, float32(x), float32(y), 320, 320)
-	if u.Portrait != nil {
-		uicore.DrawPortrait(dst, u.Portrait, float32(x), float32(y), 320, 320)
-	}
-	text.Draw(dst, u.Name, uicore.FaceTitle, x, y-16, uicore.ColText)
-	text.Draw(dst, u.Class+"  Lv "+uicore.Itoa(u.Level), uicore.FaceMain, x, y+350, uicore.ColAccent)
-	text.Draw(dst, uicore.Itoa(u.HP)+"/"+uicore.Itoa(u.HPMax), uicore.FaceMain, x, y+384, uicore.ColText)
-	uicore.DrawHPBar(dst, x, y+390, 320, 14, u.HP, u.HPMax)
+    sz := uicore.S(320)
+    uicore.DrawFramedRect(dst, float32(x), float32(y), float32(sz), float32(sz))
+    if u.Portrait != nil {
+        uicore.DrawPortrait(dst, u.Portrait, float32(x), float32(y), float32(sz), float32(sz))
+    }
+    text.Draw(dst, u.Name, uicore.FaceTitle, x, y-uicore.S(16), uicore.ColText)
+    text.Draw(dst, u.Class+"  Lv "+uicore.Itoa(u.Level), uicore.FaceMain, x, y+uicore.S(350), uicore.ColAccent)
+    text.Draw(dst, uicore.Itoa(u.HP)+"/"+uicore.Itoa(u.HPMax), uicore.FaceMain, x, y+uicore.S(384), uicore.ColText)
+    uicore.DrawHPBar(dst, x, y+uicore.S(390), sz, uicore.S(14), u.HP, u.HPMax)
 }

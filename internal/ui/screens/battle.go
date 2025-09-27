@@ -18,10 +18,10 @@ var wtShared *model.WeaponTable
 func SetWeaponTable(wt *model.WeaponTable) { wtShared = wt }
 
 func BattleStartButtonRect(sw, sh int) (x, y, w, h int) {
-	w, h = 240, 60
-	x = (sw - w) / 2
-	y = sh - uicore.ListMargin - h
-	return
+    w, h = uicore.S(240), uicore.S(60)
+    x = (sw - w) / 2
+    y = sh - uicore.ListMarginPx() - h
+    return
 }
 
 // DrawBattle は後方互換（平地扱い）。
@@ -49,7 +49,7 @@ func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, at
         labelCol = color.RGBA{200, 200, 200, 180}
     }
     vector.DrawFilledRect(dst, float32(bx), float32(by), float32(bw), float32(bh), fill, false)
-    text.Draw(dst, "戦闘開始", uicore.FaceMain, bx+70, by+38, labelCol)
+    text.Draw(dst, "戦闘開始", uicore.FaceMain, bx+uicore.S(70), by+uicore.S(38), labelCol)
 
     // 予測値表示（/pkg/game.ForecastAt）
     if frAtk, frAtkBk, frDef, frDefBk, canCounter, ok := forecastBothWithTerrainExplain(attacker, defender, attT, defT); ok {

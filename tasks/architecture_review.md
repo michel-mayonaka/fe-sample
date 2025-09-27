@@ -52,3 +52,4 @@
 - 2025-09-27: Repo/Adapter 雛形を追加（`internal/repo`, `internal/adapter`）。`internal/app` を新設し戦闘解決を `App.RunBattleRound` へ集約。`main.go` から戦闘ロジック/保存処理を委譲し薄型化。
 - 2025-09-27: レベルアップ保存処理を `App.PersistUnit` へ委譲。`internal/ui/screens/battle.go` の変換を `adapter.UIToGame` に統一。画像キャッシュ `internal/assets` を導入し `ui/core` の読み込みを置換。
 - 2025-09-27: 三すくみ関係/地形名を `pkg/game` に昇格（`TriangleRelationOf`, `TerrainPresetName`）。UIは表示のみ担当。Backspaceで Repo リロード＋画像キャッシュクリアを App API 経由に変更。
+- 2025-09-27: スケーリング基盤（`uicore.Metrics`）を追加。`一覧/ボタン/戦闘/模擬戦` の主要レイアウトに適用し、ウィンドウサイズから毎フレーム更新。

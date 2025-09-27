@@ -1,13 +1,13 @@
 package uipopup
 
 import (
-	"fmt"
-	"github.com/hajimehoshi/ebiten/v2"
-	text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2
-	"github.com/hajimehoshi/ebiten/v2/vector"
-	"image/color"
-	"ui_sample/internal/model"
-	uicore "ui_sample/internal/ui/core"
+    "fmt"
+    "github.com/hajimehoshi/ebiten/v2"
+    text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2
+    "github.com/hajimehoshi/ebiten/v2/vector"
+    "image/color"
+    "ui_sample/internal/model"
+    uicore "ui_sample/internal/ui/core"
 )
 
 type LevelUpGains struct {
@@ -91,33 +91,31 @@ func ApplyGains(u *uicore.Unit, gains LevelUpGains, levelCap int) {
 }
 
 func DrawLevelUpPopup(dst *ebiten.Image, u uicore.Unit, gains LevelUpGains) {
-	sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
-	overlay := color.RGBA{0, 0, 0, 160}
-	vector.DrawFilledRect(dst, 0, 0, float32(sw), float32(sh), overlay, false)
-	pw, ph := 520, 480
-	px := (sw - pw) / 2
-	py := (sh - ph) / 2
-	uicore.DrawPanel(dst, float32(px), float32(py), float32(pw), float32(ph))
-	text.Draw(dst, "レベルアップ!", uicore.FaceTitle, px+24, py+56, uicore.ColAccent)
-	text.Draw(dst, fmt.Sprintf("Lv %d", u.Level), uicore.FaceMain, px+24, py+96, uicore.ColText)
-	y := py + 140
-	line := 34
-	drawInc := func(label string, v int) {
-		if v > 0 {
-			text.Draw(dst, fmt.Sprintf("%s +%d", label, v), uicore.FaceMain, px+40, y, uicore.ColAccent)
-			y += line
-		}
-	}
-	if gains.HPGain > 0 {
-		drawInc("HP", gains.HPGain)
-	}
-	drawInc("力", gains.Inc.Str)
-	drawInc("魔力", gains.Inc.Mag)
-	drawInc("技", gains.Inc.Skl)
-	drawInc("速さ", gains.Inc.Spd)
-	drawInc("幸運", gains.Inc.Lck)
-	drawInc("守備", gains.Inc.Def)
-	drawInc("魔防", gains.Inc.Res)
-	drawInc("移動", gains.Inc.Mov)
-	text.Draw(dst, "クリックで閉じる", uicore.FaceSmall, px+pw-180, py+ph-24, uicore.ColText)
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    overlay := color.RGBA{0, 0, 0, 160}
+    vector.DrawFilledRect(dst, 0, 0, float32(sw), float32(sh), overlay, false)
+    pw, ph := uicore.S(520), uicore.S(480)
+    px := (sw - pw) / 2
+    py := (sh - ph) / 2
+    uicore.DrawPanel(dst, float32(px), float32(py), float32(pw), float32(ph))
+    text.Draw(dst, "レベルアップ!", uicore.FaceTitle, px+uicore.S(24), py+uicore.S(56), uicore.ColAccent)
+    text.Draw(dst, fmt.Sprintf("Lv %d", u.Level), uicore.FaceMain, px+uicore.S(24), py+uicore.S(96), uicore.ColText)
+    y := py + uicore.S(140)
+    line := uicore.S(34)
+    drawInc := func(label string, v int) {
+        if v > 0 {
+            text.Draw(dst, fmt.Sprintf("%s +%d", label, v), uicore.FaceMain, px+uicore.S(40), y, uicore.ColAccent)
+            y += line
+        }
+    }
+    if gains.HPGain > 0 { drawInc("HP", gains.HPGain) }
+    drawInc("力", gains.Inc.Str)
+    drawInc("魔力", gains.Inc.Mag)
+    drawInc("技", gains.Inc.Skl)
+    drawInc("速さ", gains.Inc.Spd)
+    drawInc("幸運", gains.Inc.Lck)
+    drawInc("守備", gains.Inc.Def)
+    drawInc("魔防", gains.Inc.Res)
+    drawInc("移動", gains.Inc.Mov)
+    text.Draw(dst, "クリックで閉じる", uicore.FaceSmall, px+pw-uicore.S(180), py+ph-uicore.S(24), uicore.ColText)
 }
