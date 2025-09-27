@@ -239,25 +239,25 @@ func (g *Game) Update() error {
 		// レベルアップボタン
 		lbx, lby, lbw, lbh := ui.LevelUpButtonRect(screenW, screenH)
 		lvEnabled := g.unit.Level < game.LevelCap && !g.popupActive
-		if lvEnabled && pointIn(mx, my, lbx, lby, lbw, lbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			// 抽選 → 反映 → 保存 → ポップアップ表示
-			gains := ui.RollLevelUp(g.unit, g.rng.Float64)
-			ui.ApplyGains(&g.unit, gains, game.LevelCap)
-			g.units[g.selIndex] = g.unit
-			g.popupGains = gains
-			g.popupActive = true
-			g.popupJustOpened = true
-			// 保存
-			if g.userTable != nil {
-				if c, ok := g.userTable.Find(g.unit.ID); ok {
-					c.Level = g.unit.Level
-					c.HPMax = g.unit.HPMax
-					c.Stats = user.Stats{Str: g.unit.Stats.Str, Mag: g.unit.Stats.Mag, Skl: g.unit.Stats.Skl, Spd: g.unit.Stats.Spd, Lck: g.unit.Stats.Lck, Def: g.unit.Stats.Def, Res: g.unit.Stats.Res, Mov: g.unit.Stats.Mov}
-					g.userTable.UpdateCharacter(c)
-					_ = g.userTable.Save(g.userPath)
-				}
-			}
-		}
+        if lvEnabled && pointIn(mx, my, lbx, lby, lbw, lbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            // 抽選 → 反映 → 保存 → ポップアップ表示
+            gains := ui.RollLevelUp(g.unit, g.rng.Float64)
+            ui.ApplyGains(&g.unit, gains, game.LevelCap)
+            g.units[g.selIndex] = g.unit
+            g.popupGains = gains
+            g.popupActive = true
+            g.popupJustOpened = true
+            // 保存（App経由） + ローカルテーブル同期
+            if g.userTable != nil {
+                if c, ok := g.userTable.Find(g.unit.ID); ok {
+                    c.Level = g.unit.Level
+                    c.HPMax = g.unit.HPMax
+                    c.Stats = user.Stats{Str: g.unit.Stats.Str, Mag: g.unit.Stats.Mag, Skl: g.unit.Stats.Skl, Spd: g.unit.Stats.Spd, Lck: g.unit.Stats.Lck, Def: g.unit.Stats.Def, Res: g.unit.Stats.Res, Mov: g.unit.Stats.Mov}
+                    g.userTable.UpdateCharacter(c)
+                }
+            }
+            if g.app != nil { _ = g.app.PersistUnit(g.unit) }
+        }
 		// ポップアップ閉じる
 		if g.popupActive {
 			if g.popupJustOpened {

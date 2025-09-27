@@ -8,7 +8,7 @@
 - UI層: `internal/ui/{core,widgets,screens,popup}` で描画・レイアウトを分割し、`internal/ui/api.go` で外向けAPI提供。
 - ドメイン層: `pkg/game` に戦闘ロジック（予測/解決/地形/三すくみ）。単体テストあり。
 - データ層: マスタ `internal/model`（mst_）とユーザ `internal/user`（usr_）で明確分離。
-- 資産: 画像はファイル読み込み（`ebitenutil.NewImageFromFile`）。`embed` 未使用。
+- 資産: 画像はキャッシュ（`internal/assets.ImageCache`）経由でファイル読み込み。`embed` 未使用。
 - ツール: Makefile に vet/build/test。`pkg/...` を最小対象にしている。
 
 ## 良い点
@@ -50,3 +50,4 @@
 - 2025-09-27: 初版作成（現状評価と改善提案を反映）。
 - 2025-09-27: ステータス=作成完了。次アクション案: Repo/Adapter 雛形の追加と `main` の薄型化。
 - 2025-09-27: Repo/Adapter 雛形を追加（`internal/repo`, `internal/adapter`）。`internal/app` を新設し戦闘解決を `App.RunBattleRound` へ集約。`main.go` から戦闘ロジック/保存処理を委譲し薄型化。
+- 2025-09-27: レベルアップ保存処理を `App.PersistUnit` へ委譲。`internal/ui/screens/battle.go` の変換を `adapter.UIToGame` に統一。画像キャッシュ `internal/assets` を導入し `ui/core` の読み込みを置換。

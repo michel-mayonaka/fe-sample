@@ -6,6 +6,7 @@ import (
     "ui_sample/internal/adapter"
     "ui_sample/internal/repo"
     uicore "ui_sample/internal/ui/core"
+    "ui_sample/internal/user"
     gcore "ui_sample/pkg/game"
 )
 
@@ -82,4 +83,17 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
         }
     }
     return units, logs, true, nil
+}
+
+// PersistUnit は UI ユニットの現在値をユーザセーブへ反映して保存します。
+func (a *App) PersistUnit(u uicore.Unit) error {
+    if a == nil || a.Users == nil { return nil }
+    c, ok := a.Users.Find(u.ID)
+    if !ok { return nil }
+    c.Level = u.Level
+    c.HP = u.HP
+    c.HPMax = u.HPMax
+    c.Stats = user.Stats{Str: u.Stats.Str, Mag: u.Stats.Mag, Skl: u.Stats.Skl, Spd: u.Stats.Spd, Lck: u.Stats.Lck, Def: u.Stats.Def, Res: u.Stats.Res, Mov: u.Stats.Mov}
+    a.Users.Update(c)
+    return a.Users.Save()
 }

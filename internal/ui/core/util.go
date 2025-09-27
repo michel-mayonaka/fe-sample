@@ -3,10 +3,10 @@ package uicore
 import (
     "github.com/hajimehoshi/ebiten/v2"
     text "github.com/hajimehoshi/ebiten/v2/text"
-    "github.com/hajimehoshi/ebiten/v2/ebitenutil"
     "golang.org/x/image/font"
     "image/color"
     "strconv"
+    "ui_sample/internal/assets"
     "ui_sample/internal/user"
 )
 
@@ -23,11 +23,11 @@ func UnitFromUser(c user.Character) Unit {
 	for _, it := range c.Equip {
 		u.Equip = append(u.Equip, Item{Name: it.Name, Uses: it.Uses, Max: it.Max})
 	}
-	if c.Portrait != "" {
-		if img, _, err := ebitenutil.NewImageFromFile(c.Portrait); err == nil {
-			u.Portrait = img
-		}
-	}
+    if c.Portrait != "" {
+        if img, err := assets.LoadImage(c.Portrait); err == nil {
+            u.Portrait = img
+        }
+    }
 	if u.HP == 0 && u.HPMax > 0 {
 		u.HP = u.HPMax
 	} else {

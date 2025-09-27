@@ -6,6 +6,7 @@ import (
     text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2
     "github.com/hajimehoshi/ebiten/v2/vector"
     "image/color"
+    "ui_sample/internal/adapter"
     "ui_sample/internal/model"
     "ui_sample/internal/ui/core"
     gcore "ui_sample/pkg/game"
@@ -119,14 +120,8 @@ func forecastBoth(atk, def uicore.Unit) (gcore.ForecastResult, gcore.ForecastRes
     if err != nil {
         return gcore.ForecastResult{}, gcore.ForecastResult{}, false, gcore.Terrain{}, gcore.Terrain{}, false
     }
-    ga, ok := toGameUnit(wt, atk)
-    if !ok {
-        return gcore.ForecastResult{}, gcore.ForecastResult{}, false, gcore.Terrain{}, gcore.Terrain{}, false
-    }
-    gd, ok := toGameUnit(wt, def)
-    if !ok {
-        return gcore.ForecastResult{}, gcore.ForecastResult{}, false, gcore.Terrain{}, gcore.Terrain{}, false
-    }
+    ga := adapter.UIToGame(wt, atk)
+    gd := adapter.UIToGame(wt, def)
     // 射程（暫定：距離1固定）。
     dist := 1
     canCounter := gd.W.RMin <= dist && dist <= gd.W.RMax
@@ -145,14 +140,8 @@ func forecastBothWithTerrain(atk, def uicore.Unit, attT, defT gcore.Terrain) (gc
     if err != nil {
         return gcore.ForecastResult{}, gcore.ForecastResult{}, false, false
     }
-    ga, ok := toGameUnit(wt, atk)
-    if !ok {
-        return gcore.ForecastResult{}, gcore.ForecastResult{}, false, false
-    }
-    gd, ok := toGameUnit(wt, def)
-    if !ok {
-        return gcore.ForecastResult{}, gcore.ForecastResult{}, false, false
-    }
+    ga := adapter.UIToGame(wt, atk)
+    gd := adapter.UIToGame(wt, def)
     dist := 1
     canCounter := gd.W.RMin <= dist && dist <= gd.W.RMax
     frDef := gcore.ForecastResult{}
@@ -168,14 +157,8 @@ func forecastBothWithTerrainExplain(atk, def uicore.Unit, attT, defT gcore.Terra
     if err != nil {
         return gcore.ForecastResult{}, gcore.ForecastBreakdown{}, gcore.ForecastResult{}, gcore.ForecastBreakdown{}, false, false
     }
-    ga, ok := toGameUnit(wt, atk)
-    if !ok {
-        return gcore.ForecastResult{}, gcore.ForecastBreakdown{}, gcore.ForecastResult{}, gcore.ForecastBreakdown{}, false, false
-    }
-    gd, ok := toGameUnit(wt, def)
-    if !ok {
-        return gcore.ForecastResult{}, gcore.ForecastBreakdown{}, gcore.ForecastResult{}, gcore.ForecastBreakdown{}, false, false
-    }
+    ga := adapter.UIToGame(wt, atk)
+    gd := adapter.UIToGame(wt, def)
     dist := 1
     canCounter := gd.W.RMin <= dist && dist <= gd.W.RMax
     frAtk, bkAtk := gcore.ForecastAtExplain(ga, gd, attT, defT)
@@ -187,20 +170,7 @@ func forecastBothWithTerrainExplain(atk, def uicore.Unit, attT, defT gcore.Terra
     return frAtk, bkAtk, frDef, bkDef, canCounter, true
 }
 
-func toGameUnit(wt *model.WeaponTable, u uicore.Unit) (gcore.Unit, bool) {
-    var w model.Weapon
-    if len(u.Equip) > 0 {
-        if ww, ok := wt.Find(u.Equip[0].Name); ok {
-            w = ww
-        }
-    }
-    gu := gcore.Unit{
-        ID: u.ID, Name: u.Name, Class: u.Class, Lv: u.Level,
-        S: gcore.Stats{HP: u.HP, Str: u.Stats.Str, Skl: u.Stats.Skl, Spd: u.Stats.Spd, Lck: u.Stats.Lck, Def: u.Stats.Def, Res: u.Stats.Res, Mov: u.Stats.Mov},
-        W: gcore.Weapon{MT: w.Might, Hit: w.Hit, Crit: w.Crit, Wt: w.Weight, RMin: w.RangeMin, RMax: w.RangeMax, Type: w.Type},
-    }
-    return gu, true
-}
+// 変換は adapter.UIToGame に集約。
 
 func defaultTerrains() (gcore.Terrain, gcore.Terrain) {
     // MVP: 平地（回避0/防御0/命中0）を両者に適用。後続でUI/マップに接続。

@@ -1,6 +1,8 @@
 package uicore
 
-import "github.com/hajimehoshi/ebiten/v2/ebitenutil"
+import (
+    "ui_sample/internal/assets"
+)
 
 func SampleUnit() Unit {
 	if ut, err := LoadUnitsFromUser("db/user/usr_characters.json"); err == nil && len(ut) > 0 {
@@ -20,8 +22,6 @@ func SampleUnit() Unit {
 		Magic:  MagicRanks{Anima: "-", Light: "-", Dark: "-", Staff: "-"},
 		Growth: Growth{HP: 70, Str: 45, Mag: 10, Skl: 55, Spd: 65, Lck: 50, Def: 20, Res: 35, Mov: 0},
 	}
-	if img, _, err := ebitenutil.NewImageFromFile("assets/01_iris.png"); err == nil {
-		u.Portrait = img
-	}
-	return u
+    if img, err := assets.LoadImage("assets/01_iris.png"); err == nil { u.Portrait = img }
+    return u
 }
