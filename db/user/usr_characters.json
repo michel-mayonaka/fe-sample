@@ -46,10 +46,10 @@
     },
     "equip": [
       {
-        "usr_weapons_id": "uw_charlie_w1"
+        "usr_weapons_id": "uw_iris_w1"
       },
       {
-        "usr_weapons_id": "uw_iris_w2"
+        "usr_weapons_id": "uw_charlie_w1"
       },
       {
         "usr_items_id": "ui_iris_i1"
@@ -103,7 +103,7 @@
     },
     "equip": [
       {
-        "usr_weapons_id": "uw_loyd_w1"
+        "usr_weapons_id": "uw_mac_w1"
       },
       {
         "usr_items_id": "ui_loyd_i1"
@@ -209,7 +209,7 @@
     },
     "equip": [
       {
-        "usr_weapons_id": "uw_mac_w1"
+        "usr_weapons_id": "uw_iris_w2"
       },
       {
         "usr_items_id": "ui_mac_i1"
@@ -262,7 +262,7 @@
     },
     "equip": [
       {
-        "usr_weapons_id": "uw_iris_w1"
+        "usr_weapons_id": "uw_loyd_w1"
       },
       {
         "usr_items_id": "ui_charlie_i1"

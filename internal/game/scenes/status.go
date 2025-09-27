@@ -19,6 +19,8 @@ func (s *Status) ShouldPop() bool { return s.pop }
 func (s *Status) Update(ctx *game.Ctx) (game.Scene, error) {
     s.sw, s.sh = ctx.ScreenW, ctx.ScreenH
     mx, my := ebiten.CursorPosition()
+    // 直前にポップアップが開いていたか（クリックの二重処理防止）
+    wasPopup := s.E != nil && s.E.PopupActive
     // 戻る
     bx, by, bw, bh := ui.BackButtonRect(s.sw, s.sh)
     if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { s.pop = true; return nil, nil }
@@ -43,6 +45,35 @@ func (s *Status) Update(ctx *game.Ctx) (game.Scene, error) {
     }
     if s.E.PopupActive {
         if s.E.PopupJustOpened { s.E.PopupJustOpened = false } else if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { s.E.PopupActive = false }
+    }
+
+    // ポップアップを閉じるクリックと同フレームでは以降のクリック処理を無効化
+    if wasPopup && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+        return nil, nil
+    }
+
+    // 装備スロットクリックで在庫へ
+    for i := 0; i < 5; i++ {
+        x, y, w, h := ui.EquipSlotRect(s.sw, s.sh, i)
+        if pointIn(mx, my, x, y, w, h) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            s.E.CurrentSlot = i
+            s.E.SelectingEquip = true
+            s.E.HoverInv = -1
+            // 既装備の種別からタブを初期選択（なければ武器）
+            s.E.SelectingIsWeapon = true
+            s.E.InvTab = 0
+            if s.E.UserTable != nil {
+                unit := s.E.Selected()
+                if c, ok := s.E.UserTable.Find(unit.ID); ok {
+                    if i < len(c.Equip) {
+                        er := c.Equip[i]
+                        if er.UserItemsID != "" { s.E.SelectingIsWeapon = false; s.E.InvTab = 1 }
+                        if er.UserWeaponsID != "" { s.E.SelectingIsWeapon = true;  s.E.InvTab = 0 }
+                    }
+                }
+            }
+            return NewInventory(s.E), nil
+        }
     }
 
     // 装備付け替え（ショートカット）
@@ -74,4 +105,3 @@ func (s *Status) Draw(dst *ebiten.Image) {
     if s.E.PopupActive { ui.DrawLevelUpPopup(dst, unit, s.E.PopupGains) }
     ebitenutil.DebugPrintAt(dst, "装備: E/数字/DELETE で操作", uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10))
 }
-
