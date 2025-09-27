@@ -10,7 +10,9 @@
 - `type SceneStack`: `Current/Push/Pop/Replace/Size` を提供する LIFO スタック。
 - `package actor.IActor`: `Update(*game.Ctx) bool`, `Draw(*ebiten.Image)`, `Layer() int`。
 - `package service.Input`: 抽象アクション `Up/Down/Left/Right/Confirm/Cancel/Menu/Next/Prev` と、
-  便宜アクション `OpenWeapons/OpenItems/EquipToggle/Slot1..5/Unassign`、`Snapshot/Press/Down`。
+  便宜アクション `OpenWeapons/OpenItems/EquipToggle/Slot1..5/Unassign`、
+  地形切替 `TerrainAtt1..3/TerrainDef1..3` を提供。`Snapshot/Press/Down` に加え、
+  テスト用の `SnapshotWith(func(ebiten.Key) bool)` を用意。
 
 ## internal/model（マスタデータ / mst_）
 - `type Character`

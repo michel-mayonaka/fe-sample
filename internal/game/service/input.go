@@ -28,6 +28,13 @@ const (
     Slot4
     Slot5
     Unassign
+    // 地形切替（攻撃側/防御側）
+    TerrainAtt1
+    TerrainAtt2
+    TerrainAtt3
+    TerrainDef1
+    TerrainDef2
+    TerrainDef3
     ActionCount
 )
 
@@ -74,16 +81,31 @@ func (i *Input) BindKey(k ebiten.Key, a Action) {
 }
 
 // Snapshot は現在のキー状態を抽象アクションへ投影し、prev/curr を更新します。
-func (i *Input) Snapshot() {
+func (i *Input) Snapshot() { i.SnapshotWith(ebiten.IsKeyPressed) }
+
+// SnapshotWith はテスト用にキー状態の供給元を差し替え可能にした版です。
+func (i *Input) SnapshotWith(isDown func(k ebiten.Key) bool) {
     i.prev = i.curr
     // クリア
     for a := Action(0); a < ActionCount; a++ {
         i.curr[a] = false
     }
+    // 一般マッピング
     for k, a := range i.mapKey {
-        if ebiten.IsKeyPressed(k) {
+        if isDown(k) {
             i.curr[a] = true
         }
+    }
+    // 地形切替（1/2/3, Shift+1/2/3 を攻守に割当）
+    shift := isDown(ebiten.KeyShift) || isDown(ebiten.KeyShiftLeft) || isDown(ebiten.KeyShiftRight)
+    if isDown(ebiten.Key1) {
+        if shift { i.curr[TerrainDef1] = true } else { i.curr[TerrainAtt1] = true }
+    }
+    if isDown(ebiten.Key2) {
+        if shift { i.curr[TerrainDef2] = true } else { i.curr[TerrainAtt2] = true }
+    }
+    if isDown(ebiten.Key3) {
+        if shift { i.curr[TerrainDef3] = true } else { i.curr[TerrainAtt3] = true }
     }
 }
 

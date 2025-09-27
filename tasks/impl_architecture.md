@@ -515,3 +515,62 @@ func (b *Battle) Update(ctx *game.Ctx) (game.Scene, error) {
 4) テスト
    - `service.Input` の `Snapshot/Press/Down` のユニットテスト（長押し/連打境界）。
    - Scene 遷移の最小 E2E（list→status→back, list→inv→back, list→sim→back）。
+
+進捗ログ（2025-09-28 夜・Phase1 仕上げ + ctx）
+
+- 抽象入力の拡張（地形切替）とUI置換：
+  - 追加アクション: `TerrainAtt1..3`, `TerrainDef1..3` を `service.Input` に定義。
+  - 実装: `SnapshotWith` を導入し、Shift+1/2/3 を防御側、1/2/3 を攻撃側にマッピング。
+  - UI更新: 旧 `inpututil.IsKeyJustPressed(1/2/3 + Shift)` を全面置換（`cmd/ui_sample/main.go`）。
+- Ctx の時間情報を実装：
+  - `game.Ctx` の `DT/Frame` を `NewGame`/`Update` から供給（Scene駆動時）。
+  - 目的: 将来的な AI/スクリプト分割やアニメ時間管理の基盤。
+- テスト追加：
+  - `internal/game/service/input_test.go`: 
+    - `Confirm` の Press/Down 挙動、`Menu` 長押しの Press 一度きり性、`Shift+2`→`TerrainDef2`/`2`→`TerrainAtt2` のマッピングを検証。
+- ドキュメント更新：
+  - `docs/API.md`: 新アクション群と `SnapshotWith` を追記。
+
+残タスク（Phase2 準備継続）
+- SceneStack 管理の `internal/game/app` への移譲（ランナー追加）
+  - `Runner`（仮）: `stack game.SceneStack`, `Update(ctx)`, `Draw(screen)` を提供。
+  - 当面は Pop 条件のコールバック（例: `AfterUpdate(sc) bool`）で `cmd` 側のモード復帰検知を委譲。
+- `cmd/ui_sample` の Scene 実体を `internal/...` へ段階移行し、`app` 層から直接呼べる形に整理。
+
+進捗ログ（2025-09-28 夜遅・SceneStack 移譲）
+
+- `internal/game/app/runner.go` を実装し、`cmd/ui_sample` から Runner を利用する形に移譲。
+  - `Game` 構造体: `stack` → `runner` へ置換、`AfterUpdate` で Pop 条件（一覧へ戻ったら Pop）を委譲。
+  - `Update/Draw`: 直接 Stack を触らず Runner の `Update/Draw` を呼び出すよう変更。
+- ビルド/テスト: `go build ./cmd/ui_sample` / `go test ./...` 成功。
+
+追加進捗（2025-09-28 深夜・Scene 内部移設）
+
+- `internal/game/scenes` を追加し、`List/Status/Inventory/Sim` の4 Scene を Host 越しに実装。
+- `cmd/ui_sample` 側に Host アダプタ `scenesHost` を追加。
+- 旧 `cmd/ui_sample/scenes.go` を削除し、初期 Push を `scenes.List` に変更。
+
+フォローアップ（2025-09-28 深夜・main.go スリム化）
+
+- `cmd/ui_sample/main.go` から責務を分割。起動エントリのみを残し、以下へ移設：
+  - `cmd/ui_sample/game_core.go`: 画面定数・`Game` 構造体・共通ヘルパ
+  - `cmd/ui_sample/app_bootstrap.go`: `NewGame` と Repo 初期化
+  - `cmd/ui_sample/game_loop.go`: `Update/Draw/Layout` とグローバル操作
+  - `cmd/ui_sample/mode_list.go`: 一覧モードの更新/描画
+  - `cmd/ui_sample/mode_status.go`: ステータス更新/描画 + 装備同期
+  - `cmd/ui_sample/mode_inventory.go`: 在庫更新/描画
+  - `cmd/ui_sample/mode_sim.go`: 模擬戦更新/描画
+  - `cmd/ui_sample/scenes_host.go`: `scenes.Host` アダプタ
+- 目的: エントリと実装の分離、可読性/保守性の向上、差分の小分け。
+
+設計変更（2025-09-28 さらに整理・scenesへ集約）
+
+- 入力・更新・描画ロジックを `internal/game/scenes` 下へ移設。
+  - 追加: `scenes.Env`（App/ユーザテーブル/ユニット配列など共有状態）
+  - 実装: `List/Status/Inventory/Sim` が `game.Scene` を実装し、`Update(ctx *game.Ctx)` で抽象入力（`ctx.Input`）を参照。
+  - Pop判定: `ShouldPop() bool` を導入し、`Runner.AfterUpdate` で type assert によりポップ制御。
+- `cmd/ui_sample` からはモード別関数を撤去し、Runner 駆動に一本化。
+
+次の移行ステップ（提案）
+- Scene 実体を `cmd/` から `internal/game/scenes` 配下へ移設（差分を最小化しつつ、UI依存部は残留）。
+- Runner に `Replace`/`PopAll` 等のヘルパーを追加（必要性が出たら）。
