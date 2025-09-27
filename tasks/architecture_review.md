@@ -55,3 +55,16 @@
 - 2025-09-27: スケーリング基盤（`uicore.Metrics`）を追加。`一覧/ボタン/戦闘/模擬戦` の主要レイアウトに適用し、ウィンドウサイズから毎フレーム更新。
 - 2025-09-27: ステータス画面・レベルアップポップアップのスケール適用を追加（portrait/HPバー/行高/余白）。バトル開始ボタン/模擬戦サイド枠も拡張。
 - 2025-09-27: フォントのスケール連動を実装（`uicore.MaybeUpdateFontFaces`）。ウィンドウサイズに応じて FaceTitle/Main/Small を再生成。
+
+## TODO（残務）
+本節の詳細TODOは以下へ分割しました（本ドキュメントは以後参照用とします）。
+- tasks/todo_layering_dependency.md
+- tasks/todo_data_repo.md
+- tasks/todo_ui_scaling.md
+- tasks/todo_domain_logic.md
+- tasks/todo_ci_lint.md
+- tasks/todo_testing.md
+- tasks/todo_docs.md
+- tasks/todo_sqlite_prep.md
+
+ステータス: Closed（2025-09-27）。以後は各 TODO ファイルで進捗を管理します。
