@@ -147,3 +147,11 @@
 7) ドキュメント追補
 - 目的: コントリビューションしやすくするためのガイド整備。
 - 内容: `README` に「開発ループ（make mcp / run / lint）」「よくあるエラーと回避」「UIキーバインド一覧」を追記。
+
+## 完了（2025-09-28）
+- ステータス: 本タスクは達成済み。以降はフォローアップ項目として個別扱い。
+- 実施: `.golangci.yml` 強化、`Makefile` の `lint-ci`/`mcp` 連携、CI Workflow 追加・キャッシュキー安定化（`**/go.mod`/`**/go.sum`/`.golangci.yml`）、`workflow_dispatch` 入力で厳格ルール切替、README に Go 1.25 とツールチェーン手順を明示。
+- 検証: `make check-all` 成功、`golangci-lint run` 0件、`cmd/ui_sample` ビルドOK。
+- 備考: GUI 依存のビルドは CI でスキップ条件を維持（`MCP_STRICT=0`）。必要時は `extra_linters` で段階的に強化。
+
+クローズ基準を満たしたため、`tasks/finish/` へ移動。
