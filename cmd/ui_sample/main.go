@@ -15,6 +15,7 @@ import (
     "ui_sample/internal/repo"
     "ui_sample/internal/assets"
     "ui_sample/internal/game"
+    uicore "ui_sample/internal/ui/core"
     "ui_sample/internal/ui"
     "ui_sample/internal/user"
     gcore "ui_sample/pkg/game"
@@ -120,7 +121,7 @@ func terrainFort() gcore.Terrain   { return gcore.Terrain{Avoid: 15, Def: 2, Hit
 // NewGame は Game を初期化して返します。
 func NewGame() *Game {
     g := &Game{}
-	g.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+    g.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 	g.userPath = config.DefaultUserPath
 	if ut, err := user.LoadFromJSON(g.userPath); err == nil {
 		g.userTable = ut
@@ -150,6 +151,8 @@ func NewGame() *Game {
             ui.SetWeaponTable(wr.Table())
         }
     }
+    // メトリクス初期化（論理解像度）
+    uicore.SetBaseResolution(screenW, screenH)
     return g
 }
 
@@ -361,7 +364,9 @@ func (g *Game) Update() error {
 
 // Draw は画面描画を行います。
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{12, 18, 30, 255})
+    // ウィンドウサイズからスケール更新
+    uicore.UpdateMetricsFromWindow()
+    screen.Fill(color.RGBA{12, 18, 30, 255})
 	switch g.mode {
 	case modeList:
 		ui.DrawCharacterList(screen, g.units, g.hoverIndex)

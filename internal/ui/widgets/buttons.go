@@ -1,21 +1,22 @@
 package uiwidgets
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2
-	"github.com/hajimehoshi/ebiten/v2/vector"
-	"image/color"
-	"ui_sample/internal/ui/core"
+    "github.com/hajimehoshi/ebiten/v2"
+    text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2
+    "github.com/hajimehoshi/ebiten/v2/vector"
+    "image/color"
+    "ui_sample/internal/ui/core"
 )
 
 func BackButtonRect(sw, _ int) (x, y, w, h int) {
-	panelX, panelY := uicore.ListMargin, uicore.ListMargin
-	panelW := sw - uicore.ListMargin*2
-	x = panelX + panelW - 180
-	y = panelY + 24
-	w = 160
-	h = 48
-	return
+    lm := uicore.ListMarginPx()
+    panelX, panelY := lm, lm
+    panelW := sw - lm*2
+    x = panelX + panelW - uicore.S(180)
+    y = panelY + uicore.S(24)
+    w = uicore.S(160)
+    h = uicore.S(48)
+    return
 }
 
 func DrawBackButton(dst *ebiten.Image, hovered bool) {
@@ -27,14 +28,15 @@ func DrawBackButton(dst *ebiten.Image, hovered bool) {
 	}
 	uicore.DrawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
 	vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), bg, false)
-	text.Draw(dst, "＜ 一覧へ", uicore.FaceMain, x+20, y+32, uicore.ColText)
+    text.Draw(dst, "＜ 一覧へ", uicore.FaceMain, x+uicore.S(20), y+uicore.S(32), uicore.ColText)
 }
 
 func LevelUpButtonRect(sw, sh int) (x, y, w, h int) {
-	w, h = 220, 56
-	x = sw - uicore.ListMargin - w
-	y = sh - uicore.ListMargin - h
-	return
+    lm := uicore.ListMarginPx()
+    w, h = uicore.S(220), uicore.S(56)
+    x = sw - lm - w
+    y = sh - lm - h
+    return
 }
 
 func DrawLevelUpButton(dst *ebiten.Image, hovered, enabled bool) {
@@ -49,19 +51,19 @@ func DrawLevelUpButton(dst *ebiten.Image, hovered, enabled bool) {
 	}
 	uicore.DrawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
 	vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), base, false)
-	label := "レベルアップ"
-	if !enabled {
-		label = "最大レベル"
-	}
-	text.Draw(dst, label, uicore.FaceMain, x+24, y+36, uicore.ColText)
+    label := "レベルアップ"
+    if !enabled {
+        label = "最大レベル"
+    }
+    text.Draw(dst, label, uicore.FaceMain, x+uicore.S(24), y+uicore.S(36), uicore.ColText)
 }
 
 func ToBattleButtonRect(sw, sh int) (x, y, w, h int) {
-	rx, ry, _, rh := LevelUpButtonRect(sw, sh)
-	w, h = 220, rh
-	x = rx - 20 - w
-	y = ry
-	return
+    rx, ry, _, rh := LevelUpButtonRect(sw, sh)
+    w, h = uicore.S(220), rh
+    x = rx - uicore.S(20) - w
+    y = ry
+    return
 }
 
 func DrawToBattleButton(dst *ebiten.Image, hovered, enabled bool) {
@@ -100,9 +102,9 @@ func DrawSimBattleButton(dst *ebiten.Image, hovered, enabled bool) {
 	}
 	uicore.DrawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
 	vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), base, false)
-	label := "模擬戦"
-	if hovered && enabled {
-		label = "> 模擬戦 <"
-	}
-	text.Draw(dst, label, uicore.FaceMain, x+24, y+32, uicore.ColText)
+    label := "模擬戦"
+    if hovered && enabled {
+        label = "> 模擬戦 <"
+    }
+    text.Draw(dst, label, uicore.FaceMain, x+uicore.S(24), y+uicore.S(32), uicore.ColText)
 }

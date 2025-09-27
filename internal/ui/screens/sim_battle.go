@@ -69,25 +69,26 @@ func simulateHit(atk, def uicore.Unit, rng *rand.Rand) (uicore.Unit, uicore.Unit
 // DrawSimulationBattle は模擬戦の結果を画面に描画します。
 func DrawSimulationBattle(dst *ebiten.Image, atk, def uicore.Unit, logs []string) {
 	sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
-	uicore.DrawPanel(dst, uicore.ListMargin, uicore.ListMargin, float32(sw-2*uicore.ListMargin), float32(sh-2*uicore.ListMargin))
+    lm := uicore.ListMarginPx()
+    uicore.DrawPanel(dst, float32(lm), float32(lm), float32(sw-2*lm), float32(sh-2*lm))
 	// 左右ユニット
-	leftX := uicore.ListMargin + 40
-	rightX := sw - uicore.ListMargin - 560
-	topY := uicore.ListMargin + 80
+    leftX := lm + uicore.S(40)
+    rightX := sw - lm - uicore.S(560)
+    topY := lm + uicore.S(80)
 	drawSide(dst, atk, leftX, topY)
 	drawSide(dst, def, rightX, topY)
 	// ログパネル
-	lw, lh := 800, 260
-	lx := (sw - lw) / 2
-	ly := sh - uicore.ListMargin - lh - 20
+    lw, lh := uicore.S(800), uicore.S(260)
+    lx := (sw - lw) / 2
+    ly := sh - lm - lh - uicore.S(20)
 	uicore.DrawFramedRect(dst, float32(lx), float32(ly), float32(lw), float32(lh))
 	vector.DrawFilledRect(dst, float32(lx), float32(ly), float32(lw), float32(lh), color.RGBA{25, 30, 50, 220}, false)
 	y := ly + 36
-	for i := len(logs) - 1; i >= 0 && y < ly+lh-10; i-- { // 下に新しいログを表示
-		text.Draw(dst, logs[i], uicore.FaceSmall, lx+16, y, uicore.ColText)
-		y += 22
-	}
-	text.Draw(dst, "模擬戦", uicore.FaceTitle, sw/2-60, uicore.ListMargin+56, uicore.ColAccent)
+    for i := len(logs) - 1; i >= 0 && y < ly+lh-uicore.S(10); i-- { // 下に新しいログを表示
+        text.Draw(dst, logs[i], uicore.FaceSmall, lx+16, y, uicore.ColText)
+        y += uicore.S(22)
+    }
+    text.Draw(dst, "模擬戦", uicore.FaceTitle, sw/2-uicore.S(60), lm+uicore.S(56), uicore.ColAccent)
 }
 
 func drawSide(dst *ebiten.Image, u uicore.Unit, x, y int) {

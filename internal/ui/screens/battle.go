@@ -39,7 +39,7 @@ func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, at
     topY := uicore.ListMargin + 80
     drawBattleSide(dst, attacker, leftX, topY)
     drawBattleSide(dst, defender, rightX, topY)
-    text.Draw(dst, "戦闘プレビュー", uicore.FaceTitle, sw/2-120, uicore.ListMargin+56, uicore.ColAccent)
+    text.Draw(dst, "戦闘プレビュー", uicore.FaceTitle, sw/2-uicore.S(120), uicore.ListMarginPx()+uicore.S(56), uicore.ColAccent)
     bx, by, bw, bh := BattleStartButtonRect(sw, sh)
     uicore.DrawFramedRect(dst, float32(bx), float32(by), float32(bw), float32(bh))
     fill := color.RGBA{110, 90, 40, 255}
@@ -84,10 +84,10 @@ func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, at
         leftHitLine := fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
             frAtkBk.WeapHit, frAtkBk.Skl2, frAtkBk.LckHalf, frAtkBk.AttTileHit,
             frAtkBk.DefSpd2, frAtkBk.DefLck, frAtkBk.DefTileAvoid, frAtkBk.TriangleHit, frAtkBk.HitDisp)
-        y2 := uicore.DrawWrapped(dst, uicore.FaceSmall, leftHitLine, ax, ay+50, color.RGBA{210,230,255,255}, 820, uicore.LineHSmall)
+        y2 := uicore.DrawWrapped(dst, uicore.FaceSmall, leftHitLine, ax, ay+uicore.S(50), color.RGBA{210,230,255,255}, uicore.S(820), uicore.LineHSmallPx())
         leftDmgLine := fmt.Sprintf("[与ダメ内訳] 力:%d + 威力:%d + 相性:%+d - 守備合計:%d = %d",
             frAtkBk.AtkStr, frAtkBk.WpnMt, frAtkBk.TriangleMt, frAtkBk.DefTotal, frAtkBk.Dmg)
-        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, leftDmgLine, ax, y2, color.RGBA{210,230,255,255}, 820, uicore.LineHSmall)
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, leftDmgLine, ax, y2, color.RGBA{210,230,255,255}, uicore.S(820), uicore.LineHSmallPx())
         if canCounter {
             rightHit := fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
                 frDefBk.WeapHit, frDefBk.Skl2, frDefBk.LckHalf, frDefBk.AttTileHit,
@@ -235,15 +235,15 @@ func DrawBattleLogOverlay(dst *ebiten.Image, logs []string) {
     vector.DrawFilledRect(dst, float32(px), float32(py), float32(pw), float32(ph), color.RGBA{25, 30, 50, 230}, false)
     text.Draw(dst, "戦闘ログ", uicore.FaceMain, px+16, py+32, uicore.ColAccent)
     // ログ本文（下に新しいもの）
-    maxLines := (ph - 80) / uicore.LineHSmall
+    maxLines := (ph - uicore.S(80)) / uicore.LineHSmallPx()
     start := 0
     if len(logs) > maxLines {
         start = len(logs) - maxLines
     }
     y := py + 58
     for i := start; i < len(logs); i++ {
-        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, logs[i], px+16, y, uicore.ColText, pw-32, uicore.LineHSmall)
-        y += uicore.LineHSmall
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, logs[i], px+uicore.S(16), y, uicore.ColText, pw-uicore.S(32), uicore.LineHSmallPx())
+        y += uicore.LineHSmallPx()
     }
     hint := "クリック または Z/Enter で閉じる"
     tw := text.BoundString(uicore.FaceSmall, hint).Dx()
@@ -262,14 +262,14 @@ func DrawBattleLogs(dst *ebiten.Image, logs []string) {
     uicore.DrawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
     vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), color.RGBA{25, 30, 50, 220}, false)
     text.Draw(dst, "戦闘ログ", uicore.FaceMain, x+12, y+24, uicore.ColAccent)
-    maxLines := (h - 40) / uicore.LineHSmall
+    maxLines := (h - uicore.S(40)) / uicore.LineHSmallPx()
     lineY := y + 40
     start := 0
     if len(logs) > maxLines {
         start = len(logs) - maxLines
     }
     for i := start; i < len(logs); i++ {
-        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, logs[i], x+12, lineY, uicore.ColText, w-24, uicore.LineHSmall)
-        lineY += uicore.LineHSmall
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, logs[i], x+uicore.S(12), lineY, uicore.ColText, w-uicore.S(24), uicore.LineHSmallPx())
+        lineY += uicore.LineHSmallPx()
     }
 }
