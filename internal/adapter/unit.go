@@ -2,7 +2,7 @@
 package adapter
 
 import (
-    uicore "ui_sample/internal/ui/core"
+    uicore "ui_sample/internal/game/service/ui"
     "ui_sample/internal/model"
     gcore "ui_sample/pkg/game"
 )

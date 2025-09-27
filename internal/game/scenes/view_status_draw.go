@@ -1,4 +1,4 @@
-package uiscreens
+package scenes
 
 import (
     "fmt"
@@ -6,7 +6,7 @@ import (
     "golang.org/x/image/font"
     "ui_sample/internal/adapter"
     "ui_sample/internal/game"
-    uicore "ui_sample/internal/ui/core"
+    uicore "ui_sample/internal/game/service/ui"
 )
 
 const slotCap = 5
@@ -62,7 +62,6 @@ func drawCoreStats(dst *ebiten.Image, u uicore.Unit, tx, statsTop, line, colGap 
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+1*line, "守備", u.Stats.Def, u.Growth.Def)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+2*line, "魔防", u.Stats.Res, u.Growth.Res)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+3*line, "体格", u.Stats.Bld, u.Growth.Bld)
-    drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+4*line, "移動", u.Stats.Mov, u.Growth.Mov)
     drawStatLine(dst, uicore.FaceMain, tx+1*colGap, statsTop+5*line, "攻撃速度", atkSpeed)
 }
 
@@ -146,3 +145,4 @@ func drawStatLine(dst *ebiten.Image, face font.Face, x, y int, label string, v i
     gap := uicore.S(20)
     uicore.TextDraw(dst, fmt.Sprintf("%2d", v), face, x+lw+gap, y, uicore.ColAccent)
 }
+

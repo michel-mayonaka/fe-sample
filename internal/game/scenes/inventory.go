@@ -9,8 +9,8 @@ import (
     "ui_sample/internal/game"
     gamesvc "ui_sample/internal/game/service"
     "ui_sample/internal/model"
-    uicore "ui_sample/internal/ui/core"
-    "ui_sample/internal/ui"
+    uicore "ui_sample/internal/game/service/ui"
+    uiwidgets "ui_sample/internal/game/service/ui/widgets"
     "ui_sample/internal/user"
 )
 
@@ -36,9 +36,9 @@ func (s *Inventory) Update(ctx *game.Ctx) (game.Scene, error) {
     }
     // リスト操作（装備確定で戻る）
     if s.E.InvTab == 0 {
-        weapons := ui.BuildWeaponRowsWithOwners(s.E.App.Inv.Weapons(), s.E.App.WeaponsTable(), s.E.UserTable)
+        weapons := BuildWeaponRowsWithOwners(s.E.App.Inv.Weapons(), s.E.App.WeaponsTable(), s.E.UserTable)
         for i := range weapons {
-            x, y, w, h := ui.ListItemRect(s.sw, s.sh, i)
+            x, y, w, h := ListItemRect(s.sw, s.sh, i)
             if pointIn(mx,my,x,y,w,h) { s.E.HoverInv = i }
             if s.E.SelectingEquip && s.E.SelectingIsWeapon && s.E.HoverInv==i && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
                 chosen := weapons[i]
@@ -49,9 +49,9 @@ func (s *Inventory) Update(ctx *game.Ctx) (game.Scene, error) {
         }
     } else {
         it, _ := model.LoadItemsJSON("db/master/mst_items.json")
-        items := ui.BuildItemRowsWithOwners(s.E.App.Inv.Items(), it, s.E.UserTable)
+        items := BuildItemRowsWithOwners(s.E.App.Inv.Items(), it, s.E.UserTable)
         for i := range items {
-            x, y, w, h := ui.ListItemRect(s.sw, s.sh, i)
+            x, y, w, h := ListItemRect(s.sw, s.sh, i)
             if pointIn(mx,my,x,y,w,h) { s.E.HoverInv = i }
             if s.E.SelectingEquip && !s.E.SelectingIsWeapon && s.E.HoverInv==i && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
                 chosen := items[i]
@@ -62,7 +62,7 @@ func (s *Inventory) Update(ctx *game.Ctx) (game.Scene, error) {
         }
     }
     // 戻る
-    bx, by, bw, bh := ui.BackButtonRect(s.sw, s.sh)
+    bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
     if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { s.pop = true }
     if ctx != nil && ctx.Input != nil && ctx.Input.Press(gamesvc.Cancel) { s.pop = true }
     return nil, nil
@@ -71,12 +71,12 @@ func (s *Inventory) Update(ctx *game.Ctx) (game.Scene, error) {
 func (s *Inventory) Draw(dst *ebiten.Image) {
     // 本体（タブに応じて）
     if s.E.InvTab == 0 {
-        weapons := ui.BuildWeaponRowsWithOwners(s.E.App.Inv.Weapons(), s.E.App.WeaponsTable(), s.E.UserTable)
-        ui.DrawWeaponList(dst, weapons, s.E.HoverInv)
+        weapons := BuildWeaponRowsWithOwners(s.E.App.Inv.Weapons(), s.E.App.WeaponsTable(), s.E.UserTable)
+        DrawWeaponList(dst, weapons, s.E.HoverInv)
     } else {
         it, _ := model.LoadItemsJSON("db/master/mst_items.json")
-        items := ui.BuildItemRowsWithOwners(s.E.App.Inv.Items(), it, s.E.UserTable)
-        ui.DrawItemList(dst, items, s.E.HoverInv)
+        items := BuildItemRowsWithOwners(s.E.App.Inv.Items(), it, s.E.UserTable)
+        DrawItemList(dst, items, s.E.HoverInv)
     }
     // タブ描画
     tabW, tabH := uicore.S(160), uicore.S(44)
@@ -98,8 +98,8 @@ func (s *Inventory) Draw(dst *ebiten.Image) {
     uicore.TextDraw(dst, "アイテム", uicore.FaceMain, tx2+uicore.S(34), ty+uicore.S(30), uicore.ColText)
     // 戻る
     mx, my := ebiten.CursorPosition()
-    bx, by, bw, bh := ui.BackButtonRect(s.sw, s.sh)
-    ui.DrawBackButton(dst, pointIn(mx, my, bx, by, bw, bh))
+    bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
+    uiwidgets.DrawBackButton(dst, pointIn(mx, my, bx, by, bw, bh))
     if s.E.SelectingEquip { ebitenutil.DebugPrintAt(dst, "クリックでスロットに装備", uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10)) }
 }
 
@@ -156,4 +156,3 @@ func (s *Inventory) refreshUnitByID(id string) {
     u := uicore.UnitFromUser(c)
     for i := range s.E.Units { if s.E.Units[i].ID == id { s.E.Units[i] = u; if s.E.SelIndex==i { /* keep selected */ } } }
 }
-

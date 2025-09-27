@@ -1,16 +1,15 @@
-package uiscreens
+package scenes
 
 import (
     "fmt"
     "math/rand"
     "ui_sample/internal/adapter"
     "ui_sample/internal/model"
-    uicore "ui_sample/internal/ui/core"
+    uicore "ui_sample/internal/game/service/ui"
     gcore "ui_sample/pkg/game"
 )
 
 // SimulateBattleCopy はコピーを用いた簡易模擬戦を行い、結果ログを返します（永続化なし）。
-// 互換API: 地形なし。
 func SimulateBattleCopy(atk, def uicore.Unit, rng *rand.Rand) (uicore.Unit, uicore.Unit, []string) {
     return SimulateBattleCopyWithTerrain(atk, def, gcore.Terrain{}, gcore.Terrain{}, rng)
 }
@@ -71,3 +70,4 @@ func SimulateBattleCopyWithTerrain(atk, def uicore.Unit, attT, defT gcore.Terrai
     logs = append(logs, "模擬戦終了")
     return a, d, logs
 }
+

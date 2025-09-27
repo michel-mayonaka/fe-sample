@@ -1,10 +1,10 @@
-package uiscreens
+package scenes
 
 import (
     "github.com/hajimehoshi/ebiten/v2"
     "github.com/hajimehoshi/ebiten/v2/vector"
     "image/color"
-    uicore "ui_sample/internal/ui/core"
+    uicore "ui_sample/internal/game/service/ui"
 )
 
 // ListItemRect は一覧の i 行目の矩形を返します。
@@ -46,3 +46,4 @@ func DrawCharacterList(dst *ebiten.Image, units []uicore.Unit, hover int) {
         uicore.TextDraw(dst, u.Class+"  Lv "+uicore.Itoa(u.Level), uicore.FaceSmall, tx, ty+uicore.S(26), uicore.ColAccent)
     }
 }
+

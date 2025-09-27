@@ -4,7 +4,8 @@ import (
     "math/rand"
 
     app "ui_sample/internal/app"
-    "ui_sample/internal/ui"
+    uicore "ui_sample/internal/game/service/ui"
+    scpopup "ui_sample/internal/game/scenes/common/popup"
     "ui_sample/internal/user"
 )
 
@@ -15,12 +16,12 @@ type Env struct {
     UserPath  string
     RNG       *rand.Rand
 
-    Units    []ui.Unit
+    Units    []uicore.Unit
     SelIndex int
 
     // ステータス/在庫で共有する状態
     PopupActive     bool
-    PopupGains      ui.LevelUpGains
+    PopupGains      scpopup.LevelUpGains
     PopupJustOpened bool
     CurrentSlot     int
     SelectingEquip  bool
@@ -29,15 +30,14 @@ type Env struct {
     HoverInv        int
 }
 
-func (e *Env) Selected() ui.Unit {
-    if e == nil || len(e.Units) == 0 { return ui.SampleUnit() }
+func (e *Env) Selected() uicore.Unit {
+    if e == nil || len(e.Units) == 0 { return uicore.SampleUnit() }
     if e.SelIndex < 0 || e.SelIndex >= len(e.Units) { return e.Units[0] }
     return e.Units[e.SelIndex]
 }
 
-func (e *Env) SetSelected(u ui.Unit) {
+func (e *Env) SetSelected(u uicore.Unit) {
     if e == nil || len(e.Units) == 0 { return }
     if e.SelIndex < 0 || e.SelIndex >= len(e.Units) { return }
     e.Units[e.SelIndex] = u
 }
-

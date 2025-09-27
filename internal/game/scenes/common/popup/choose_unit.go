@@ -1,12 +1,12 @@
-// Package uipopup は各種ポップアップUIの描画を提供します。
-package uipopup
+// Package popup は各種ポップアップUIの描画を提供します。
+package popup
 
 import (
     "github.com/hajimehoshi/ebiten/v2"
     "github.com/hajimehoshi/ebiten/v2/vector"
     "golang.org/x/image/font"
     "image/color"
-    uicore "ui_sample/internal/ui/core"
+    uicore "ui_sample/internal/game/service/ui"
 )
 
 // ChooseUnitItemRect はポップアップ内の i 番目のキャラ項目の矩形を返します。
@@ -17,12 +17,8 @@ func ChooseUnitItemRect(sw, sh, i, _ int) (x, y, w, h int) {
     py := (sh - ph) / 2
     // グリッド設定
     cols := 5
-    if pw < uicore.S(900) {
-        cols = 4
-    }
-    if pw < uicore.S(700) {
-        cols = 3
-    }
+    if pw < uicore.S(900) { cols = 4 }
+    if pw < uicore.S(700) { cols = 3 }
     cellW := (pw - uicore.S(48)) / cols // 左右マージン+隙間
     cellH := uicore.S(160)
     gap := uicore.S(8)
@@ -84,3 +80,4 @@ func popupSize(sw, sh int) (w, h int) {
     if h > uicore.S(900) { h = uicore.S(900) }
     return
 }
+

@@ -156,3 +156,19 @@ grep -R "package main" で cmd/ に迷い込んだロジックがないか最後
 見た目だけ/汎用コンポーネントか？ → service/ui
 
 保存・読み込みか？ → repository
+
+---
+
+進捗メモ（2025-09-28）
+- 完了: ui/core → internal/game/service/ui へ移設（パッケージ名は暫定で `uicore` 維持）。
+- 完了: ui/widgets → internal/game/service/ui/widgets へ移設。参照を全体置換。
+- 完了: screens → scenes へ移設（一覧/ステータス/バトル/在庫・行構築/模擬戦）。`internal/ui/screens` と `internal/ui/api.go` を撤去。
+- 完了: scenes 側で `BattleStartButtonRect`/`AutoRunButtonRect`/`Draw*` 群を提供し、呼び出し元から `ui` 依存を解消。
+- 完了: `SetWeaponTable` は `scenes.SetWeaponTable` に移動。再読み込み処理も追随。
+- 完了: `LoadUnitsFromUser` は `uicore.LoadUnitsFromUser` を直接利用。
+- 保留: ui/popup の scenes/common/popup への移設。
+- 保留: service/ui に抽象（Painter/Layout）導入。
+
+次アクション
+- screens/* の各描画関数を scenes 下へ整理し、`ui` 経由呼び出しの段階的解消。
+- `service/ui` に抽象 API を追加し、scenes は抽象にのみ依存する形へ。

@@ -11,8 +11,7 @@ import (
     "ui_sample/internal/game/scenes"
     gamesvc "ui_sample/internal/game/service"
     "ui_sample/internal/repo"
-    uicore "ui_sample/internal/ui/core"
-    "ui_sample/internal/ui"
+    uicore "ui_sample/internal/game/service/ui"
     "ui_sample/internal/user"
 )
 
@@ -28,15 +27,15 @@ func NewUIAppGame() *Game {
     var ut *user.Table
     if t, err := user.LoadFromJSON(userPath); err == nil { ut = t }
     // 一覧
-    units, _ := ui.LoadUnitsFromUser(userPath)
-    if len(units) == 0 { units = []ui.Unit{ui.SampleUnit()} }
+    units, _ := uicore.LoadUnitsFromUser(userPath)
+    if len(units) == 0 { units = []uicore.Unit{uicore.SampleUnit()} }
 
     // Ports（JSON）を注入して App を生成
     urepo, _ := repo.NewJSONUserRepo(userPath)
     wrepo, _ := repo.NewJSONWeaponsRepo(config.DefaultWeaponsPath)
     inv, _ := repo.NewJSONInventoryRepo(config.DefaultUserWeaponsPath, config.DefaultUserItemsPath, config.DefaultWeaponsPath, "db/master/mst_items.json")
     a := appuse.New(urepo, wrepo, inv, rng)
-    ui.SetWeaponTable(wrepo.Table())
+    scenes.SetWeaponTable(wrepo.Table())
 
     // 画面メトリクス初期化
     uicore.SetBaseResolution(screenW, screenH)
@@ -57,4 +56,3 @@ func NewUIAppGame() *Game {
     ebiten.SetWindowTitle("Ebiten UI サンプル - ステータス画面")
     return g
 }
-

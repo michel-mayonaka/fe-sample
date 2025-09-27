@@ -7,7 +7,7 @@ import (
     "ui_sample/internal/adapter"
     "ui_sample/internal/model"
     "ui_sample/internal/repo"
-    uicore "ui_sample/internal/ui/core"
+    uicore "ui_sample/internal/game/service/ui"
     "ui_sample/internal/user"
     "ui_sample/internal/assets"
     gcore "ui_sample/pkg/game"

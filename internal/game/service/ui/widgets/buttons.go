@@ -5,7 +5,7 @@ import (
     "github.com/hajimehoshi/ebiten/v2"
     "github.com/hajimehoshi/ebiten/v2/vector"
     "image/color"
-    uicore "ui_sample/internal/ui/core"
+    uicore "ui_sample/internal/game/service/ui"
 )
 
 // BackButtonRect は画面右上の戻るボタンの矩形を返します。

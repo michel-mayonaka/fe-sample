@@ -9,8 +9,7 @@ import (
     "ui_sample/internal/game"
     gamesvc "ui_sample/internal/game/service"
     "ui_sample/internal/game/scenes"
-    uicore "ui_sample/internal/ui/core"
-    "ui_sample/internal/ui"
+    uicore "ui_sample/internal/game/service/ui"
 )
 
 const (
@@ -66,11 +65,11 @@ func (g *Game) updateGlobalToggles() {
         if g.reloadHold == 30 { // 約0.5秒（60FPS時）
             if g.Env != nil && g.Env.App != nil {
                 _ = g.Env.App.ReloadData()
-                ui.SetWeaponTable(g.Env.App.WeaponsTable())
+                scenes.SetWeaponTable(g.Env.App.WeaponsTable())
             }
             // UIユニット再構築
             if g.Env != nil && g.Env.UserPath != "" {
-                if us, err := ui.LoadUnitsFromUser(g.Env.UserPath); err == nil && len(us) > 0 {
+                if us, err := uicore.LoadUnitsFromUser(g.Env.UserPath); err == nil && len(us) > 0 {
                     g.Env.Units = us
                     if g.Env.SelIndex >= len(us) { g.Env.SelIndex = 0 }
                 }
@@ -93,4 +92,3 @@ func SetupWindow() {
     ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
     ebiten.SetTPS(60)
 }
-

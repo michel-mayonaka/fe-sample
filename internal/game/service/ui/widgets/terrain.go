@@ -4,7 +4,7 @@ import (
     "github.com/hajimehoshi/ebiten/v2"
     "github.com/hajimehoshi/ebiten/v2/vector"
     "image/color"
-    uicore "ui_sample/internal/ui/core"
+    uicore "ui_sample/internal/game/service/ui"
 )
 
 // TerrainButtonRect は左右それぞれの地形選択ボタン矩形を返します。
