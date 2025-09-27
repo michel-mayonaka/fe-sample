@@ -53,6 +53,13 @@ type Game struct {
     simDef    ui.Unit
     simLogs   []string
     simLogPopup bool
+    // 模擬戦・選択フロー
+    simSelecting bool
+    simSelectStep int // 0=攻撃側選択,1=防御側選択
+    chooseHover int
+    // 地形選択
+    attTerrainSel int
+    defTerrainSel int
 
     // 戦闘プレビュー用地形（暫定: 手動切替）
     attTerrain gcore.Terrain
@@ -123,7 +130,8 @@ func terrainFort() gcore.Terrain   { return gcore.Terrain{Avoid: 15, Def: 2, Hit
 func NewGame() *Game {
     g := &Game{}
     g.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
-	g.userPath = config.DefaultUserPath
+    g.attTerrainSel, g.defTerrainSel = 0, 0
+    g.userPath = config.DefaultUserPath
 	if ut, err := user.LoadFromJSON(g.userPath); err == nil {
 		g.userTable = ut
 	}
@@ -224,21 +232,40 @@ func (g *Game) Update() error {
         sbx, sby, sbw, sbh := ui.SimBattleButtonRect(screenW, screenH)
         if pointIn(mx, my, sbx, sby, sbw, sbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
             if len(g.units) > 1 {
-                aidx := g.selIndex
-                if g.hoverIndex >= 0 { aidx = g.hoverIndex }
-                didx := (aidx + 1) % len(g.units)
-                g.simAtk = g.units[aidx]
-                g.simDef = g.units[didx]
-                g.simLogs = nil
-                g.simLogPopup = false
-                g.simActive = true
-                g.mode = modeSimBattle
+                g.simSelecting = true
+                g.simSelectStep = 0
             }
         }
-        if g.hoverIndex >= 0 && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+        if g.hoverIndex >= 0 && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) && !g.simSelecting {
             g.selIndex = g.hoverIndex
             g.unit = g.units[g.selIndex]
             g.mode = modeStatus
+        }
+        // 選択ポップアップの操作
+        if g.simSelecting {
+            g.chooseHover = -1
+            for i := range g.units {
+                x, y, w, h := ui.ChooseUnitItemRect(screenW, screenH, i, len(g.units))
+                if pointIn(mx, my, x, y, w, h) {
+                    g.chooseHover = i
+                    if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+                        if g.simSelectStep == 0 { g.simAtk = g.units[i]; g.simSelectStep = 1 } else {
+                            g.simDef = g.units[i]
+                            // 開始
+                            g.simLogs = nil
+                            g.simLogPopup = false
+                            g.simActive = true
+                            g.mode = modeSimBattle
+                            g.simSelecting = false
+                        }
+                    }
+                }
+            }
+        }
+        // 選択キャンセル
+        if g.simSelecting && (inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyX)) {
+            g.simSelecting = false
+            g.simSelectStep = 0
         }
     case modeStatus:
 		// レベルアップボタン
@@ -366,15 +393,29 @@ func (g *Game) Update() error {
             g.simAtk, g.simDef, g.simLogs = a, d, logs
             g.simLogPopup = true
         }
-        // 地形切替（1/2/3: 攻撃側、Shift+1/2/3: 防御側）
+        // 地形ボタン（クリック選択）
+        mx, my := ebiten.CursorPosition()
+        for i := 0; i < 3; i++ {
+            ax, ay, aw, ah := ui.TerrainButtonRect(screenW, screenH, true, i)
+            if pointIn(mx, my, ax, ay, aw, ah) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+                g.attTerrainSel = i
+                switch i { case 0: g.attTerrain = terrainPlain(); case 1: g.attTerrain = terrainForest(); case 2: g.attTerrain = terrainFort() }
+            }
+            dx, dy, dw, dh := ui.TerrainButtonRect(screenW, screenH, false, i)
+            if pointIn(mx, my, dx, dy, dw, dh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+                g.defTerrainSel = i
+                switch i { case 0: g.defTerrain = terrainPlain(); case 1: g.defTerrain = terrainForest(); case 2: g.defTerrain = terrainFort() }
+            }
+        }
+        // キー（互換操作）: 1/2/3 = 攻、Shift+1/2/3 = 防
         if inpututil.IsKeyJustPressed(ebiten.Key1) {
-            if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrain = terrainPlain() } else { g.attTerrain = terrainPlain() }
+            if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrainSel = 0; g.defTerrain = terrainPlain() } else { g.attTerrainSel = 0; g.attTerrain = terrainPlain() }
         }
         if inpututil.IsKeyJustPressed(ebiten.Key2) {
-            if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrain = terrainForest() } else { g.attTerrain = terrainForest() }
+            if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrainSel = 1; g.defTerrain = terrainForest() } else { g.attTerrainSel = 1; g.attTerrain = terrainForest() }
         }
         if inpututil.IsKeyJustPressed(ebiten.Key3) {
-            if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrain = terrainFort() } else { g.attTerrain = terrainFort() }
+            if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrainSel = 2; g.defTerrain = terrainFort() } else { g.attTerrainSel = 2; g.attTerrain = terrainFort() }
         }
     }
     return nil
@@ -387,13 +428,19 @@ func (g *Game) Draw(screen *ebiten.Image) {
     uicore.MaybeUpdateFontFaces()
     screen.Fill(color.RGBA{12, 18, 30, 255})
 	switch g.mode {
-	case modeList:
-		ui.DrawCharacterList(screen, g.units, g.hoverIndex)
-		// 模擬戦ボタン（統一スタイル）
-		mx, my := ebiten.CursorPosition()
-		bx, by, bw, bh := ui.SimBattleButtonRect(screenW, screenH)
-		hovered := pointIn(mx, my, bx, by, bw, bh)
-		ui.DrawSimBattleButton(screen, hovered, len(g.units) > 1)
+    case modeList:
+        ui.DrawCharacterList(screen, g.units, g.hoverIndex)
+        // 模擬戦ボタン（統一スタイル）
+        mx, my := ebiten.CursorPosition()
+        bx, by, bw, bh := ui.SimBattleButtonRect(screenW, screenH)
+        hovered := pointIn(mx, my, bx, by, bw, bh)
+        ui.DrawSimBattleButton(screen, hovered, len(g.units) > 1)
+        // 選択フローのガイド
+        if g.simSelecting {
+            title := "模擬戦: 攻撃側を選択"
+            if g.simSelectStep == 1 { title = "模擬戦: 防御側を選択" }
+            ui.DrawChooseUnitPopup(screen, title, g.units, g.chooseHover)
+        }
     case modeStatus:
         ui.DrawStatus(screen, g.unit)
         // 戻るボタン
@@ -416,6 +463,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
         // 新バトルシミュレータ（battleレイアウトを使用）
         canStart := g.simAtk.HP > 0 && g.simDef.HP > 0 && !g.simLogPopup
         ui.DrawBattleWithTerrain(screen, g.simAtk, g.simDef, g.attTerrain, g.defTerrain, canStart)
+        // 地形ボタン
+        attIdx := g.attTerrainSel
+        defIdx := g.defTerrainSel
+        ui.DrawTerrainButtons(screen, attIdx, defIdx)
         if g.simLogPopup {
             ui.DrawBattleLogOverlay(screen, g.simLogs)
         }

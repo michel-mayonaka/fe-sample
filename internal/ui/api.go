@@ -67,7 +67,15 @@ func DrawToBattleButton(dst *ebiten.Image, hovered, enabled bool) {
     uiwidgets.DrawToBattleButton(dst, hovered, enabled)
 }
 func BattleStartButtonRect(sw, sh int) (int, int, int, int) {
-	return uiscreens.BattleStartButtonRect(sw, sh)
+    return uiscreens.BattleStartButtonRect(sw, sh)
+}
+
+// 地形ボタンUI
+func TerrainButtonRect(sw, sh int, left bool, idx int) (int, int, int, int) {
+    return uiwidgets.TerrainButtonRect(sw, sh, left, idx)
+}
+func DrawTerrainButtons(dst *ebiten.Image, attSel, defSel int) {
+    uiwidgets.DrawTerrainButtons(dst, attSel, defSel)
 }
 
 // レベルアップポップアップ
@@ -77,3 +85,11 @@ func DrawLevelUpPopup(dst *ebiten.Image, u Unit, g LevelUpGains) { uipopup.DrawL
 
 // 依存注入（武器テーブル共有）
 func SetWeaponTable(wt *model.WeaponTable) { uiscreens.SetWeaponTable(wt) }
+
+// 選択ポップアップ
+func DrawChooseUnitPopup(dst *ebiten.Image, title string, units []Unit, hover int) {
+    uipopup.DrawChooseUnitPopup(dst, title, units, hover)
+}
+func ChooseUnitItemRect(sw, sh, i, total int) (int, int, int, int) {
+    return uipopup.ChooseUnitItemRect(sw, sh, i, total)
+}
