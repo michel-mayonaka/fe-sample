@@ -3,7 +3,7 @@ package game
 import "math/rand"
 
 // ResolveRound は1回の命中判定とダメージ適用を行い、簡易ログを返します。
-// 仕様は仮: 2RN、最小ダメ0、HP下限0。
+// 仕様: 2RN、最小ダメ0、HP下限0。距離・地形は未考慮（ResolveRoundAtを用意予定）。
 func ResolveRound(att, def Unit, rng *rand.Rand) (Unit, Unit, string) {
 	fr := Forecast(att, def)
 	hitTrue := (rng.Intn(100) + rng.Intn(100)) / 2
