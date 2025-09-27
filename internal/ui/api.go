@@ -39,11 +39,12 @@ func DrawBattleWithTerrain(dst *ebiten.Image, atk, def Unit, attT, defT gcore.Te
 func DrawBattleLogOverlay(dst *ebiten.Image, logs []string) { uiscreens.DrawBattleLogOverlay(dst, logs) }
 
 // 模擬戦API
-func DrawSimulationBattle(dst *ebiten.Image, atk, def Unit, logs []string) {
-	uiscreens.DrawSimulationBattle(dst, atk, def, logs)
-}
 func SimulateBattleCopy(atk, def Unit, rng *rand.Rand) (Unit, Unit, []string) {
     a, d, l := uiscreens.SimulateBattleCopy(atk, def, rng)
+    return a, d, l
+}
+func SimulateBattleCopyWithTerrain(atk, def Unit, attT, defT gcore.Terrain, rng *rand.Rand) (Unit, Unit, []string) {
+    a, d, l := uiscreens.SimulateBattleCopyWithTerrain(atk, def, attT, defT, rng)
     return a, d, l
 }
 func SimBattleButtonRect(sw, sh int) (int, int, int, int) {

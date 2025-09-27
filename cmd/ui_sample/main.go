@@ -52,6 +52,7 @@ type Game struct {
     simAtk    ui.Unit
     simDef    ui.Unit
     simLogs   []string
+    simLogPopup bool
 
     // 戦闘プレビュー用地形（暫定: 手動切替）
     attTerrain gcore.Terrain
@@ -224,14 +225,12 @@ func (g *Game) Update() error {
         if pointIn(mx, my, sbx, sby, sbw, sbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
             if len(g.units) > 1 {
                 aidx := g.selIndex
-                if g.hoverIndex >= 0 {
-                    aidx = g.hoverIndex
-                }
+                if g.hoverIndex >= 0 { aidx = g.hoverIndex }
                 didx := (aidx + 1) % len(g.units)
                 g.simAtk = g.units[aidx]
                 g.simDef = g.units[didx]
-                a, d, logs := ui.SimulateBattleCopy(g.simAtk, g.simDef, g.rng)
-                g.simAtk, g.simDef, g.simLogs = a, d, logs
+                g.simLogs = nil
+                g.simLogPopup = false
                 g.simActive = true
                 g.mode = modeSimBattle
             }
@@ -276,24 +275,12 @@ func (g *Game) Update() error {
         if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
             g.mode = modeList
         }
-        // 戦闘へ
-        sbx, sby, sbw, sbh := ui.ToBattleButtonRect(screenW, screenH)
-        if pointIn(mx, my, sbx, sby, sbw, sbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-            if len(g.units) > 1 {
-                g.mode = modeBattle
-                g.battleLogs = nil
-            }
-        }
+        // 戦闘へ（Phase3: オミット）
         // キー操作: X/Escで戻る、Z/Enterで戦闘へ
         if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
             g.mode = modeList
         }
-        if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyZ) {
-            if len(g.units) > 1 {
-                g.mode = modeBattle
-                g.battleLogs = nil
-            }
-        }
+        // キー操作による戦闘遷移は無効化
     case modeBattle:
         // 戻る
         bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
@@ -345,19 +332,50 @@ func (g *Game) Update() error {
             }
         }
     case modeSimBattle:
+        // ログポップアップ中は閉じる操作のみ受け付け
+        if g.simLogPopup {
+            if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || inpututil.IsKeyJustPressed(ebiten.KeyZ) || inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+                g.simLogPopup = false
+            }
+            return nil
+        }
+        // 戻る
         bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
         if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
             g.mode = modeList
             g.simActive = false
         }
-        // キー操作: X/Escで戻る
         if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
             g.mode = modeList
             g.simActive = false
         }
-        // Repo/キャッシュ再読込
+        // 武器/画像キャッシュのクリアとテーブル再注入（UI更新）
         if g.app != nil { _ = g.app.ReloadData(); ui.SetWeaponTable(g.app.WeaponsTable()) }
         assets.Clear()
+        // 戦闘開始（コピーでシミュレーション）
+        bx2, by2, bw2, bh2 := ui.BattleStartButtonRect(screenW, screenH)
+        // 実行可能条件: 両者HP>0
+        canStart := g.simAtk.HP > 0 && g.simDef.HP > 0
+        if canStart && pointIn(mx, my, bx2, by2, bw2, bh2) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simAtk, g.simDef, g.attTerrain, g.defTerrain, g.rng)
+            g.simAtk, g.simDef, g.simLogs = a, d, logs
+            g.simLogPopup = true
+        }
+        if canStart && (inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyZ)) {
+            a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simAtk, g.simDef, g.attTerrain, g.defTerrain, g.rng)
+            g.simAtk, g.simDef, g.simLogs = a, d, logs
+            g.simLogPopup = true
+        }
+        // 地形切替（1/2/3: 攻撃側、Shift+1/2/3: 防御側）
+        if inpututil.IsKeyJustPressed(ebiten.Key1) {
+            if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrain = terrainPlain() } else { g.attTerrain = terrainPlain() }
+        }
+        if inpututil.IsKeyJustPressed(ebiten.Key2) {
+            if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrain = terrainForest() } else { g.attTerrain = terrainForest() }
+        }
+        if inpututil.IsKeyJustPressed(ebiten.Key3) {
+            if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrain = terrainFort() } else { g.attTerrain = terrainFort() }
+        }
     }
     return nil
 }
@@ -376,42 +394,34 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		bx, by, bw, bh := ui.SimBattleButtonRect(screenW, screenH)
 		hovered := pointIn(mx, my, bx, by, bw, bh)
 		ui.DrawSimBattleButton(screen, hovered, len(g.units) > 1)
-	case modeStatus:
-		ui.DrawStatus(screen, g.unit)
-		// 戻るボタン
-		mx, my := ebiten.CursorPosition()
-		bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
-		hovered := pointIn(mx, my, bx, by, bw, bh)
-		ui.DrawBackButton(screen, hovered)
-		// レベルアップボタン
-		lvx, lvy, lvw, lvh := ui.LevelUpButtonRect(screenW, screenH)
-		lvHovered := pointIn(mx, my, lvx, lvy, lvw, lvh)
-		ui.DrawLevelUpButton(screen, lvHovered, g.unit.Level < game.LevelCap && !g.popupActive)
-		if g.popupActive {
-			ui.DrawLevelUpPopup(screen, g.unit, g.popupGains)
-		}
-		// 戦闘へ
-		sbx, sby, sbw, sbh := ui.ToBattleButtonRect(screenW, screenH)
-		sbHovered := pointIn(mx, my, sbx, sby, sbw, sbh)
-		ui.DrawToBattleButton(screen, sbHovered, len(g.units) > 1)
+    case modeStatus:
+        ui.DrawStatus(screen, g.unit)
+        // 戻るボタン
+        mx, my := ebiten.CursorPosition()
+        bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+        hovered := pointIn(mx, my, bx, by, bw, bh)
+        ui.DrawBackButton(screen, hovered)
+        // レベルアップボタン
+        lvx, lvy, lvw, lvh := ui.LevelUpButtonRect(screenW, screenH)
+        lvHovered := pointIn(mx, my, lvx, lvy, lvw, lvh)
+        ui.DrawLevelUpButton(screen, lvHovered, g.unit.Level < game.LevelCap && !g.popupActive)
+        if g.popupActive {
+            ui.DrawLevelUpPopup(screen, g.unit, g.popupGains)
+        }
+        // Phase3: ステータス画面の「戦闘へ」ボタンは削除
     case modeBattle:
-        // 対戦相手は次のユニット
-        defIdx := (g.selIndex + 1) % len(g.units)
-        atk := g.units[g.selIndex]
-        def := g.units[defIdx]
-        canStart := !g.battleLogPopup && atk.HP > 0 && def.HP > 0
-        ui.DrawBattleWithTerrain(screen, atk, def, g.attTerrain, g.defTerrain, canStart)
-        if g.battleLogPopup {
-            ui.DrawBattleLogOverlay(screen, g.battleLogs)
+        // Phase3: 実戦画面は非推奨（将来撤去）。現状はステータスから遷移しないため通常到達しない。
+        fallthrough
+    case modeSimBattle:
+        // 新バトルシミュレータ（battleレイアウトを使用）
+        canStart := g.simAtk.HP > 0 && g.simDef.HP > 0 && !g.simLogPopup
+        ui.DrawBattleWithTerrain(screen, g.simAtk, g.simDef, g.attTerrain, g.defTerrain, canStart)
+        if g.simLogPopup {
+            ui.DrawBattleLogOverlay(screen, g.simLogs)
         }
         mx, my := ebiten.CursorPosition()
         bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
         ui.DrawBackButton(screen, pointIn(mx, my, bx, by, bw, bh))
-	case modeSimBattle:
-		ui.DrawSimulationBattle(screen, g.simAtk, g.simDef, g.simLogs)
-		mx, my := ebiten.CursorPosition()
-		bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
-		ui.DrawBackButton(screen, pointIn(mx, my, bx, by, bw, bh))
 	}
 	if g.showHelp {
 		ebitenutil.DebugPrintAt(screen, "H: ヘルプ表示切替 / ESC: 閉じる\nBackspace: サンプル値を再読み込み", 16, screenH-64)
