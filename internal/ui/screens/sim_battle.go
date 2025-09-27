@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"ui_sample/internal/model"
 	uicore "ui_sample/internal/ui/core"
+	gcore "ui_sample/pkg/game"
 )
 
 // ボタンRectは widgets パッケージ側に統一しています。
@@ -52,25 +53,20 @@ func simulateHit(atk, def uicore.Unit, rng *rand.Rand) (uicore.Unit, uicore.Unit
 			}
 		}
 	}
-	hit := 80 + atk.Stats.Skl*2 + atk.Stats.Lck/2 - (def.Stats.Spd*2 + def.Stats.Lck)
-	if hit < 0 {
-		hit = 0
+	ga := gcore.Unit{ID: atk.ID, Name: atk.Name, Class: atk.Class, Lv: atk.Level,
+		S: gcore.Stats{HP: atk.HP, Str: atk.Stats.Str, Skl: atk.Stats.Skl, Spd: atk.Stats.Spd, Lck: atk.Stats.Lck, Def: atk.Stats.Def, Res: atk.Stats.Res, Mov: atk.Stats.Mov},
+		W: gcore.Weapon{MT: might}}
+	gd := gcore.Unit{ID: def.ID, Name: def.Name, Class: def.Class, Lv: def.Level,
+		S: gcore.Stats{HP: def.HP, Str: def.Stats.Str, Skl: def.Stats.Skl, Spd: def.Stats.Spd, Lck: def.Stats.Lck, Def: def.Stats.Def, Res: def.Stats.Res, Mov: def.Stats.Mov}}
+	_, gd, line := gcore.ResolveRound(ga, gd, rng)
+	def.HP = gd.S.HP
+	if def.HP < 0 {
+		def.HP = 0
 	}
-	if hit > 100 {
-		hit = 100
+	if line == "" {
+		line = fmt.Sprintf("命中! 0ダメージ (HP %d/%d)", def.HP, def.HPMax)
 	}
-	if rng.Intn(100) < hit {
-		dmg := atk.Stats.Str + might - def.Stats.Def
-		if dmg < 0 {
-			dmg = 0
-		}
-		def.HP -= dmg
-		if def.HP < 0 {
-			def.HP = 0
-		}
-		return atk, def, fmt.Sprintf("命中! %dダメージ (HP %d/%d)", dmg, def.HP, def.HPMax)
-	}
-	return atk, def, "ミス!"
+	return atk, def, line
 }
 
 // DrawSimulationBattle は模擬戦の結果を画面に描画します。
