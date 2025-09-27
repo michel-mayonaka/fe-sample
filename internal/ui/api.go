@@ -1,12 +1,13 @@
 package ui
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	"math/rand"
-	uicore "ui_sample/internal/ui/core"
-	uipopup "ui_sample/internal/ui/popup"
-	uiscreens "ui_sample/internal/ui/screens"
-	uiwidgets "ui_sample/internal/ui/widgets"
+    "github.com/hajimehoshi/ebiten/v2"
+    "math/rand"
+    uicore "ui_sample/internal/ui/core"
+    uipopup "ui_sample/internal/ui/popup"
+    uiscreens "ui_sample/internal/ui/screens"
+    uiwidgets "ui_sample/internal/ui/widgets"
+    gcore "ui_sample/pkg/game"
 )
 
 // 型エイリアス（外部API互換）
@@ -31,6 +32,9 @@ func DrawCharacterList(dst *ebiten.Image, units []Unit, hover int) {
 }
 func DrawStatus(dst *ebiten.Image, u Unit)        { uiscreens.DrawStatus(dst, u) }
 func DrawBattle(dst *ebiten.Image, atk, def Unit) { uiscreens.DrawBattle(dst, atk, def) }
+func DrawBattleWithTerrain(dst *ebiten.Image, atk, def Unit, attT, defT gcore.Terrain) {
+    uiscreens.DrawBattleWithTerrain(dst, atk, def, attT, defT)
+}
 
 // 模擬戦API
 func DrawSimulationBattle(dst *ebiten.Image, atk, def Unit, logs []string) {

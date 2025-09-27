@@ -56,6 +56,26 @@
 
 フォント: Ebiten examples の M+ 1p Regular を OpenType で初期化（失敗時は basicfont にフォールバック）。
 
+## pkg/game（ロジック層・UI非依存）
+- 型
+  - `type Stats { HP, Str, Skl, Spd, Lck, Def, Res, Mov int }`
+  - `type Weapon { MT, Hit, Crit, Wt, RMin, RMax int; Type string }`
+  - `type Unit { ID, Name, Class string; Lv int; S Stats; W Weapon }`
+  - `type Terrain { Avoid, Def, Hit, Heal int }`（MVP: Avoid/Def/Hit を使用）
+  - `type ForecastResult { HitDisp, Dmg, Crit int }`
+- 三すくみ
+  - 暫定: `Sword > Axe > Lance > Sword`（命中±10/威力±2）。
+- API
+  - `Forecast(att, def Unit) ForecastResult`
+    - 地形なしの互換API。2RNは表示値のみ（判定はResolve系）。
+  - `ForecastAt(att, def Unit, attTile, defTile Terrain) ForecastResult`
+    - 仕様: `atk_hit = hit + skl*2 + floor(lck/2) + attTile.Hit`、`def_avo = spd*2 + lck + defTile.Avoid`、
+      `hit_disp = clamp(atk_hit - def_avo + triHit, 0..100)`、`dmg = max(1, str+mt+triMt - (def + defTile.Def))`。
+  - `ResolveRound(att, def Unit, rng *rand.Rand) (Unit, Unit, string)`
+    - 地形なしの互換API。2RN・最小ダメ1・HP下限0。
+  - `ResolveRoundAt(att, def Unit, attTile, defTile Terrain, rng *rand.Rand) (Unit, Unit, string)`
+    - 予測値に基づき命中/クリティカル計算（0..100でクランプ）。
+
 ## cmd/ui_sample（エントリ）
 - `const screenW = 1920`, `const screenH = 1080`: 論理解像度。
 - `type Game`

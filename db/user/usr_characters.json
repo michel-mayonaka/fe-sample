@@ -63,7 +63,7 @@
     "class": "傭兵",
     "portrait": "assets/02_loyd.png",
     "level": 20,
-    "hp": 35,
+    "hp": 3,
     "hp_max": 35,
     "stats": {
       "Str": 17,
@@ -101,7 +101,7 @@
     "equip": [
       {
         "name": "アイアンソード",
-        "uses": 40,
+        "uses": 34,
         "max": 45
       },
       {
@@ -117,7 +117,6 @@
     "class": "剣士",
     "portrait": "assets/03_hayate.png",
     "level": 20,
-    "hp": 15,
     "hp_max": 31,
     "stats": {
       "Str": 12,

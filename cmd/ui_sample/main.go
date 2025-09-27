@@ -3,17 +3,18 @@
 package main
 
 import (
-	"image/color"
-	"math/rand"
-	"time"
+    "image/color"
+    "math/rand"
+    "time"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"ui_sample/internal/game"
-	"ui_sample/internal/model"
-	"ui_sample/internal/ui"
-	"ui_sample/internal/user"
+    "github.com/hajimehoshi/ebiten/v2"
+    "github.com/hajimehoshi/ebiten/v2/ebitenutil"
+    "github.com/hajimehoshi/ebiten/v2/inpututil"
+    "ui_sample/internal/game"
+    "ui_sample/internal/model"
+    "ui_sample/internal/ui"
+    "ui_sample/internal/user"
+    gcore "ui_sample/pkg/game"
 )
 
 const (
@@ -43,10 +44,14 @@ type Game struct {
 	popupJustOpened bool
 
 	// 模擬戦
-	simActive bool
-	simAtk    ui.Unit
-	simDef    ui.Unit
-	simLogs   []string
+    simActive bool
+    simAtk    ui.Unit
+    simDef    ui.Unit
+    simLogs   []string
+
+    // 戦闘プレビュー用地形（暫定: 手動切替）
+    attTerrain gcore.Terrain
+    defTerrain gcore.Terrain
 }
 
 type screenMode int
@@ -64,76 +69,42 @@ func pointIn(px, py, x, y, w, h int) bool {
 
 // 簡易戦闘の1ラウンドを実行し、結果をUIとユーザJSONへ反映します。
 func (g *Game) runBattleRound() {
-	if len(g.units) < 2 {
-		return
-	}
-	atkIdx := g.selIndex
-	defIdx := (g.selIndex + 1) % len(g.units)
-	atk := g.units[atkIdx]
-	def := g.units[defIdx]
+    if len(g.units) < 2 {
+        return
+    }
+    atkIdx := g.selIndex
+    defIdx := (g.selIndex + 1) % len(g.units)
+    atk := g.units[atkIdx]
+    def := g.units[defIdx]
 
-	// 武器威力（先頭装備）
-	wepMight := 0
-	if len(atk.Equip) > 0 {
-		if wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json"); err == nil {
-			if w, ok := wt.Find(atk.Equip[0].Name); ok {
-				wepMight = w.Might
-			}
-		}
-		// 使用回数を1つ消費
-		if atk.Equip[0].Uses > 0 {
-			atk.Equip[0].Uses--
-		}
-	}
-	// 命中（単純化）
-	hit := 80 + atk.Stats.Skl*2 + atk.Stats.Lck/2 - (def.Stats.Spd*2 + def.Stats.Lck)
-	if hit < 0 {
-		hit = 0
-	}
-	if hit > 100 {
-		hit = 100
-	}
-
-	// 攻撃
-	if g.rng.Intn(100) < hit {
-		dmg := atk.Stats.Str + wepMight - def.Stats.Def
-		if dmg < 0 {
-			dmg = 0
-		}
-		def.HP -= dmg
-		if def.HP < 0 {
-			def.HP = 0
-		}
-	}
-	// 反撃（隣接想定）
-	if def.HP > 0 {
-		// 反撃も簡易。敵の先頭装備威力
-		w2 := 0
-		if len(def.Equip) > 0 {
-			if wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json"); err == nil {
-				if w, ok := wt.Find(def.Equip[0].Name); ok {
-					w2 = w.Might
-				}
-			}
-		}
-		hit2 := 80 + def.Stats.Skl*2 + def.Stats.Lck/2 - (atk.Stats.Spd*2 + atk.Stats.Lck)
-		if hit2 < 0 {
-			hit2 = 0
-		}
-		if hit2 > 100 {
-			hit2 = 100
-		}
-		if g.rng.Intn(100) < hit2 {
-			dmg := def.Stats.Str + w2 - atk.Stats.Def
-			if dmg < 0 {
-				dmg = 0
-			}
-			atk.HP -= dmg
-			if atk.HP < 0 {
-				atk.HP = 0
-			}
-		}
-	}
+    // 武器定義を読み込み、/pkg/game.Unit へ変換
+    wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json")
+    if err == nil {
+        ga := toGameUnit(wt, atk)
+        gd := toGameUnit(wt, def)
+        // 地形（暫定: 平地固定）
+        attT := gcore.Terrain{}
+        defT := gcore.Terrain{}
+        // 1ラウンド攻撃
+        ga2, gd2, _ := gcore.ResolveRoundAt(ga, gd, attT, defT, g.rng)
+        // 反映
+        def.HP = gd2.S.HP
+        atk.HP = ga2.S.HP // 現状は変化しないが将来の効果に備えて
+        // 反撃（距離1想定、射程判定）
+        if def.HP > 0 {
+            dist := 1
+            canCounter := gd2.W.RMin <= dist && dist <= gd2.W.RMax
+            if canCounter {
+                gd3, ga3, _ := gcore.ResolveRoundAt(gd2, ga2, defT, attT, g.rng)
+                atk.HP = ga3.S.HP
+                def.HP = gd3.S.HP
+            }
+        }
+    }
+    // 使用回数を1つ消費（攻撃側のみ、従来仕様を踏襲）
+    if len(atk.Equip) > 0 && atk.Equip[0].Uses > 0 {
+        atk.Equip[0].Uses--
+    }
 
 	// 反映
 	g.units[atkIdx] = atk
@@ -160,9 +131,28 @@ func (g *Game) runBattleRound() {
 	}
 }
 
+// toGameUnit は UIユニットを /pkg/game.Unit に変換します。
+func toGameUnit(wt *model.WeaponTable, u ui.Unit) gcore.Unit {
+    var w model.Weapon
+    if len(u.Equip) > 0 {
+        if ww, ok := wt.Find(u.Equip[0].Name); ok {
+            w = ww
+        }
+    }
+    return gcore.Unit{
+        ID: u.ID, Name: u.Name, Class: u.Class, Lv: u.Level,
+        S: gcore.Stats{HP: u.HP, Str: u.Stats.Str, Skl: u.Stats.Skl, Spd: u.Stats.Spd, Lck: u.Stats.Lck, Def: u.Stats.Def, Res: u.Stats.Res, Mov: u.Stats.Mov},
+        W: gcore.Weapon{MT: w.Might, Hit: w.Hit, Crit: w.Crit, Wt: w.Weight, RMin: w.RangeMin, RMax: w.RangeMax, Type: w.Type},
+    }
+}
+
+func terrainPlain() gcore.Terrain  { return gcore.Terrain{Avoid: 0, Def: 0, Hit: 0} }
+func terrainForest() gcore.Terrain { return gcore.Terrain{Avoid: 20, Def: 1, Hit: 0} }
+func terrainFort() gcore.Terrain   { return gcore.Terrain{Avoid: 15, Def: 2, Hit: 0} }
+
 // NewGame は Game を初期化して返します。
 func NewGame() *Game {
-	g := &Game{}
+    g := &Game{}
 	g.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 	g.userPath = "db/user/usr_characters.json"
 	if ut, err := user.LoadFromJSON(g.userPath); err == nil {
@@ -179,9 +169,12 @@ func NewGame() *Game {
 		g.units = []ui.Unit{g.unit}
 		g.selIndex = 0
 	}
-	g.mode = modeList
-	g.hoverIndex = -1
-	return g
+    g.mode = modeList
+    g.hoverIndex = -1
+    // 地形の初期値（平地）
+    g.attTerrain = gcore.Terrain{}
+    g.defTerrain = gcore.Terrain{}
+    return g
 }
 
 // Update は毎フレームの更新処理を行います。
@@ -208,38 +201,60 @@ func (g *Game) Update() error {
 
 	// 入力（マウス）
 	mx, my := ebiten.CursorPosition()
-	switch g.mode {
-	case modeList:
-		g.hoverIndex = -1
-		for i := range g.units {
-			x, y, w, h := ui.ListItemRect(screenW, screenH, i)
-			if pointIn(mx, my, x, y, w, h) {
-				g.hoverIndex = i
-			}
-		}
-		// 模擬戦ボタン
-		sbx, sby, sbw, sbh := ui.SimBattleButtonRect(screenW, screenH)
-		if pointIn(mx, my, sbx, sby, sbw, sbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			if len(g.units) > 1 {
-				aidx := g.selIndex
-				if g.hoverIndex >= 0 {
-					aidx = g.hoverIndex
-				}
-				didx := (aidx + 1) % len(g.units)
-				g.simAtk = g.units[aidx]
-				g.simDef = g.units[didx]
-				a, d, logs := ui.SimulateBattleCopy(g.simAtk, g.simDef, g.rng)
-				g.simAtk, g.simDef, g.simLogs = a, d, logs
-				g.simActive = true
-				g.mode = modeSimBattle
-			}
-		}
-		if g.hoverIndex >= 0 && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			g.selIndex = g.hoverIndex
-			g.unit = g.units[g.selIndex]
-			g.mode = modeStatus
-		}
-	case modeStatus:
+    switch g.mode {
+    case modeList:
+        g.hoverIndex = -1
+        for i := range g.units {
+            x, y, w, h := ui.ListItemRect(screenW, screenH, i)
+            if pointIn(mx, my, x, y, w, h) {
+                g.hoverIndex = i
+            }
+        }
+        // キー操作: ↑↓で選択、Z/Enterで詳細、Tabで次へ
+        if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+            if g.selIndex > 0 {
+                g.selIndex--
+                g.unit = g.units[g.selIndex]
+            }
+        }
+        if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
+            if g.selIndex < len(g.units)-1 {
+                g.selIndex++
+                g.unit = g.units[g.selIndex]
+            }
+        }
+        if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
+            if len(g.units) > 0 {
+                g.selIndex = (g.selIndex + 1) % len(g.units)
+                g.unit = g.units[g.selIndex]
+            }
+        }
+        if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyZ) {
+            g.mode = modeStatus
+        }
+        // 模擬戦ボタン
+        sbx, sby, sbw, sbh := ui.SimBattleButtonRect(screenW, screenH)
+        if pointIn(mx, my, sbx, sby, sbw, sbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            if len(g.units) > 1 {
+                aidx := g.selIndex
+                if g.hoverIndex >= 0 {
+                    aidx = g.hoverIndex
+                }
+                didx := (aidx + 1) % len(g.units)
+                g.simAtk = g.units[aidx]
+                g.simDef = g.units[didx]
+                a, d, logs := ui.SimulateBattleCopy(g.simAtk, g.simDef, g.rng)
+                g.simAtk, g.simDef, g.simLogs = a, d, logs
+                g.simActive = true
+                g.mode = modeSimBattle
+            }
+        }
+        if g.hoverIndex >= 0 && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            g.selIndex = g.hoverIndex
+            g.unit = g.units[g.selIndex]
+            g.mode = modeStatus
+        }
+    case modeStatus:
 		// レベルアップボタン
 		lbx, lby, lbw, lbh := ui.LevelUpButtonRect(screenW, screenH)
 		lvEnabled := g.unit.Level < game.LevelCap && !g.popupActive
@@ -270,36 +285,79 @@ func (g *Game) Update() error {
 				g.popupActive = false
 			}
 		}
-		bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
-		if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			g.mode = modeList
-		}
-		// 戦闘へ
-		sbx, sby, sbw, sbh := ui.ToBattleButtonRect(screenW, screenH)
-		if pointIn(mx, my, sbx, sby, sbw, sbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			if len(g.units) > 1 {
-				g.mode = modeBattle
-			}
-		}
-	case modeBattle:
-		// 戻る
-		bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
-		if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			g.mode = modeStatus
-		}
-		// 戦闘開始
-		bx2, by2, bw2, bh2 := ui.BattleStartButtonRect(screenW, screenH)
-		if pointIn(mx, my, bx2, by2, bw2, bh2) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			g.runBattleRound()
-		}
-	case modeSimBattle:
-		bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
-		if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			g.mode = modeList
-			g.simActive = false
-		}
-	}
-	return nil
+        bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+        if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            g.mode = modeList
+        }
+        // 戦闘へ
+        sbx, sby, sbw, sbh := ui.ToBattleButtonRect(screenW, screenH)
+        if pointIn(mx, my, sbx, sby, sbw, sbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            if len(g.units) > 1 {
+                g.mode = modeBattle
+            }
+        }
+        // キー操作: X/Escで戻る、Z/Enterで戦闘へ
+        if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+            g.mode = modeList
+        }
+        if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyZ) {
+            if len(g.units) > 1 {
+                g.mode = modeBattle
+            }
+        }
+    case modeBattle:
+        // 戻る
+        bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+        if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            g.mode = modeStatus
+        }
+        // 戦闘開始
+        bx2, by2, bw2, bh2 := ui.BattleStartButtonRect(screenW, screenH)
+        if pointIn(mx, my, bx2, by2, bw2, bh2) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            g.runBattleRound()
+        }
+        // キー操作: Z/Enterで戦闘、X/Escで戻る
+        if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyZ) {
+            g.runBattleRound()
+        }
+        if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+            g.mode = modeStatus
+        }
+        // 地形切替（1/2/3: 攻撃側、Shift+1/2/3: 防御側）
+        if inpututil.IsKeyJustPressed(ebiten.Key1) {
+            if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) {
+                g.defTerrain = terrainPlain()
+            } else {
+                g.attTerrain = terrainPlain()
+            }
+        }
+        if inpututil.IsKeyJustPressed(ebiten.Key2) {
+            if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) {
+                g.defTerrain = terrainForest()
+            } else {
+                g.attTerrain = terrainForest()
+            }
+        }
+        if inpututil.IsKeyJustPressed(ebiten.Key3) {
+            if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) {
+                g.defTerrain = terrainFort()
+            } else {
+                g.attTerrain = terrainFort()
+            }
+        }
+    case modeSimBattle:
+        bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+        if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            g.mode = modeList
+            g.simActive = false
+        }
+        // キー操作: X/Escで戻る
+        if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+            g.mode = modeList
+            g.simActive = false
+        }
+    }
+    return nil
 }
 
 // Draw は画面描画を行います。
@@ -331,15 +389,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		sbx, sby, sbw, sbh := ui.ToBattleButtonRect(screenW, screenH)
 		sbHovered := pointIn(mx, my, sbx, sby, sbw, sbh)
 		ui.DrawToBattleButton(screen, sbHovered, len(g.units) > 1)
-	case modeBattle:
-		// 対戦相手は次のユニット
-		defIdx := (g.selIndex + 1) % len(g.units)
-		atk := g.units[g.selIndex]
-		def := g.units[defIdx]
-		ui.DrawBattle(screen, atk, def)
-		mx, my := ebiten.CursorPosition()
-		bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
-		ui.DrawBackButton(screen, pointIn(mx, my, bx, by, bw, bh))
+    case modeBattle:
+        // 対戦相手は次のユニット
+        defIdx := (g.selIndex + 1) % len(g.units)
+        atk := g.units[g.selIndex]
+        def := g.units[defIdx]
+        ui.DrawBattleWithTerrain(screen, atk, def, g.attTerrain, g.defTerrain)
+        mx, my := ebiten.CursorPosition()
+        bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+        ui.DrawBackButton(screen, pointIn(mx, my, bx, by, bw, bh))
 	case modeSimBattle:
 		ui.DrawSimulationBattle(screen, g.simAtk, g.simDef, g.simLogs)
 		mx, my := ebiten.CursorPosition()

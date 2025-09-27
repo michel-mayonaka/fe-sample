@@ -1,17 +1,32 @@
 # OS / editor
 .DS_Store
+Thumbs.db
 .idea/
 .vscode/
+
+# Local caches
+.cache/
+.gocache/
+.gomodcache/
 
 # Go build
 bin/
 dist/
 build/
 coverage.out
+coverage.*
+*.prof
 
 # Modules / workspace
 go.work
 
 # Env / logs
 .env
+.env.*
 *.log
+
+# Artifacts (検証/保存物など)
+artifacts/
+
+# Local user DB override (任意運用)
+db/user/*_local.json
