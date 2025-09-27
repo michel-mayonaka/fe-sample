@@ -4,6 +4,7 @@ import (
     "fmt"
     "math/rand"
     "ui_sample/internal/adapter"
+    "ui_sample/internal/model"
     "ui_sample/internal/repo"
     uicore "ui_sample/internal/ui/core"
     "ui_sample/internal/user"
@@ -83,6 +84,20 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
         }
     }
     return units, logs, true, nil
+}
+
+// ReloadData は JSON バックエンドのキャッシュを再読み込みします。
+func (a *App) ReloadData() error {
+    if a == nil { return nil }
+    if a.Weapons != nil { return a.Weapons.Reload() }
+    return nil
+}
+
+// WeaponsTable は共有用の武器テーブル参照を返します。
+// UIはこれを `ui.SetWeaponTable` に渡して利用します。
+func (a *App) WeaponsTable() *model.WeaponTable {
+    if a == nil || a.Weapons == nil { return nil }
+    return a.Weapons.Table()
 }
 
 // PersistUnit は UI ユニットの現在値をユーザセーブへ反映して保存します。

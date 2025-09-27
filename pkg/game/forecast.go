@@ -82,3 +82,35 @@ func clamp(v, lo, hi int) int {
 	}
 	return v
 }
+
+// TriangleRelation は三すくみの関係を表します。
+// 便宜上、0=中立, +1=有利, -1=不利 とします。
+type TriangleRelation int
+
+const (
+    TriangleNeutral      TriangleRelation = 0
+    TriangleAdvantage    TriangleRelation = 1
+    TriangleDisadvantage TriangleRelation = -1
+)
+
+// TriangleRelationOf は武器種同士の関係を返します。
+func TriangleRelationOf(attType, defType string) TriangleRelation {
+    m := triangleMod(attType, defType)
+    if m.Mt > 0 || m.Hit > 0 { return TriangleAdvantage }
+    if m.Mt < 0 || m.Hit < 0 { return TriangleDisadvantage }
+    return TriangleNeutral
+}
+
+// TerrainPresetName は既知の簡易地形名を返します（未知は "地形"）。
+func TerrainPresetName(t Terrain) string {
+    switch {
+    case t.Avoid == 0 && t.Def == 0 && t.Hit == 0:
+        return "平地"
+    case t.Avoid == 20 && t.Def == 1 && t.Hit == 0:
+        return "森"
+    case t.Avoid == 15 && t.Def == 2 && t.Hit == 0:
+        return "砦"
+    default:
+        return "地形"
+    }
+}

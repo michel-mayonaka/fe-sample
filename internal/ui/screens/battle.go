@@ -62,7 +62,7 @@ func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, at
         if wt := weaponTable(); wt != nil {
             aType := weaponTypeOf(wt, attacker)
             dType := weaponTypeOf(wt, defender)
-            lbl, col := triangleLabel(aType, dType)
+            lbl, col := triangleRelationLabelColor(gcore.TriangleRelationOf(aType, dType))
             w := text.BoundString(uicore.FaceMain, baseLine).Dx()
             text.Draw(dst, "  相性: ", uicore.FaceMain, ax+w+8, ay, uicore.ColText)
             w2 := text.BoundString(uicore.FaceMain, "  相性: ").Dx()
@@ -78,8 +78,8 @@ func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, at
             _ = uicore.DrawWrapped(dst, uicore.FaceMain, "(反撃不可) 命中 -  与ダメ -  必殺 -", dx, dy, color.RGBA{180,180,180,255}, 520, uicore.LineHMain)
         }
         // 地形表示
-        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, terrainLabel(attT), ax, ay+26, color.RGBA{200,220,255,255}, 820, uicore.LineHSmall)
-        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, terrainLabel(defT), dx, dy+26, color.RGBA{200,220,255,255}, 520, uicore.LineHSmall)
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, terrainLine(attT), ax, ay+26, color.RGBA{200,220,255,255}, 820, uicore.LineHSmall)
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, terrainLine(defT), dx, dy+26, color.RGBA{200,220,255,255}, 520, uicore.LineHSmall)
         // 内訳（簡潔表示）: 折り返し描画
         leftHitLine := fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
             frAtkBk.WeapHit, frAtkBk.Skl2, frAtkBk.LckHalf, frAtkBk.AttTileHit,
@@ -182,13 +182,8 @@ func defaultTerrains() (gcore.Terrain, gcore.Terrain) {
     return gcore.Terrain{}, gcore.Terrain{}
 }
 
-func terrainLabel(t gcore.Terrain) string {
-    name := "平地"
-    if t.Avoid == 20 && t.Def == 1 {
-        name = "森"
-    } else if t.Avoid == 15 && t.Def == 2 {
-        name = "砦"
-    }
+func terrainLine(t gcore.Terrain) string {
+    name := gcore.TerrainPresetName(t)
     return fmt.Sprintf("地形: %s (回避+%d 防御+%d 命中+%d)", name, t.Avoid, t.Def, t.Hit)
 }
 
@@ -212,29 +207,15 @@ func weaponTable() *model.WeaponTable {
     return nil
 }
 
-func triangleLabel(attType, defType string) (string, color.Color) {
-    // Sword > Axe > Lance > Sword
-    switch attType {
-    case "Sword":
-        if defType == "Axe" {
-            return "有利", uicore.ColAccent
-        } else if defType == "Lance" {
-            return "不利", color.RGBA{255, 170, 70, 255}
-        }
-    case "Axe":
-        if defType == "Lance" {
-            return "有利", uicore.ColAccent
-        } else if defType == "Sword" {
-            return "不利", color.RGBA{255, 170, 70, 255}
-        }
-    case "Lance":
-        if defType == "Sword" {
-            return "有利", uicore.ColAccent
-        } else if defType == "Axe" {
-            return "不利", color.RGBA{255, 170, 70, 255}
-        }
+func triangleRelationLabelColor(rel gcore.TriangleRelation) (string, color.Color) {
+    switch rel {
+    case gcore.TriangleAdvantage:
+        return "有利", uicore.ColAccent
+    case gcore.TriangleDisadvantage:
+        return "不利", color.RGBA{255, 170, 70, 255}
+    default:
+        return "中立", color.RGBA{180, 180, 180, 255}
     }
-    return "中立", color.RGBA{180, 180, 180, 255}
 }
 
 // DrawBattleLogOverlay は全画面を半透明で覆い、中央にログを表示します。

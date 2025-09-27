@@ -353,7 +353,7 @@ func (g *Game) Update() error {
             g.simActive = false
         }
         // Repo/キャッシュ再読込
-        if g.app != nil && g.app.Weapons != nil { _ = g.app.Weapons.Reload(); ui.SetWeaponTable(g.app.Weapons.Table()) }
+        if g.app != nil { _ = g.app.ReloadData(); ui.SetWeaponTable(g.app.WeaponsTable()) }
         assets.Clear()
     }
     return nil
