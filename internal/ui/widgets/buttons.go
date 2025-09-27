@@ -78,3 +78,31 @@ func DrawToBattleButton(dst *ebiten.Image, hovered, enabled bool) {
 	vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), base, false)
 	text.Draw(dst, "戦闘へ", uicore.FaceMain, x+70, y+36, uicore.ColText)
 }
+
+// SimBattleButtonRect は一覧画面の右上に表示する「模擬戦」ボタンの矩形です。
+func SimBattleButtonRect(sw, _ int) (x, y, w, h int) {
+	w, h = 160, 48
+	x = sw - uicore.ListMargin - w
+	y = uicore.ListMargin + 16
+	return
+}
+
+// DrawSimBattleButton は一覧画面の「模擬戦」ボタンを描画します。
+func DrawSimBattleButton(dst *ebiten.Image, hovered, enabled bool) {
+	sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+	x, y, w, h := SimBattleButtonRect(sw, sh)
+	base := color.RGBA{40, 60, 100, 255}
+	if !enabled {
+		base = color.RGBA{70, 70, 70, 255}
+	}
+	if hovered && enabled {
+		base = color.RGBA{60, 90, 150, 255}
+	}
+	uicore.DrawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
+	vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), base, false)
+	label := "模擬戦"
+	if hovered && enabled {
+		label = "> 模擬戦 <"
+	}
+	text.Draw(dst, label, uicore.FaceMain, x+24, y+32, uicore.ColText)
+}

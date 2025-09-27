@@ -10,7 +10,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 	"ui_sample/internal/game"
 	"ui_sample/internal/model"
 	"ui_sample/internal/ui"
@@ -293,6 +292,12 @@ func (g *Game) Update() error {
 		if pointIn(mx, my, bx2, by2, bw2, bh2) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 			g.runBattleRound()
 		}
+	case modeSimBattle:
+		bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+		if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+			g.mode = modeList
+			g.simActive = false
+		}
 	}
 	return nil
 }
@@ -303,17 +308,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	switch g.mode {
 	case modeList:
 		ui.DrawCharacterList(screen, g.units, g.hoverIndex)
-		// 模擬戦ボタン（簡易表示）
+		// 模擬戦ボタン（統一スタイル）
 		mx, my := ebiten.CursorPosition()
 		bx, by, bw, bh := ui.SimBattleButtonRect(screenW, screenH)
 		hovered := pointIn(mx, my, bx, by, bw, bh)
-		// 枠と背景（vectorで描画）
-		vector.DrawFilledRect(screen, float32(bx), float32(by), float32(bw), float32(bh), color.RGBA{40, 60, 100, 255}, false)
-		label := "模擬戦"
-		if hovered {
-			label = "> 模擬戦 <"
-		}
-		ebitenutil.DebugPrintAt(screen, label, bx+16, by+16)
+		ui.DrawSimBattleButton(screen, hovered, len(g.units) > 1)
 	case modeStatus:
 		ui.DrawStatus(screen, g.unit)
 		// 戻るボタン

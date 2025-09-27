@@ -41,7 +41,10 @@ func SimulateBattleCopy(atk, def Unit, rng *rand.Rand) (Unit, Unit, []string) {
 	return a, d, l
 }
 func SimBattleButtonRect(sw, sh int) (int, int, int, int) {
-	return uiscreens.SimBattleButtonRect(sw, sh)
+	return uiwidgets.SimBattleButtonRect(sw, sh)
+}
+func DrawSimBattleButton(dst *ebiten.Image, hovered, enabled bool) {
+	uiwidgets.DrawSimBattleButton(dst, hovered, enabled)
 }
 func ListItemRect(sw, sh, i int) (int, int, int, int) { return uiscreens.ListItemRect(sw, sh, i) }
 

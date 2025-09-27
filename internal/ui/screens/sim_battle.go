@@ -11,13 +11,7 @@ import (
 	uicore "ui_sample/internal/ui/core"
 )
 
-// SimBattleButtonRect は一覧画面の右上に表示する「模擬戦」ボタン矩形を返します。
-func SimBattleButtonRect(sw, _ int) (x, y, w, h int) {
-	w, h = 160, 48
-	x = sw - uicore.ListMargin - w
-	y = uicore.ListMargin + 16
-	return
-}
+// ボタンRectは widgets パッケージ側に統一しています。
 
 // SimulateBattleCopy はコピーを用いた簡易模擬戦を行い、結果ログを返します（永続化なし）。
 func SimulateBattleCopy(atk, def uicore.Unit, rng *rand.Rand) (uicore.Unit, uicore.Unit, []string) {
