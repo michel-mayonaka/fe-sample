@@ -3,15 +3,26 @@ package scenes
 import (
     "math/rand"
 
-    app "ui_sample/internal/app"
+    "ui_sample/internal/model"
+    "ui_sample/internal/repo"
     uicore "ui_sample/internal/game/service/ui"
     scpopup "ui_sample/internal/game/scenes/common/popup"
     "ui_sample/internal/user"
+    gcore "ui_sample/pkg/game"
 )
+
+// AppPort は Scene 層が必要とする最小限のユースケース境界です。
+type AppPort interface {
+    ReloadData() error
+    WeaponsTable() *model.WeaponTable
+    PersistUnit(u uicore.Unit) error
+    RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore.Terrain) ([]uicore.Unit, []string, bool, error)
+    Inventory() repo.InventoryRepo
+}
 
 // Env は UI シーン間で共有する状態とユースケースを束ねます。
 type Env struct {
-    App       *app.App
+    App       AppPort
     UserTable *user.Table
     UserPath  string
     RNG       *rand.Rand

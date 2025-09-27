@@ -28,15 +28,15 @@ func (s *Inventory) Update(ctx *game.Ctx) (game.Scene, error) {
     tx := lm + uicore.S(20)
     ty := lm + uicore.S(12)
     if pointIn(mx,my,tx,ty,tabW,tabH) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-        if s.E.App != nil && s.E.App.Inv != nil { s.E.InvTab, s.E.HoverInv = 0, -1 }
+        if s.E.App != nil && s.E.App.Inventory() != nil { s.E.InvTab, s.E.HoverInv = 0, -1 }
     }
     tx2 := tx + tabW + uicore.S(10)
     if pointIn(mx,my,tx2,ty,tabW,tabH) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-        if s.E.App != nil && s.E.App.Inv != nil { s.E.InvTab, s.E.HoverInv = 1, -1 }
+        if s.E.App != nil && s.E.App.Inventory() != nil { s.E.InvTab, s.E.HoverInv = 1, -1 }
     }
     // リスト操作（装備確定で戻る）
     if s.E.InvTab == 0 {
-        weapons := BuildWeaponRowsWithOwners(s.E.App.Inv.Weapons(), s.E.App.WeaponsTable(), s.E.UserTable)
+        weapons := BuildWeaponRowsWithOwners(s.E.App.Inventory().Weapons(), s.E.App.WeaponsTable(), s.E.UserTable)
         for i := range weapons {
             x, y, w, h := ListItemRect(s.sw, s.sh, i)
             if pointIn(mx,my,x,y,w,h) { s.E.HoverInv = i }
@@ -49,7 +49,7 @@ func (s *Inventory) Update(ctx *game.Ctx) (game.Scene, error) {
         }
     } else {
         it, _ := model.LoadItemsJSON("db/master/mst_items.json")
-        items := BuildItemRowsWithOwners(s.E.App.Inv.Items(), it, s.E.UserTable)
+        items := BuildItemRowsWithOwners(s.E.App.Inventory().Items(), it, s.E.UserTable)
         for i := range items {
             x, y, w, h := ListItemRect(s.sw, s.sh, i)
             if pointIn(mx,my,x,y,w,h) { s.E.HoverInv = i }
@@ -71,11 +71,11 @@ func (s *Inventory) Update(ctx *game.Ctx) (game.Scene, error) {
 func (s *Inventory) Draw(dst *ebiten.Image) {
     // 本体（タブに応じて）
     if s.E.InvTab == 0 {
-        weapons := BuildWeaponRowsWithOwners(s.E.App.Inv.Weapons(), s.E.App.WeaponsTable(), s.E.UserTable)
+        weapons := BuildWeaponRowsWithOwners(s.E.App.Inventory().Weapons(), s.E.App.WeaponsTable(), s.E.UserTable)
         DrawWeaponList(dst, weapons, s.E.HoverInv)
     } else {
         it, _ := model.LoadItemsJSON("db/master/mst_items.json")
-        items := BuildItemRowsWithOwners(s.E.App.Inv.Items(), it, s.E.UserTable)
+        items := BuildItemRowsWithOwners(s.E.App.Inventory().Items(), it, s.E.UserTable)
         DrawItemList(dst, items, s.E.HoverInv)
     }
     // タブ描画

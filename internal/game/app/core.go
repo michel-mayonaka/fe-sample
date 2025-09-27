@@ -5,7 +5,6 @@ import (
     "time"
 
     "github.com/hajimehoshi/ebiten/v2"
-    appuse "ui_sample/internal/app"
     "ui_sample/internal/config"
     "ui_sample/internal/game"
     "ui_sample/internal/game/scenes"
@@ -34,7 +33,7 @@ func NewUIAppGame() *Game {
     urepo, _ := repo.NewJSONUserRepo(userPath)
     wrepo, _ := repo.NewJSONWeaponsRepo(config.DefaultWeaponsPath)
     inv, _ := repo.NewJSONInventoryRepo(config.DefaultUserWeaponsPath, config.DefaultUserItemsPath, config.DefaultWeaponsPath, "db/master/mst_items.json")
-    a := appuse.New(urepo, wrepo, inv, rng)
+    a := New(urepo, wrepo, inv, rng)
     scenes.SetWeaponTable(wrepo.Table())
 
     // 画面メトリクス初期化

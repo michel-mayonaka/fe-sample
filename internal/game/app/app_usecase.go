@@ -154,3 +154,6 @@ func (a *App) PersistUnit(u uicore.Unit) error {
     a.Users.Update(c)
     return a.Users.Save()
 }
+
+// Inventory は在庫リポジトリへのアクセサです（Scene層からの参照用）。
+func (a *App) Inventory() repo.InventoryRepo { return a.Inv }
