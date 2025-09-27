@@ -50,11 +50,11 @@ func simulateHit(atk, def uicore.Unit, rng *rand.Rand) (uicore.Unit, uicore.Unit
             if w, ok := wt.Find(atk.Equip[0].Name); ok { might = w.Might }
         }
     }
-	ga := gcore.Unit{ID: atk.ID, Name: atk.Name, Class: atk.Class, Lv: atk.Level,
-		S: gcore.Stats{HP: atk.HP, Str: atk.Stats.Str, Skl: atk.Stats.Skl, Spd: atk.Stats.Spd, Lck: atk.Stats.Lck, Def: atk.Stats.Def, Res: atk.Stats.Res, Mov: atk.Stats.Mov},
-		W: gcore.Weapon{MT: might}}
-	gd := gcore.Unit{ID: def.ID, Name: def.Name, Class: def.Class, Lv: def.Level,
-		S: gcore.Stats{HP: def.HP, Str: def.Stats.Str, Skl: def.Stats.Skl, Spd: def.Stats.Spd, Lck: def.Stats.Lck, Def: def.Stats.Def, Res: def.Stats.Res, Mov: def.Stats.Mov}}
+    ga := gcore.Unit{ID: atk.ID, Name: atk.Name, Class: atk.Class, Lv: atk.Level,
+        S: gcore.Stats{HP: atk.HP, Str: atk.Stats.Str, Skl: atk.Stats.Skl, Spd: atk.Stats.Spd, Lck: atk.Stats.Lck, Def: atk.Stats.Def, Res: atk.Stats.Res, Mov: atk.Stats.Mov, Bld: atk.Stats.Bld},
+        W: gcore.Weapon{MT: might}}
+    gd := gcore.Unit{ID: def.ID, Name: def.Name, Class: def.Class, Lv: def.Level,
+        S: gcore.Stats{HP: def.HP, Str: def.Stats.Str, Skl: def.Stats.Skl, Spd: def.Stats.Spd, Lck: def.Stats.Lck, Def: def.Stats.Def, Res: def.Stats.Res, Mov: def.Stats.Mov, Bld: def.Stats.Bld}}
 	_, gd, line := gcore.ResolveRound(ga, gd, rng)
 	def.HP = gd.S.HP
 	if def.HP < 0 {

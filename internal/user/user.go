@@ -9,12 +9,12 @@ import (
 
 // Stats は現在の能力値を表します。
 type Stats struct {
-	Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
+    Str, Mag, Skl, Spd, Lck, Def, Res, Mov, Bld int
 }
 
 // Growth は成長率（%）を表します。
 type Growth struct {
-	HP, Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
+    HP, Str, Mag, Skl, Spd, Lck, Def, Res, Mov, Bld int
 }
 
 // WeaponRanks は物理武器のランクを表します。

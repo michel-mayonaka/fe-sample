@@ -111,7 +111,7 @@ func (a *App) PersistUnit(u uicore.Unit) error {
     c.Level = u.Level
     c.HP = u.HP
     c.HPMax = u.HPMax
-    c.Stats = user.Stats{Str: u.Stats.Str, Mag: u.Stats.Mag, Skl: u.Stats.Skl, Spd: u.Stats.Spd, Lck: u.Stats.Lck, Def: u.Stats.Def, Res: u.Stats.Res, Mov: u.Stats.Mov}
+    c.Stats = user.Stats{Str: u.Stats.Str, Mag: u.Stats.Mag, Skl: u.Stats.Skl, Spd: u.Stats.Spd, Lck: u.Stats.Lck, Def: u.Stats.Def, Res: u.Stats.Res, Mov: u.Stats.Mov, Bld: u.Stats.Bld}
     a.Users.Update(c)
     return a.Users.Save()
 }

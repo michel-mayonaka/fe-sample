@@ -1,7 +1,7 @@
 package game
 
 // 最小スキーマ（MVP段階で拡張）
-type Stats struct{ HP, Str, Skl, Spd, Lck, Def, Res, Mov int }
+type Stats struct{ HP, Str, Skl, Spd, Lck, Def, Res, Mov, Bld int }
 
 type Weapon struct {
     MT, Hit, Crit, Wt int

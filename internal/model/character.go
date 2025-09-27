@@ -9,12 +9,12 @@ import (
 
 // Stats は各種能力値を表します。
 type Stats struct {
-	Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
+    Str, Mag, Skl, Spd, Lck, Def, Res, Mov, Bld int
 }
 
 // Growth は各能力の成長率（%）を表します。
 type Growth struct {
-	Str, Mag, Skl, Spd, Lck, Def, Res, Mov int
+    Str, Mag, Skl, Spd, Lck, Def, Res, Mov, Bld int
 }
 
 // Item は耐久制装備（武器・消耗品）を表します。

@@ -40,7 +40,9 @@ func DrawStatus(dst *ebiten.Image, u uicore.Unit) {
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+0*line, "幸運", u.Stats.Lck, u.Growth.Lck)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+1*line, "守備", u.Stats.Def, u.Growth.Def)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+2*line, "魔防", u.Stats.Res, u.Growth.Res)
-    drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+3*line, "移動", u.Stats.Mov, u.Growth.Mov)
+    drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+3*line, "体格", u.Stats.Bld, u.Growth.Bld)
+    // 行を一段増やして移動を表示
+    drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+4*line, "移動", u.Stats.Mov, u.Growth.Mov)
     wrX := tx + 2*colGap + uicore.S(64)
     wrY := ty
     text.Draw(dst, "武器レベル", uicore.FaceMain, wrX, wrY, uicore.ColAccent)
