@@ -10,6 +10,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 	"ui_sample/internal/game"
 	"ui_sample/internal/model"
 	"ui_sample/internal/ui"
@@ -41,6 +42,12 @@ type Game struct {
 	popupActive     bool
 	popupGains      ui.LevelUpGains
 	popupJustOpened bool
+
+	// 模擬戦
+	simActive bool
+	simAtk    ui.Unit
+	simDef    ui.Unit
+	simLogs   []string
 }
 
 type screenMode int
@@ -49,6 +56,7 @@ const (
 	modeList screenMode = iota
 	modeStatus
 	modeBattle
+	modeSimBattle
 )
 
 func pointIn(px, py, x, y, w, h int) bool {
@@ -210,6 +218,23 @@ func (g *Game) Update() error {
 				g.hoverIndex = i
 			}
 		}
+		// 模擬戦ボタン
+		sbx, sby, sbw, sbh := ui.SimBattleButtonRect(screenW, screenH)
+		if pointIn(mx, my, sbx, sby, sbw, sbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+			if len(g.units) > 1 {
+				aidx := g.selIndex
+				if g.hoverIndex >= 0 {
+					aidx = g.hoverIndex
+				}
+				didx := (aidx + 1) % len(g.units)
+				g.simAtk = g.units[aidx]
+				g.simDef = g.units[didx]
+				a, d, logs := ui.SimulateBattleCopy(g.simAtk, g.simDef, g.rng)
+				g.simAtk, g.simDef, g.simLogs = a, d, logs
+				g.simActive = true
+				g.mode = modeSimBattle
+			}
+		}
 		if g.hoverIndex >= 0 && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 			g.selIndex = g.hoverIndex
 			g.unit = g.units[g.selIndex]
@@ -278,6 +303,17 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	switch g.mode {
 	case modeList:
 		ui.DrawCharacterList(screen, g.units, g.hoverIndex)
+		// 模擬戦ボタン（簡易表示）
+		mx, my := ebiten.CursorPosition()
+		bx, by, bw, bh := ui.SimBattleButtonRect(screenW, screenH)
+		hovered := pointIn(mx, my, bx, by, bw, bh)
+		// 枠と背景（vectorで描画）
+		vector.DrawFilledRect(screen, float32(bx), float32(by), float32(bw), float32(bh), color.RGBA{40, 60, 100, 255}, false)
+		label := "模擬戦"
+		if hovered {
+			label = "> 模擬戦 <"
+		}
+		ebitenutil.DebugPrintAt(screen, label, bx+16, by+16)
 	case modeStatus:
 		ui.DrawStatus(screen, g.unit)
 		// 戻るボタン
@@ -302,6 +338,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		atk := g.units[g.selIndex]
 		def := g.units[defIdx]
 		ui.DrawBattle(screen, atk, def)
+		mx, my := ebiten.CursorPosition()
+		bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+		ui.DrawBackButton(screen, pointIn(mx, my, bx, by, bw, bh))
+	case modeSimBattle:
+		ui.DrawSimulationBattle(screen, g.simAtk, g.simDef, g.simLogs)
 		mx, my := ebiten.CursorPosition()
 		bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
 		ui.DrawBackButton(screen, pointIn(mx, my, bx, by, bw, bh))

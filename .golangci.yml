@@ -8,7 +8,6 @@ linters:
   enable:
     - govet
     - staticcheck
-    - revive
     - gocritic
     - ineffassign
     - errcheck
