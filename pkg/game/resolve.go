@@ -3,10 +3,11 @@ package game
 import "math/rand"
 
 // ResolveRound は1回の命中判定とダメージ適用を行い、簡易ログを返します。
-// 仕様は仮: 1RN、最小ダメ0、HP下限0。
+// 仕様は仮: 2RN、最小ダメ0、HP下限0。
 func ResolveRound(att, def Unit, rng *rand.Rand) (Unit, Unit, string) {
 	fr := Forecast(att, def)
-	if rng.Intn(100) < fr.HitDisp {
+	hitTrue := (rng.Intn(100) + rng.Intn(100)) / 2
+	if hitTrue < fr.HitDisp {
 		dmg := fr.Dmg
 		if dmg < 0 {
 			dmg = 0
