@@ -2,6 +2,8 @@ version: 2
 run:
   timeout: 3m
   go: "1.25"
+  tests: true
+  modules-download-mode: readonly
 
 linters:
   disable-all: true
@@ -12,12 +14,32 @@ linters:
     - ineffassign
     - errcheck
     - misspell
+    - revive
+    - unused
 
 linters-settings:
   revive:
     rules:
+      # まずは侵襲性の低いルールのみ有効化（段階的に強化）
+      - name: indent-error-flow
+      - name: unexported-return
+      - name: empty-lines
       - name: exported
-        arguments: ["disableStutteringCheck"]
+      - name: package-comments
+      - name: var-naming
+      - name: error-naming
+      - name: if-return
+      - name: superfluous-else
+      - name: early-return
+      - name: unhandled-error
+      - name: argument-limit
+        arguments: [5]
+      - name: function-result-limit
+        arguments: [3]
+      - name: unnecessary-stmt
+      - name: unused-parameter
+  gocritic:
+    disabled-checks: []
   misspell:
     locale: US
 

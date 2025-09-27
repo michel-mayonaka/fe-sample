@@ -27,20 +27,23 @@ func NewJSONUserRepo(path string) (*JSONUserRepo, error) {
     return &JSONUserRepo{path: path, t: ut}, nil
 }
 
+// Find はIDでユーザキャラクターを検索します。
 func (r *JSONUserRepo) Find(id string) (user.Character, bool) {
     if r == nil || r.t == nil { return user.Character{}, false }
     return r.t.Find(id)
 }
 
+// Update はキャラクターを更新します（ID一致時）。
 func (r *JSONUserRepo) Update(c user.Character) {
     if r == nil || r.t == nil { return }
     r.t.UpdateCharacter(c)
 }
 
+// Save はテーブルを元のJSONへ保存します。
 func (r *JSONUserRepo) Save() error {
     if r == nil || r.t == nil { return nil }
     return r.t.Save(r.path)
 }
 
+// Table は内部テーブルへの参照を返します。
 func (r *JSONUserRepo) Table() *user.Table { return r.t }
-

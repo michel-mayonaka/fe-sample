@@ -1,0 +1,7 @@
+[
+  {"id":"ui_iris_i1",   "mst_items_id":"it_vulnerary", "uses": 3, "max": 3},
+  {"id":"ui_loyd_i1",   "mst_items_id":"it_vulnerary", "uses": 3, "max": 3},
+  {"id":"ui_hayate_i1", "mst_items_id":"it_vulnerary", "uses": 2, "max": 3},
+  {"id":"ui_mac_i1",    "mst_items_id":"it_vulnerary", "uses": 3, "max": 3},
+  {"id":"ui_charlie_i1",  "mst_items_id":"it_vulnerary", "uses": 2, "max": 3}
+]

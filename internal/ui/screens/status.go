@@ -3,13 +3,15 @@ package uiscreens
 import (
     "fmt"
     "github.com/hajimehoshi/ebiten/v2"
-    text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck
     "golang.org/x/image/font"
     "ui_sample/internal/adapter"
     "ui_sample/internal/game"
     uicore "ui_sample/internal/ui/core"
 )
 
+const slotCap = 5
+
+// DrawStatus はステータス画面を描画します。
 func DrawStatus(dst *ebiten.Image, u uicore.Unit) {
     sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
     lm := float32(uicore.ListMarginPx())
@@ -18,23 +20,39 @@ func DrawStatus(dst *ebiten.Image, u uicore.Unit) {
     uicore.DrawPanel(dst, panelX, panelY, panelW, panelH)
     px, py := panelX+float32(uicore.S(24)), panelY+float32(uicore.S(24))
     pw, ph := float32(uicore.S(320)), float32(uicore.S(320))
-    uicore.DrawFramedRect(dst, px, py, pw, ph)
-    if u.Portrait != nil {
-        uicore.DrawPortrait(dst, u.Portrait, px, py, pw, ph)
-    } else {
-        uicore.DrawPortraitPlaceholder(dst, px, py, pw, ph)
-    }
     tx := int(px + pw + float32(uicore.S(32)))
     ty := int(py + float32(uicore.S(44)))
-    text.Draw(dst, u.Name, uicore.FaceTitle, tx, ty, uicore.ColAccent)
-    text.Draw(dst, u.Class, uicore.FaceMain, tx, ty+uicore.S(40), uicore.ColText)
-    text.Draw(dst, fmt.Sprintf("Lv %d / %d    経験値 %02d / %d", u.Level, game.LevelCap, u.Exp, game.LevelUpExp), uicore.FaceMain, tx, ty+uicore.S(70), uicore.ColText)
-    text.Draw(dst, fmt.Sprintf("HP %d/%d", u.HP, u.HPMax), uicore.FaceMain, tx, ty+uicore.S(110), uicore.ColText)
-    uicore.DrawHPBar(dst, tx, ty+uicore.S(116), uicore.S(300), uicore.S(14), u.HP, u.HPMax)
+    drawStatusHeader(dst, u, int(px), int(py), int(pw), int(ph), tx, ty)
     statsTop := ty + uicore.S(160)
     line := uicore.S(34)
     colGap := uicore.S(180)
-    // 派生: 攻撃速度（一元化ロジックを呼び出し）。
+    drawCoreStats(dst, u, tx, statsTop, line, colGap)
+    wrX := tx + 2*colGap + uicore.S(64)
+    wrY := ty
+    drawWeaponRanks(dst, u, wrX, wrY)
+    mrX := wrX
+    mrY := wrY + (4+1)*uicore.S(32) + uicore.S(16)
+    drawMagicRanks(dst, u, mrX, mrY)
+    drawEquipList(dst, u, int(px), int(py), int(ph))
+}
+
+// ヘッダ（ポートレート/名前/クラス/レベル/HP）
+func drawStatusHeader(dst *ebiten.Image, u uicore.Unit, px, py, pw, ph, tx, ty int) {
+    uicore.DrawFramedRect(dst, float32(px), float32(py), float32(pw), float32(ph))
+    if u.Portrait != nil {
+        uicore.DrawPortrait(dst, u.Portrait, float32(px), float32(py), float32(pw), float32(ph))
+    } else {
+        uicore.DrawPortraitPlaceholder(dst, float32(px), float32(py), float32(pw), float32(ph))
+    }
+    uicore.TextDraw(dst, u.Name, uicore.FaceTitle, tx, ty, uicore.ColAccent)
+    uicore.TextDraw(dst, u.Class, uicore.FaceMain, tx, ty+uicore.S(40), uicore.ColText)
+    uicore.TextDraw(dst, fmt.Sprintf("Lv %d / %d    経験値 %02d / %d", u.Level, game.LevelCap, u.Exp, game.LevelUpExp), uicore.FaceMain, tx, ty+uicore.S(70), uicore.ColText)
+    uicore.TextDraw(dst, fmt.Sprintf("HP %d/%d", u.HP, u.HPMax), uicore.FaceMain, tx, ty+uicore.S(110), uicore.ColText)
+    uicore.DrawHPBar(dst, tx, ty+uicore.S(116), uicore.S(300), uicore.S(14), u.HP, u.HPMax)
+}
+
+// 基本ステータス（成長率付き）+ 派生（攻撃速度）
+func drawCoreStats(dst *ebiten.Image, u uicore.Unit, tx, statsTop, line, colGap int) {
     atkSpeed := adapter.AttackSpeedOf(weaponTable(), u)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+0*colGap, statsTop+0*line, "力", u.Stats.Str, u.Growth.Str)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+0*colGap, statsTop+1*line, "魔力", u.Stats.Mag, u.Growth.Mag)
@@ -44,58 +62,87 @@ func DrawStatus(dst *ebiten.Image, u uicore.Unit) {
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+1*line, "守備", u.Stats.Def, u.Growth.Def)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+2*line, "魔防", u.Stats.Res, u.Growth.Res)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+3*line, "体格", u.Stats.Bld, u.Growth.Bld)
-    // 行を一段増やして移動を表示
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+4*line, "移動", u.Stats.Mov, u.Growth.Mov)
-    // 派生表示（成長率なし）
     drawStatLine(dst, uicore.FaceMain, tx+1*colGap, statsTop+5*line, "攻撃速度", atkSpeed)
-    wrX := tx + 2*colGap + uicore.S(64)
-    wrY := ty
-    text.Draw(dst, "武器レベル", uicore.FaceMain, wrX, wrY, uicore.ColAccent)
+}
+
+// 武器ランク
+func drawWeaponRanks(dst *ebiten.Image, u uicore.Unit, x, y int) {
+    uicore.TextDraw(dst, "武器レベル", uicore.FaceMain, x, y, uicore.ColAccent)
     rline := uicore.S(32)
-    drawRankLine(dst, uicore.FaceMain, wrX, wrY+1*rline, "剣", u.Weapon.Sword)
-    drawRankLine(dst, uicore.FaceMain, wrX, wrY+2*rline, "槍", u.Weapon.Lance)
-    drawRankLine(dst, uicore.FaceMain, wrX, wrY+3*rline, "斧", u.Weapon.Axe)
-    drawRankLine(dst, uicore.FaceMain, wrX, wrY+4*rline, "弓", u.Weapon.Bow)
-    mrX := wrX
-    mrY := wrY + (4+1)*rline + uicore.S(16)
-    text.Draw(dst, "魔法レベル", uicore.FaceMain, mrX, mrY, uicore.ColAccent)
-    drawRankLine(dst, uicore.FaceMain, mrX, mrY+1*rline, "理", u.Magic.Anima)
-    drawRankLine(dst, uicore.FaceMain, mrX, mrY+2*rline, "光", u.Magic.Light)
-    drawRankLine(dst, uicore.FaceMain, mrX, mrY+3*rline, "闇", u.Magic.Dark)
-    drawRankLine(dst, uicore.FaceMain, mrX, mrY+4*rline, "杖", u.Magic.Staff)
-    equipTitleY := int(py + ph + float32(uicore.S(56)))
-    text.Draw(dst, "装備", uicore.FaceMain, int(px), equipTitleY, uicore.ColAccent)
-    for i, it := range u.Equip {
+    drawRankLine(dst, uicore.FaceMain, x, y+1*rline, "剣", u.Weapon.Sword)
+    drawRankLine(dst, uicore.FaceMain, x, y+2*rline, "槍", u.Weapon.Lance)
+    drawRankLine(dst, uicore.FaceMain, x, y+3*rline, "斧", u.Weapon.Axe)
+    drawRankLine(dst, uicore.FaceMain, x, y+4*rline, "弓", u.Weapon.Bow)
+}
+
+// 魔法ランク
+func drawMagicRanks(dst *ebiten.Image, u uicore.Unit, x, y int) {
+    uicore.TextDraw(dst, "魔法レベル", uicore.FaceMain, x, y, uicore.ColAccent)
+    rline := uicore.S(32)
+    drawRankLine(dst, uicore.FaceMain, x, y+1*rline, "理", u.Magic.Anima)
+    drawRankLine(dst, uicore.FaceMain, x, y+2*rline, "光", u.Magic.Light)
+    drawRankLine(dst, uicore.FaceMain, x, y+3*rline, "闇", u.Magic.Dark)
+    drawRankLine(dst, uicore.FaceMain, x, y+4*rline, "杖", u.Magic.Staff)
+}
+
+// 装備リスト
+func drawEquipList(dst *ebiten.Image, u uicore.Unit, px, py, ph int) {
+    equipTitleY := py + ph + uicore.S(56)
+    uicore.TextDraw(dst, "装備", uicore.FaceMain, px, equipTitleY, uicore.ColAccent)
+    for i := 0; i < slotCap; i++ {
         lineY := equipTitleY + uicore.S(30) + i*uicore.S(30)
-        text.Draw(dst, "- "+it.Name, uicore.FaceSmall, int(px)+uicore.S(14), lineY, uicore.ColText)
+        label := "- 空 -"
         uses := "-"
-        if it.Max > 0 {
-            uses = fmt.Sprintf("%d/%d", it.Uses, it.Max)
+        if i < len(u.Equip) {
+            it := u.Equip[i]
+            if it.Name != "" {
+                label = "- " + it.Name
+                if it.Max > 0 { uses = fmt.Sprintf("%d/%d", it.Uses, it.Max) }
+            }
         }
-        text.Draw(dst, uses, uicore.FaceSmall, int(px)+uicore.S(300), lineY, uicore.ColAccent)
+        uicore.TextDraw(dst, label, uicore.FaceSmall, px+uicore.S(14), lineY, uicore.ColText)
+        uicore.TextDraw(dst, uses, uicore.FaceSmall, px+uicore.S(300), lineY, uicore.ColAccent)
     }
+}
+
+// EquipSlotRect はステータス画面における装備スロット行の矩形を返します。
+// index は 0..slotCap-1。
+func EquipSlotRect(_ , _ int, index int) (x, y, w, h int) {
+    if index < 0 || index >= slotCap { return 0,0,0,0 }
+    lm := float32(uicore.ListMarginPx())
+    panelX, panelY := lm, lm
+    px, py := panelX+float32(uicore.S(24)), panelY+float32(uicore.S(24))
+    ph := float32(uicore.S(320))
+    equipTitleY := int(py + ph + float32(uicore.S(56)))
+    lineY := equipTitleY + uicore.S(30) + index*uicore.S(30)
+    x = int(px)
+    y = lineY - uicore.S(20)
+    w = uicore.S(360)
+    h = uicore.S(26)
+    return
 }
 
 // ローカル描画補助
 func drawStatLineWithGrowth(dst *ebiten.Image, face font.Face, x, y int, label string, v, g int) {
-    text.Draw(dst, label, face, x, y, uicore.ColText)
-    text.Draw(dst, fmt.Sprintf("%2d", v), face, x+uicore.S(64), y, uicore.ColAccent)
-    text.Draw(dst, fmt.Sprintf("%d%%", g), uicore.FaceSmall, x+uicore.S(120), y, uicore.ColAccent)
+    uicore.TextDraw(dst, label, face, x, y, uicore.ColText)
+    uicore.TextDraw(dst, fmt.Sprintf("%2d", v), face, x+uicore.S(64), y, uicore.ColAccent)
+    uicore.TextDraw(dst, fmt.Sprintf("%d%%", g), uicore.FaceSmall, x+uicore.S(120), y, uicore.ColAccent)
 }
 
 func drawRankLine(dst *ebiten.Image, face font.Face, x, y int, label, rank string) {
     if rank == "" {
         rank = "-"
     }
-    text.Draw(dst, label, face, x, y, uicore.ColText)
-    text.Draw(dst, rank, face, x+uicore.S(120), y, uicore.ColAccent)
+    uicore.TextDraw(dst, label, face, x, y, uicore.ColText)
+    uicore.TextDraw(dst, rank, face, x+uicore.S(120), y, uicore.ColAccent)
 }
 
 // 成長率のない派生値用の簡易行描画。
 func drawStatLine(dst *ebiten.Image, face font.Face, x, y int, label string, v int) {
-    text.Draw(dst, label, face, x, y, uicore.ColText)
+    uicore.TextDraw(dst, label, face, x, y, uicore.ColText)
     // ラベル実幅を測って十分な余白を確保
-    lw := text.BoundString(face, label).Dx()
+    lw := int(font.MeasureString(face, label) >> 6)
     gap := uicore.S(20)
-    text.Draw(dst, fmt.Sprintf("%2d", v), face, x+lw+gap, y, uicore.ColAccent)
+    uicore.TextDraw(dst, fmt.Sprintf("%2d", v), face, x+lw+gap, y, uicore.ColAccent)
 }

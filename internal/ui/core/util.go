@@ -2,17 +2,39 @@ package uicore
 
 import (
     "github.com/hajimehoshi/ebiten/v2"
-    text "github.com/hajimehoshi/ebiten/v2/text"
     "golang.org/x/image/font"
     "image/color"
     "strconv"
     "ui_sample/internal/assets"
+    "ui_sample/internal/model"
     "ui_sample/internal/user"
 )
 
+// Itoa は整数を10進文字列に変換します。
 func Itoa(n int) string { return strconv.Itoa(n) }
 
+var (
+    cachedMaster *model.Table
+    cachedWeapons *model.WeaponTable
+    cachedItems *model.ItemDefTable
+    cachedUsrWeapons []user.OwnWeapon
+    cachedUsrItems []user.OwnItem
+    cacheLoaded bool
+)
+
+func ensureCaches() {
+    if cacheLoaded { return }
+    if t, err := model.LoadFromJSON("db/master/mst_characters.json"); err == nil { cachedMaster = t }
+    if wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json"); err == nil { cachedWeapons = wt }
+    if it, err := model.LoadItemsJSON("db/master/mst_items.json"); err == nil { cachedItems = it }
+    if uw, err := user.LoadUserWeaponsJSON("db/user/usr_weapons.json"); err == nil { cachedUsrWeapons = uw }
+    if ui, err := user.LoadUserItemsJSON("db/user/usr_items.json"); err == nil { cachedUsrItems = ui }
+    cacheLoaded = true
+}
+
+// UnitFromUser はユーザのキャラクターレコードから表示用の Unit を構築します。
 func UnitFromUser(c user.Character) Unit {
+    ensureCaches()
     u := Unit{
         ID: c.ID, Name: c.Name, Class: c.Class, Level: c.Level, Exp: c.Exp,
         HPMax: c.HPMax, Stats: Stats(c.Stats),
@@ -20,22 +42,70 @@ func UnitFromUser(c user.Character) Unit {
         Magic:  MagicRanks{Anima: c.Magic.Anima, Light: c.Magic.Light, Dark: c.Magic.Dark, Staff: c.Magic.Staff},
         Growth: Growth(c.Growth),
     }
-	for _, it := range c.Equip {
-		u.Equip = append(u.Equip, Item{Name: it.Name, Uses: it.Uses, Max: it.Max})
-	}
+    // 新参照方式: マスタで user_*_id を引く → usr_* からUses等を取得 → マスタ定義名へ解決
+    // 現行仕様: usr_* 参照を優先（旧仕様の直接埋め込みは非対応）
+    // 優先: ユーザ側の equip 参照（usr_* のID）
+    if len(c.Equip) > 0 {
+        for _, er := range c.Equip {
+            if er.UserWeaponsID != "" {
+                for _, ow := range cachedUsrWeapons {
+                    if ow.ID == er.UserWeaponsID {
+                        name := ow.MstWeaponsID
+                        if cachedWeapons != nil { if w, ok := cachedWeapons.FindByID(ow.MstWeaponsID); ok { name = w.Name } }
+                        u.Equip = append(u.Equip, Item{ID: ow.ID, Name: name, Uses: ow.Uses, Max: ow.Max})
+                        break
+                    }
+                }
+            } else if er.UserItemsID != "" {
+                for _, oi := range cachedUsrItems {
+                    if oi.ID == er.UserItemsID {
+                        name := oi.MstItemsID
+                        if cachedItems != nil { if it, ok := cachedItems.FindByID(oi.MstItemsID); ok { name = it.Name } }
+                        u.Equip = append(u.Equip, Item{ID: oi.ID, Name: name, Uses: oi.Uses, Max: oi.Max})
+                        break
+                    }
+                }
+            }
+        }
+    }
+    // 次点: マスタに user_*_id があればそれを参照
+    if cachedMaster != nil {
+        key := c.MstCharactersID
+        if key == "" { key = c.ID }
+        if mc, ok := cachedMaster.Find(key); ok {
+            for _, uwid := range mc.UserWeaponsID {
+                for _, ow := range cachedUsrWeapons {
+                    if ow.ID == uwid {
+                        name := ow.MstWeaponsID
+                        if cachedWeapons != nil { if w, ok := cachedWeapons.FindByID(ow.MstWeaponsID); ok { name = w.Name } }
+                        u.Equip = append(u.Equip, Item{ID: ow.ID, Name: name, Uses: ow.Uses, Max: ow.Max})
+                        break
+                    }
+                }
+            }
+            for _, uiid := range mc.UserItemsID {
+                for _, oi := range cachedUsrItems {
+                    if oi.ID == uiid {
+                        name := oi.MstItemsID
+                        if cachedItems != nil { if it, ok := cachedItems.FindByID(oi.MstItemsID); ok { name = it.Name } }
+                        u.Equip = append(u.Equip, Item{ID: oi.ID, Name: name, Uses: oi.Uses, Max: oi.Max})
+                        break
+                    }
+                }
+            }
+        }
+    }
+    // 互換: 旧仕様（ユーザ側 Equip 埋め込み）は未対応のためスキップ
     if c.Portrait != "" {
         if img, err := assets.LoadImage(c.Portrait); err == nil {
             u.Portrait = img
         }
     }
-	if u.HP == 0 && u.HPMax > 0 {
-		u.HP = u.HPMax
-	} else {
-		u.HP = c.HP
-	}
-	return u
+    if u.HP == 0 && u.HPMax > 0 { u.HP = u.HPMax } else { u.HP = c.HP }
+    return u
 }
 
+// LoadUnitsFromUser はユーザテーブルJSONから Unit の配列を構築します。
 func LoadUnitsFromUser(path string) ([]Unit, error) {
 	ut, err := user.LoadFromJSON(path)
 	if err != nil {
@@ -52,15 +122,15 @@ func LoadUnitsFromUser(path string) ([]Unit, error) {
 // 戻り値は最後に描画した行のY座標（次の行を書く起点）です。
 func DrawWrapped(dst *ebiten.Image, face font.Face, s string, x, y int, col color.Color, maxW, lineH int) int {
     if maxW <= 0 {
-        text.Draw(dst, s, face, x, y, col)
+        TextDraw(dst, s, face, x, y, col)
         return y + lineH
     }
     // ルーン単位で貪欲折り返し
     line := ""
     for _, r := range s {
         trial := line + string(r)
-        if text.BoundString(face, trial).Dx() > maxW {
-            text.Draw(dst, line, face, x, y, col)
+        if int(font.MeasureString(face, trial)>>6) > maxW {
+            TextDraw(dst, line, face, x, y, col)
             y += lineH
             line = string(r)
             continue
@@ -68,7 +138,7 @@ func DrawWrapped(dst *ebiten.Image, face font.Face, s string, x, y int, col colo
         line = trial
     }
     if line != "" {
-        text.Draw(dst, line, face, x, y, col)
+        TextDraw(dst, line, face, x, y, col)
         y += lineH
     }
     return y

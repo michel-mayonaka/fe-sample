@@ -1,4 +1,3 @@
 [
-  {"name":"傷薬","type":"consumable","effect":"heal","power":10}
+  {"id":"it_vulnerary","name":"傷薬","type":"consumable","effect":"heal","power":10}
 ]
-

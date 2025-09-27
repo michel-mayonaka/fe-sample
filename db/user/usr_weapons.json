@@ -1,0 +1,8 @@
+[
+  {"id":"uw_iris_w1",   "mst_weapons_id":"wp_iron_lance", "uses": 35, "max": 45},
+  {"id":"uw_iris_w2",   "mst_weapons_id":"wp_javelin",    "uses": 12, "max": 20},
+  {"id":"uw_loyd_w1",   "mst_weapons_id":"wp_iron_sword", "uses": 32, "max": 45},
+  {"id":"uw_hayate_w1", "mst_weapons_id":"wp_iron_sword", "uses": 29, "max": 45},
+  {"id":"uw_mac_w1",    "mst_weapons_id":"wp_iron_axe",   "uses": 32, "max": 45},
+  {"id":"uw_charlie_w1",  "mst_weapons_id":"wp_iron_bow",   "uses": 30, "max": 45}
+]

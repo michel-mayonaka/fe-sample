@@ -21,13 +21,19 @@ func UpdateMetricsFromWindow() {
 // S は整数ピクセル値をスケールに応じて拡縮します。
 func S(n int) int { return int(float32(n) * scale) }
 
-// 代表的な行高/マージンのスケール済み値。
+// ListMarginPx は一覧パネルのマージン（スケール適用後）を返します。
 func ListMarginPx() int      { return S(ListMargin) }
+// ListItemHPx は一覧行の高さ（スケール適用後）を返します。
 func ListItemHPx() int       { return S(ListItemH) }
+// ListItemGapPx は一覧行の間隔（スケール適用後）を返します。
 func ListItemGapPx() int     { return S(ListItemGap) }
+// ListPortraitSzPx はポートレート枠サイズ（スケール適用後）を返します。
 func ListPortraitSzPx() int  { return S(ListPortraitSz) }
+// ListTitleOffsetPx はタイトルのYオフセット（スケール適用後）を返します。
 func ListTitleOffsetPx() int { return S(ListTitleOffset) }
+// LineHMainPx は本文行の高さ（スケール適用後）を返します。
 func LineHMainPx() int       { return S(LineHMain) }
+// LineHSmallPx は小サイズ行の高さ（スケール適用後）を返します。
 func LineHSmallPx() int      { return S(LineHSmall) }
 
 // CurrentScale は現在のスケール値を返します。

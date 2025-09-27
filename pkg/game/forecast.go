@@ -1,3 +1,4 @@
+// Package game は戦闘ロジック（予測/解決）を提供します。
 package game
 
 // 三すくみ補正（暫定）。Sword>Axe>Lance>Sword
@@ -88,8 +89,11 @@ func clamp(v, lo, hi int) int {
 type TriangleRelation int
 
 const (
+    // TriangleNeutral は三すくみが中立であることを示します。
     TriangleNeutral      TriangleRelation = 0
+    // TriangleAdvantage は有利関係を示します。
     TriangleAdvantage    TriangleRelation = 1
+    // TriangleDisadvantage は不利関係を示します。
     TriangleDisadvantage TriangleRelation = -1
 )
 

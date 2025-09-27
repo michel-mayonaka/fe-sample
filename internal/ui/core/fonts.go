@@ -1,3 +1,4 @@
+// Package uicore は UI の共通描画基盤（フォント/色/レイアウト等）を提供します。
 package uicore
 
 import (
@@ -8,13 +9,14 @@ import (
     "golang.org/x/image/font/opentype"
 )
 
+// FaceTitle/FaceMain/FaceSmall は現在のスケールに応じた描画用フォントです。
 var (
     FaceTitle font.Face
     FaceMain  font.Face
     FaceSmall font.Face
 
     baseFont   *opentype.Font
-    lastScaled float32 = 0
+    lastScaled float32
 )
 
 const (

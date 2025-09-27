@@ -29,6 +29,7 @@ func NewJSONWeaponsRepo(path string) (*JSONWeaponsRepo, error) {
     return &JSONWeaponsRepo{path: path, table: wt}, nil
 }
 
+// Find は武器名から定義を検索します。
 func (r *JSONWeaponsRepo) Find(name string) (model.Weapon, bool) {
     if r == nil || r.table == nil {
         return model.Weapon{}, false
@@ -36,8 +37,10 @@ func (r *JSONWeaponsRepo) Find(name string) (model.Weapon, bool) {
     return r.table.Find(name)
 }
 
+// Table は内部の武器テーブルへの参照を返します。
 func (r *JSONWeaponsRepo) Table() *model.WeaponTable { return r.table }
 
+// Reload は武器定義JSONを再読み込みします。
 func (r *JSONWeaponsRepo) Reload() error {
     wt, err := model.LoadWeaponsJSON(r.path)
     if err != nil { return err }

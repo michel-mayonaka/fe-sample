@@ -1,13 +1,17 @@
 SHELL := /bin/bash
 
-.PHONY: lint fmt check check-all check-ui build run mcp
+.PHONY: lint lint-ci fmt check check-all check-ui build run mcp
 
 lint:
 	@if command -v golangci-lint >/dev/null 2>&1; then \
-		golangci-lint run -c .golangci.yml ./pkg/... >/dev/null 2>&1 || echo "[lint] サンドボックスのためスキップ" ; \
+		golangci-lint run -c .golangci.yml ./... || echo "[lint] エラーがあります（CIは現状非必須）" ; \
 	else \
 		echo "[lint] golangci-lint が見つからないためスキップ" ; \
 	fi
+
+# CI 用: 失敗をスキップしない厳格実行
+lint-ci:
+	golangci-lint run -c .golangci.yml $(EXTRA_LINTERS) ./...
 
 .PHONY: lint-list
 lint-list:
@@ -81,4 +85,10 @@ test:
 	go test ./pkg/...
 
 # MCP: 変更前チェック（必須）
-mcp: check-all lint
+# 既定はローカル: lint / CI: lint-ci
+MCP_LINT_TARGET ?= lint
+ifdef CI
+MCP_LINT_TARGET := lint-ci
+endif
+
+mcp: check-all $(MCP_LINT_TARGET)

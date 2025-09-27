@@ -1,6 +1,8 @@
 [
   {
     "id": "iris",
+    "uid": "u_iris",
+    "mst_characters_id": "iris",
     "name": "アイリス",
     "class": "ペガサスナイト",
     "portrait": "assets/01_iris.png",
@@ -44,24 +46,20 @@
     },
     "equip": [
       {
-        "name": "アイアンランス",
-        "uses": 10,
-        "max": 45
+        "usr_weapons_id": "uw_charlie_w1"
       },
       {
-        "name": "ジャベリン",
-        "uses": 12,
-        "max": 20
+        "usr_weapons_id": "uw_iris_w2"
       },
       {
-        "name": "傷薬",
-        "uses": 3,
-        "max": 3
+        "usr_items_id": "ui_iris_i1"
       }
     ]
   },
   {
     "id": "mercenary",
+    "uid": "u_loyd",
+    "mst_characters_id": "mercenary",
     "name": "ロイド",
     "class": "傭兵",
     "portrait": "assets/02_loyd.png",
@@ -105,19 +103,17 @@
     },
     "equip": [
       {
-        "name": "アイアンソード",
-        "uses": 32,
-        "max": 45
+        "usr_weapons_id": "uw_loyd_w1"
       },
       {
-        "name": "傷薬",
-        "uses": 3,
-        "max": 3
+        "usr_items_id": "ui_loyd_i1"
       }
     ]
   },
   {
     "id": "kenshi",
+    "uid": "u_hayate",
+    "mst_characters_id": "kenshi",
     "name": "ハヤテ",
     "class": "剣士",
     "portrait": "assets/03_hayate.png",
@@ -160,14 +156,116 @@
     },
     "equip": [
       {
-        "name": "アイアンソード",
-        "uses": 29,
-        "max": 45
+        "usr_weapons_id": "uw_hayate_w1"
       },
       {
-        "name": "傷薬",
-        "uses": 2,
-        "max": 3
+        "usr_items_id": "ui_hayate_i1"
+      }
+    ]
+  },
+  {
+    "id": "mac",
+    "uid": "u_mac",
+    "mst_characters_id": "mac",
+    "name": "マック",
+    "class": "戦士",
+    "portrait": "assets/04_mac.png",
+    "level": 20,
+    "hp_max": 40,
+    "stats": {
+      "Str": 22,
+      "Mag": 0,
+      "Skl": 18,
+      "Spd": 17,
+      "Lck": 14,
+      "Def": 16,
+      "Res": 8,
+      "Mov": 5,
+      "Bld": 9
+    },
+    "growth": {
+      "HP": 85,
+      "Str": 55,
+      "Mag": 0,
+      "Skl": 45,
+      "Spd": 40,
+      "Lck": 35,
+      "Def": 35,
+      "Res": 15,
+      "Mov": 0,
+      "Bld": 10
+    },
+    "weapon": {
+      "sword": "-",
+      "lance": "-",
+      "axe": "B",
+      "bow": "-"
+    },
+    "magic": {
+      "anima": "-",
+      "light": "-",
+      "dark": "-",
+      "staff": "-"
+    },
+    "equip": [
+      {
+        "usr_weapons_id": "uw_mac_w1"
+      },
+      {
+        "usr_items_id": "ui_mac_i1"
+      }
+    ]
+  },
+  {
+    "id": "charlie",
+    "uid": "u_charlie",
+    "mst_characters_id": "charlie",
+    "name": "チャリー",
+    "class": "アーチャー",
+    "portrait": "assets/05_charlie.png",
+    "level": 20,
+    "hp_max": 31,
+    "stats": {
+      "Str": 18,
+      "Mag": 0,
+      "Skl": 25,
+      "Spd": 24,
+      "Lck": 20,
+      "Def": 12,
+      "Res": 10,
+      "Mov": 5,
+      "Bld": 6
+    },
+    "growth": {
+      "HP": 65,
+      "Str": 45,
+      "Mag": 0,
+      "Skl": 60,
+      "Spd": 60,
+      "Lck": 55,
+      "Def": 20,
+      "Res": 25,
+      "Mov": 0,
+      "Bld": 0
+    },
+    "weapon": {
+      "sword": "-",
+      "lance": "-",
+      "axe": "-",
+      "bow": "B"
+    },
+    "magic": {
+      "anima": "-",
+      "light": "-",
+      "dark": "-",
+      "staff": "-"
+    },
+    "equip": [
+      {
+        "usr_weapons_id": "uw_iris_w1"
+      },
+      {
+        "usr_items_id": "ui_charlie_i1"
       }
     ]
   }

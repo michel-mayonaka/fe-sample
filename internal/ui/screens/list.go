@@ -2,12 +2,12 @@ package uiscreens
 
 import (
     "github.com/hajimehoshi/ebiten/v2"
-    text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2
     "github.com/hajimehoshi/ebiten/v2/vector"
     "image/color"
     uicore "ui_sample/internal/ui/core"
 )
 
+// ListItemRect は一覧の i 行目の矩形を返します。
 func ListItemRect(sw, _ int, i int) (x, y, w, h int) {
     lm := uicore.ListMarginPx()
     panelX, panelY := lm, lm
@@ -17,11 +17,12 @@ func ListItemRect(sw, _ int, i int) (x, y, w, h int) {
     return panelX + uicore.S(16), y, panelW - uicore.S(32), uicore.ListItemHPx()
 }
 
+// DrawCharacterList はユニットの一覧を描画します。
 func DrawCharacterList(dst *ebiten.Image, units []uicore.Unit, hover int) {
     sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
     lm := uicore.ListMarginPx()
     uicore.DrawPanel(dst, float32(lm), float32(lm), float32(sw-2*lm), float32(sh-2*lm))
-    text.Draw(dst, "ユニット一覧", uicore.FaceTitle, lm+uicore.S(20), lm+uicore.ListTitleOffsetPx(), uicore.ColAccent)
+    uicore.TextDraw(dst, "ユニット一覧", uicore.FaceTitle, lm+uicore.S(20), lm+uicore.ListTitleOffsetPx(), uicore.ColAccent)
     for i, u := range units {
         x, y, w, h := ListItemRect(sw, sh, i)
         bg := color.RGBA{30, 45, 78, 255}
@@ -41,7 +42,7 @@ func DrawCharacterList(dst *ebiten.Image, units []uicore.Unit, hover int) {
         }
         tx := x + uicore.S(12) + ps + uicore.S(20)
         ty := y + uicore.S(36)
-        text.Draw(dst, u.Name, uicore.FaceMain, tx, ty, uicore.ColText)
-        text.Draw(dst, u.Class+"  Lv "+uicore.Itoa(u.Level), uicore.FaceSmall, tx, ty+uicore.S(26), uicore.ColAccent)
+        uicore.TextDraw(dst, u.Name, uicore.FaceMain, tx, ty, uicore.ColText)
+        uicore.TextDraw(dst, u.Class+"  Lv "+uicore.Itoa(u.Level), uicore.FaceSmall, tx, ty+uicore.S(26), uicore.ColAccent)
     }
 }

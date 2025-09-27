@@ -9,9 +9,10 @@ import (
 
 // Weapon は武器の基本性能を表します。
 type Weapon struct {
-	Name     string `json:"name"`
-	Type     string `json:"type"` // Sword/Lance/Axe/Bow/...
-	Rank     string `json:"rank"` // E-D-C-B-A-S
+    ID       string `json:"id"`
+    Name     string `json:"name"`
+    Type     string `json:"type"` // Sword/Lance/Axe/Bow/...
+    Rank     string `json:"rank"` // E-D-C-B-A-S
 	Might    int    `json:"might"`
 	Hit      int    `json:"hit"`
 	Crit     int    `json:"crit"`
@@ -21,7 +22,7 @@ type Weapon struct {
 }
 
 // WeaponTable は武器名から基本性能を引ける簡易テーブルです。
-type WeaponTable struct{ byName map[string]Weapon }
+type WeaponTable struct{ byName map[string]Weapon; byID map[string]Weapon }
 
 // LoadWeaponsJSON は武器定義の JSON を読み込みます。
 func LoadWeaponsJSON(path string) (*WeaponTable, error) {
@@ -33,18 +34,26 @@ func LoadWeaponsJSON(path string) (*WeaponTable, error) {
 	if err := json.Unmarshal(b, &rows); err != nil {
 		return nil, fmt.Errorf("decode weapons: %w", err)
 	}
-	t := &WeaponTable{byName: make(map[string]Weapon, len(rows))}
-	for _, w := range rows {
-		t.byName[w.Name] = w
-	}
-	return t, nil
+    t := &WeaponTable{byName: make(map[string]Weapon, len(rows)), byID: make(map[string]Weapon, len(rows))}
+    for _, w := range rows {
+        t.byName[w.Name] = w
+        if w.ID != "" { t.byID[w.ID] = w }
+    }
+    return t, nil
 }
 
 // Find は武器名に一致する定義を返します。
 func (t *WeaponTable) Find(name string) (Weapon, bool) {
-	if t == nil {
-		return Weapon{}, false
-	}
-	w, ok := t.byName[name]
-	return w, ok
+    if t == nil {
+        return Weapon{}, false
+    }
+    w, ok := t.byName[name]
+    return w, ok
+}
+
+// FindByID は武器IDに一致する定義を返します。
+func (t *WeaponTable) FindByID(id string) (Weapon, bool) {
+    if t == nil { return Weapon{}, false }
+    w, ok := t.byID[id]
+    return w, ok
 }

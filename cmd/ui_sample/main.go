@@ -11,8 +11,10 @@ import (
     "github.com/hajimehoshi/ebiten/v2"
     "github.com/hajimehoshi/ebiten/v2/ebitenutil"
     "github.com/hajimehoshi/ebiten/v2/inpututil"
+    "github.com/hajimehoshi/ebiten/v2/vector"
     "ui_sample/internal/app"
     "ui_sample/internal/config"
+    "ui_sample/internal/model"
     "ui_sample/internal/repo"
     "ui_sample/internal/assets"
     "ui_sample/internal/game"
@@ -78,15 +80,27 @@ type Game struct {
 
     // App（ユースケース）
     app *app.App
+
+    // 一覧（武器/アイテム）
+    weapons   []ui.WeaponRow
+    items     []ui.ItemRow
+    invTab    int // 0=武器, 1=アイテム
+    hoverInv  int
+
+    // 装備変更
+    selectingEquip bool
+    selectingIsWeapon bool
+    currentSlot int
 }
 
 type screenMode int
 
 const (
-	modeList screenMode = iota
-	modeStatus
-	modeBattle
-	modeSimBattle
+    modeList screenMode = iota
+    modeStatus
+    modeBattle
+    modeSimBattle
+    modeInventory
 )
 
 func pointIn(px, py, x, y, w, h int) bool {
@@ -104,7 +118,7 @@ func (g *Game) runBattleRound() {
     }
     g.battleLogs = logs
     g.battleLogPopup = popup
-    // ローカルの userTable が存在する場合は同期（簡易）
+    // ローカルの userTable が存在する場合は HP/Max のみ同期
     if g.userTable != nil {
         atkIdx := g.selIndex
         defIdx := (g.selIndex + 1) % len(g.units)
@@ -113,9 +127,6 @@ func (g *Game) runBattleRound() {
         if c, ok := g.userTable.Find(atk.ID); ok {
             c.HP = atk.HP
             c.HPMax = atk.HPMax
-            if len(c.Equip) > 0 && len(atk.Equip) > 0 {
-                c.Equip[0].Uses = atk.Equip[0].Uses
-            }
             g.userTable.UpdateCharacter(c)
         }
         if c2, ok := g.userTable.Find(def.ID); ok {
@@ -162,7 +173,8 @@ func NewGame() *Game {
     // App 初期化
     if ur, err := appInitUserRepo(g.userPath); err == nil {
         if wr, err2 := appInitWeaponsRepo(config.DefaultWeaponsPath); err2 == nil {
-            g.app = app.New(ur, wr, g.rng)
+            inv, _ := appInitInventoryRepo(config.DefaultUserWeaponsPath, config.DefaultUserItemsPath, config.DefaultWeaponsPath)
+            g.app = app.New(ur, wr, inv, g.rng)
             // UIへ武器テーブルを共有
             ui.SetWeaponTable(wr.Table())
         }
@@ -180,142 +192,21 @@ func appInitWeaponsRepo(path string) (*repo.JSONWeaponsRepo, error) {
     return repo.NewJSONWeaponsRepo(path)
 }
 
+func appInitInventoryRepo(usrW, usrI, mstW string) (*repo.JSONInventoryRepo, error) {
+    return repo.NewJSONInventoryRepo(usrW, usrI, mstW, "db/master/mst_items.json")
+}
+
 // Update は毎フレームの更新処理を行います。
 func (g *Game) Update() error {
-    if ebiten.IsKeyPressed(ebiten.KeyBackspace) {
-        // データ再読み込み
-        if us, err := ui.LoadUnitsFromUser("db/user/usr_characters.json"); err == nil && len(us) > 0 {
-            g.units = us
-			if g.selIndex >= len(us) {
-				g.selIndex = 0
-			}
-			g.unit = us[g.selIndex]
-		} else {
-			g.unit = ui.SampleUnit()
-			g.units = []ui.Unit{g.unit}
-			g.selIndex = 0
-		}
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyH) {
-		g.showHelp = true
-	} else if ebiten.IsKeyPressed(ebiten.KeyEscape) {
-		g.showHelp = false
-	}
+    g.updateGlobalToggles()
 
 	// 入力（マウス）
 	mx, my := ebiten.CursorPosition()
     switch g.mode {
     case modeList:
-        g.hoverIndex = -1
-        for i := range g.units {
-            x, y, w, h := ui.ListItemRect(screenW, screenH, i)
-            if pointIn(mx, my, x, y, w, h) {
-                g.hoverIndex = i
-            }
-        }
-        // キー操作: ↑↓で選択、Z/Enterで詳細、Tabで次へ
-        if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
-            if g.selIndex > 0 {
-                g.selIndex--
-                g.unit = g.units[g.selIndex]
-            }
-        }
-        if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
-            if g.selIndex < len(g.units)-1 {
-                g.selIndex++
-                g.unit = g.units[g.selIndex]
-            }
-        }
-        if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
-            if len(g.units) > 0 {
-                g.selIndex = (g.selIndex + 1) % len(g.units)
-                g.unit = g.units[g.selIndex]
-            }
-        }
-        if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyZ) {
-            g.mode = modeStatus
-        }
-        // 模擬戦ボタン
-        sbx, sby, sbw, sbh := ui.SimBattleButtonRect(screenW, screenH)
-        if pointIn(mx, my, sbx, sby, sbw, sbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-            if len(g.units) > 1 {
-                g.simSelecting = true
-                g.simSelectStep = 0
-            }
-        }
-        if g.hoverIndex >= 0 && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) && !g.simSelecting {
-            g.selIndex = g.hoverIndex
-            g.unit = g.units[g.selIndex]
-            g.mode = modeStatus
-        }
-        // 選択ポップアップの操作
-        if g.simSelecting {
-            g.chooseHover = -1
-            for i := range g.units {
-                x, y, w, h := ui.ChooseUnitItemRect(screenW, screenH, i, len(g.units))
-                if pointIn(mx, my, x, y, w, h) {
-                    g.chooseHover = i
-                    if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-                        if g.simSelectStep == 0 { g.simAtk = g.units[i]; g.simSelectStep = 1 } else {
-                            g.simDef = g.units[i]
-                            // 開始
-                            g.simLogs = nil
-                            g.simLogPopup = false
-                            g.simActive = true
-                            g.mode = modeSimBattle
-                            g.simSelecting = false
-                            g.simTurn = 1
-                        }
-                    }
-                }
-            }
-        }
-        // 選択キャンセル
-        if g.simSelecting && (inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyX)) {
-            g.simSelecting = false
-            g.simSelectStep = 0
-        }
+        g.updateListMode(mx, my)
     case modeStatus:
-		// レベルアップボタン
-		lbx, lby, lbw, lbh := ui.LevelUpButtonRect(screenW, screenH)
-		lvEnabled := g.unit.Level < game.LevelCap && !g.popupActive
-        if lvEnabled && pointIn(mx, my, lbx, lby, lbw, lbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-            // 抽選 → 反映 → 保存 → ポップアップ表示
-            gains := ui.RollLevelUp(g.unit, g.rng.Float64)
-            ui.ApplyGains(&g.unit, gains, game.LevelCap)
-            g.units[g.selIndex] = g.unit
-            g.popupGains = gains
-            g.popupActive = true
-            g.popupJustOpened = true
-            // 保存（App経由） + ローカルテーブル同期
-            if g.userTable != nil {
-                if c, ok := g.userTable.Find(g.unit.ID); ok {
-                    c.Level = g.unit.Level
-                    c.HPMax = g.unit.HPMax
-                    c.Stats = user.Stats{Str: g.unit.Stats.Str, Mag: g.unit.Stats.Mag, Skl: g.unit.Stats.Skl, Spd: g.unit.Stats.Spd, Lck: g.unit.Stats.Lck, Def: g.unit.Stats.Def, Res: g.unit.Stats.Res, Mov: g.unit.Stats.Mov}
-                    g.userTable.UpdateCharacter(c)
-                }
-            }
-            if g.app != nil { _ = g.app.PersistUnit(g.unit) }
-        }
-		// ポップアップ閉じる
-		if g.popupActive {
-			if g.popupJustOpened {
-				g.popupJustOpened = false
-			} else if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-				g.popupActive = false
-			}
-		}
-        bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
-        if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-            g.mode = modeList
-        }
-        // 戦闘へ（Phase3: オミット）
-        // キー操作: X/Escで戻る、Z/Enterで戦闘へ
-        if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
-            g.mode = modeList
-        }
-        // キー操作による戦闘遷移は無効化
+        g.updateStatusMode(mx, my)
     case modeBattle:
         // 戻る
         bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
@@ -486,8 +377,360 @@ func (g *Game) Update() error {
         if inpututil.IsKeyJustPressed(ebiten.Key3) {
             if ebiten.IsKeyPressed(ebiten.KeyShift) || ebiten.IsKeyPressed(ebiten.KeyShiftLeft) || ebiten.IsKeyPressed(ebiten.KeyShiftRight) { g.defTerrainSel = 2; g.defTerrain = terrainFort() } else { g.attTerrainSel = 2; g.attTerrain = terrainFort() }
         }
+    case modeInventory:
+        g.updateInventory()
+        }
+        return nil
+}
+
+// updateGlobalToggles はヘルプ表示やデータ再読み込みなどのグローバル操作を処理します。
+func (g *Game) updateGlobalToggles() {
+    if ebiten.IsKeyPressed(ebiten.KeyBackspace) {
+        // データ再読み込み
+        if us, err := ui.LoadUnitsFromUser("db/user/usr_characters.json"); err == nil && len(us) > 0 {
+            g.units = us
+            if g.selIndex >= len(us) {
+                g.selIndex = 0
+            }
+            g.unit = us[g.selIndex]
+        } else {
+            g.unit = ui.SampleUnit()
+            g.units = []ui.Unit{g.unit}
+            g.selIndex = 0
+        }
     }
-    return nil
+    if ebiten.IsKeyPressed(ebiten.KeyH) {
+        g.showHelp = true
+    } else if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+        g.showHelp = false
+    }
+}
+
+// updateListMode は一覧画面での入力処理を行います。
+func (g *Game) updateListMode(mx, my int) {
+    // 行ホバー検出
+    g.hoverIndex = -1
+    for i := range g.units {
+        x, y, w, h := ui.ListItemRect(screenW, screenH, i)
+        if pointIn(mx, my, x, y, w, h) {
+            g.hoverIndex = i
+        }
+    }
+    // 行クリックでステータスへ遷移
+    if g.hoverIndex >= 0 && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+        g.selIndex = g.hoverIndex
+        if g.selIndex >= 0 && g.selIndex < len(g.units) {
+            g.unit = g.units[g.selIndex]
+        }
+        g.mode = modeStatus
+        return
+    }
+
+    // ショートカット: 武器/アイテム一覧を開く
+    if inpututil.IsKeyJustPressed(ebiten.KeyW) {
+        if g.app != nil && g.app.Inv != nil {
+            g.weapons = ui.BuildWeaponRowsWithOwners(g.app.Inv.Weapons(), g.app.WeaponsTable(), g.userTable)
+            g.invTab, g.hoverInv = 0, -1
+            g.selectingEquip, g.selectingIsWeapon = false, true
+            g.mode = modeInventory
+            return
+        }
+    }
+    if inpututil.IsKeyJustPressed(ebiten.KeyI) {
+        if g.app != nil && g.app.Inv != nil {
+            if it, err := model.LoadItemsJSON("db/master/mst_items.json"); err == nil {
+                g.items = ui.BuildItemRowsWithOwners(g.app.Inv.Items(), it, g.userTable)
+            }
+            g.invTab, g.hoverInv = 1, -1
+            g.selectingEquip, g.selectingIsWeapon = false, false
+            g.mode = modeInventory
+            return
+        }
+    }
+
+    // 模擬戦選択フロー開始（ボタン）
+    bx, by, bw, bh := ui.SimBattleButtonRect(screenW, screenH)
+    if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) && len(g.units) > 1 {
+        g.simSelecting = true
+        g.simSelectStep = 0
+        g.chooseHover = -1
+        return
+    }
+    // 選択ポップアップ操作中
+    if g.simSelecting {
+        // キャンセル
+        if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyX) {
+            g.simSelecting = false
+            g.simSelectStep = 0
+            g.chooseHover = -1
+            return
+        }
+        // ホバー更新
+        g.chooseHover = -1
+        for i := range g.units {
+            x, y, w, h := ui.ChooseUnitItemRect(screenW, screenH, i, len(g.units))
+            if pointIn(mx, my, x, y, w, h) {
+                g.chooseHover = i
+            }
+        }
+        // クリックで選択
+        if g.chooseHover >= 0 && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            if g.simSelectStep == 0 {
+                g.simAtk = g.units[g.chooseHover]
+                g.simSelectStep = 1
+                return
+            }
+            // 防御側選択で確定
+            g.simDef = g.units[g.chooseHover]
+            g.simLogs = nil
+            g.simLogPopup = false
+            g.simAuto = false
+            g.simAutoCooldown = 0
+            g.simAutoEnded = false
+            g.simLogScroll = 0
+            g.simTurn = 1
+            // 地形は既定（平地）から開始
+            g.attTerrainSel, g.defTerrainSel = 0, 0
+            g.attTerrain, g.defTerrain = terrainPlain(), terrainPlain()
+            g.simSelecting = false
+            g.mode = modeSimBattle
+            return
+        }
+    }
+}
+
+// updateStatusMode はステータス画面での入力処理を行います。
+func (g *Game) updateStatusMode(mx, my int) {
+    // レベルアップボタン
+    lbx, lby, lbw, lbh := ui.LevelUpButtonRect(screenW, screenH)
+    lvEnabled := g.unit.Level < game.LevelCap && !g.popupActive
+    if lvEnabled && pointIn(mx, my, lbx, lby, lbw, lbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+        // 抽選 → 反映 → 保存 → ポップアップ表示
+        gains := ui.RollLevelUp(g.unit, g.rng.Float64)
+        ui.ApplyGains(&g.unit, gains, game.LevelCap)
+        g.units[g.selIndex] = g.unit
+        g.popupGains = gains
+        g.popupActive = true
+        g.popupJustOpened = true
+        // 保存（App経由） + ローカルテーブル同期
+        if g.userTable != nil {
+            if c, ok := g.userTable.Find(g.unit.ID); ok {
+                c.Level = g.unit.Level
+                c.HPMax = g.unit.HPMax
+                c.Stats = user.Stats{Str: g.unit.Stats.Str, Mag: g.unit.Stats.Mag, Skl: g.unit.Stats.Skl, Spd: g.unit.Stats.Spd, Lck: g.unit.Stats.Lck, Def: g.unit.Stats.Def, Res: g.unit.Stats.Res, Mov: g.unit.Stats.Mov}
+                g.userTable.UpdateCharacter(c)
+            }
+        }
+        if g.app != nil { _ = g.app.PersistUnit(g.unit) }
+    }
+    // ポップアップ閉じる
+    if g.popupActive {
+        if g.popupJustOpened {
+            g.popupJustOpened = false
+        } else if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            g.popupActive = false
+        }
+    }
+    // スロット操作: クリックで選択 + 一覧を開く
+    for i := 0; i < 5; i++ {
+        sx, sy, swd, shd := ui.EquipSlotRect(screenW, screenH, i)
+        if pointIn(mx, my, sx, sy, swd, shd) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            g.currentSlot = i
+            if g.app != nil && g.app.Inv != nil {
+                if i == 0 {
+                    g.weapons = ui.BuildWeaponRowsWithOwners(g.app.Inv.Weapons(), g.app.WeaponsTable(), g.userTable)
+                    g.invTab = 0
+                    g.hoverInv = -1
+                    g.selectingEquip = true
+                    g.selectingIsWeapon = true
+                    g.mode = modeInventory
+                } else {
+                    if it, err := model.LoadItemsJSON("db/master/mst_items.json"); err == nil {
+                        g.items = ui.BuildItemRowsWithOwners(g.app.Inv.Items(), it, g.userTable)
+                    }
+                    g.invTab = 1
+                    g.hoverInv = -1
+                    g.selectingEquip = true
+                    g.selectingIsWeapon = false
+                    g.mode = modeInventory
+                }
+            }
+        }
+    }
+    // スロット操作: 数字キー 1..5
+    if inpututil.IsKeyJustPressed(ebiten.Key1) { g.currentSlot = 0 }
+    if inpututil.IsKeyJustPressed(ebiten.Key2) { g.currentSlot = 1 }
+    if inpututil.IsKeyJustPressed(ebiten.Key3) { g.currentSlot = 2 }
+    if inpututil.IsKeyJustPressed(ebiten.Key4) { g.currentSlot = 3 }
+    if inpututil.IsKeyJustPressed(ebiten.Key5) { g.currentSlot = 4 }
+    // スロット解除
+    if inpututil.IsKeyJustPressed(ebiten.KeyDelete) || inpututil.IsKeyJustPressed(ebiten.KeyBackspace) {
+        if g.userTable != nil {
+            if c, ok := g.userTable.Find(g.unit.ID); ok {
+                for len(c.Equip) <= g.currentSlot { c.Equip = append(c.Equip, user.EquipRef{}) }
+                c.Equip[g.currentSlot] = user.EquipRef{}
+                // 末尾の空要素を圧縮
+                j := len(c.Equip)
+                for j > 0 {
+                    if c.Equip[j-1].UserItemsID == "" && c.Equip[j-1].UserWeaponsID == "" { j-- } else { break }
+                }
+                c.Equip = c.Equip[:j]
+                g.userTable.UpdateCharacter(c)
+                _ = g.userTable.Save(g.userPath)
+                g.unit = uicore.UnitFromUser(c)
+                g.units[g.selIndex] = g.unit
+            }
+        }
+    }
+    // 装備付け替え開始（ショートカット）
+    if inpututil.IsKeyJustPressed(ebiten.KeyE) {
+        if g.app != nil && g.app.Inv != nil {
+            g.weapons = ui.BuildWeaponRowsWithOwners(g.app.Inv.Weapons(), g.app.WeaponsTable(), g.userTable)
+            g.invTab = 0
+            g.hoverInv = -1
+            g.selectingEquip = true
+            g.selectingIsWeapon = true
+            g.mode = modeInventory
+        }
+    }
+    if inpututil.IsKeyJustPressed(ebiten.KeyI) {
+        if g.app != nil && g.app.Inv != nil {
+            if it, err := model.LoadItemsJSON("db/master/mst_items.json"); err == nil {
+                g.items = ui.BuildItemRowsWithOwners(g.app.Inv.Items(), it, g.userTable)
+            }
+            g.invTab = 1
+            g.hoverInv = -1
+            g.selectingEquip = true
+            g.selectingIsWeapon = false
+            g.mode = modeInventory
+        }
+    }
+    // 戻るボタン/キー
+    bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+    if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { g.mode = modeList }
+    if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) { g.mode = modeList }
+}
+
+// updateInventory は在庫タブ画面の入力処理をまとめたものです。
+func (g *Game) updateInventory() {
+    screenW, screenH := screenW, screenH
+    // タブ切替
+    tabW, tabH := uicore.S(160), uicore.S(44)
+    lm := uicore.ListMarginPx()
+    tx := lm + uicore.S(20)
+    ty := lm + uicore.S(12)
+    rxW, rxI := tx, tx+tabW+uicore.S(10)
+    mx, my := ebiten.CursorPosition()
+    if pointIn(mx, my, rxW, ty, tabW, tabH) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { g.invTab = 0 }
+    if pointIn(mx, my, rxI, ty, tabW, tabH) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { g.invTab = 1 }
+    // リスト選択
+    g.hoverInv = -1
+    if g.invTab == 0 {
+        for i := range g.weapons {
+            x, y, w, h := ui.ListItemRect(screenW, screenH, i)
+            if pointIn(mx, my, x, y, w, h) { g.hoverInv = i }
+            if g.selectingEquip && g.selectingIsWeapon && g.hoverInv == i && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+                chosen := g.weapons[i]
+                if g.userTable != nil {
+                    if c, ok := g.userTable.Find(g.unit.ID); ok {
+                        var prev user.EquipRef
+                        if g.currentSlot < len(c.Equip) { prev = c.Equip[g.currentSlot] }
+                        ownerID := ""
+                        ownerSlot := -1
+                        for _, oc := range g.userTable.Slice() {
+                            for idx, er := range oc.Equip {
+                                if er.UserWeaponsID == chosen.ID { ownerID = oc.ID; ownerSlot = idx; break }
+                            }
+                            if ownerID != "" { break }
+                        }
+                        if ownerID != "" {
+                            if oc, ok2 := g.userTable.Find(ownerID); ok2 {
+                                for len(oc.Equip) <= ownerSlot { oc.Equip = append(oc.Equip, user.EquipRef{}) }
+                                oc.Equip[ownerSlot] = prev
+                                j := len(oc.Equip)
+                                for j > 0 { if oc.Equip[j-1].UserItemsID == "" && oc.Equip[j-1].UserWeaponsID == "" { j-- } else { break } }
+                                oc.Equip = oc.Equip[:j]
+                                g.userTable.UpdateCharacter(oc)
+                                g.refreshUnitByID(ownerID)
+                            }
+                        }
+                        for len(c.Equip) <= g.currentSlot { c.Equip = append(c.Equip, user.EquipRef{}) }
+                        c.Equip[g.currentSlot] = user.EquipRef{UserWeaponsID: chosen.ID}
+                        g.userTable.UpdateCharacter(c)
+                        _ = g.userTable.Save(g.userPath)
+                        g.unit = uicore.UnitFromUser(c)
+                        g.units[g.selIndex] = g.unit
+                        g.selectingEquip = false
+                        g.mode = modeStatus
+                        break
+                    }
+                }
+            }
+        }
+    } else {
+        for i := range g.items {
+            x, y, w, h := ui.ListItemRect(screenW, screenH, i)
+            if pointIn(mx, my, x, y, w, h) { g.hoverInv = i }
+            if g.selectingEquip && !g.selectingIsWeapon && g.hoverInv == i && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+                chosen := g.items[i]
+                if g.userTable != nil {
+                    if c, ok := g.userTable.Find(g.unit.ID); ok {
+                        var prev user.EquipRef
+                        if g.currentSlot < len(c.Equip) { prev = c.Equip[g.currentSlot] }
+                        ownerID := ""
+                        ownerSlot := -1
+                        for _, oc := range g.userTable.Slice() {
+                            for idx, er := range oc.Equip {
+                                if er.UserItemsID == chosen.ID { ownerID = oc.ID; ownerSlot = idx; break }
+                            }
+                            if ownerID != "" { break }
+                        }
+                        if ownerID != "" {
+                            if oc, ok2 := g.userTable.Find(ownerID); ok2 {
+                                for len(oc.Equip) <= ownerSlot { oc.Equip = append(oc.Equip, user.EquipRef{}) }
+                                oc.Equip[ownerSlot] = prev
+                                j := len(oc.Equip)
+                                for j > 0 { if oc.Equip[j-1].UserItemsID == "" && oc.Equip[j-1].UserWeaponsID == "" { j-- } else { break } }
+                                oc.Equip = oc.Equip[:j]
+                                g.userTable.UpdateCharacter(oc)
+                                g.refreshUnitByID(ownerID)
+                            }
+                        }
+                        for len(c.Equip) <= g.currentSlot { c.Equip = append(c.Equip, user.EquipRef{}) }
+                        c.Equip[g.currentSlot] = user.EquipRef{UserItemsID: chosen.ID}
+                        g.userTable.UpdateCharacter(c)
+                        _ = g.userTable.Save(g.userPath)
+                        g.unit = uicore.UnitFromUser(c)
+                        g.units[g.selIndex] = g.unit
+                        g.selectingEquip = false
+                        g.mode = modeStatus
+                        break
+                    }
+                }
+            }
+        }
+    }
+    // 戻る
+    bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+    if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { g.mode = modeList }
+    if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) { g.mode = modeList }
+}
+
+// refreshUnitByID は g.userTable の内容から該当IDの UIユニットを再構築して差し替えます。
+func (g *Game) refreshUnitByID(id string) {
+    if g == nil || g.userTable == nil { return }
+    c, ok := g.userTable.Find(id)
+    if !ok { return }
+    u := uicore.UnitFromUser(c)
+    for i := range g.units {
+        if g.units[i].ID == id {
+            g.units[i] = u
+            if g.selIndex == i {
+                g.unit = u
+            }
+            break
+        }
+    }
 }
 
 // Draw は画面描画を行います。
@@ -498,78 +741,134 @@ func (g *Game) Draw(screen *ebiten.Image) {
     screen.Fill(color.RGBA{12, 18, 30, 255})
 	switch g.mode {
     case modeList:
-        ui.DrawCharacterList(screen, g.units, g.hoverIndex)
-        // 模擬戦ボタン（統一スタイル）
-        mx, my := ebiten.CursorPosition()
-        bx, by, bw, bh := ui.SimBattleButtonRect(screenW, screenH)
-        hovered := pointIn(mx, my, bx, by, bw, bh)
-        ui.DrawSimBattleButton(screen, hovered, len(g.units) > 1)
-        // 選択フローのガイド
-        if g.simSelecting {
-            title := "模擬戦: 攻撃側を選択"
-            if g.simSelectStep == 1 { title = "模擬戦: 防御側を選択" }
-            ui.DrawChooseUnitPopup(screen, title, g.units, g.chooseHover)
-        }
+        g.drawList(screen)
     case modeStatus:
-        ui.DrawStatus(screen, g.unit)
-        // 戻るボタン
-        mx, my := ebiten.CursorPosition()
-        bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
-        hovered := pointIn(mx, my, bx, by, bw, bh)
-        ui.DrawBackButton(screen, hovered)
-        // レベルアップボタン
-        lvx, lvy, lvw, lvh := ui.LevelUpButtonRect(screenW, screenH)
-        lvHovered := pointIn(mx, my, lvx, lvy, lvw, lvh)
-        ui.DrawLevelUpButton(screen, lvHovered, g.unit.Level < game.LevelCap && !g.popupActive)
-        if g.popupActive {
-            ui.DrawLevelUpPopup(screen, g.unit, g.popupGains)
-        }
-        // Phase3: ステータス画面の「戦闘へ」ボタンは削除
+        g.drawStatus(screen)
     case modeBattle:
         // Phase3: 実戦画面は非推奨（将来撤去）。現状はステータスから遷移しないため通常到達しない。
         fallthrough
     case modeSimBattle:
-        // 新バトルシミュレータ（battleレイアウトを使用）
-        canStart := g.simAtk.HP > 0 && g.simDef.HP > 0 && !g.simLogPopup
-        ui.DrawBattleWithTerrain(screen, g.simAtk, g.simDef, g.attTerrain, g.defTerrain, canStart)
-        // 地形ボタン
-        attIdx := g.attTerrainSel
-        defIdx := g.defTerrainSel
-        ui.DrawTerrainButtons(screen, attIdx, defIdx)
-        // 自動実行ボタン
-        mx, my := ebiten.CursorPosition()
-        ax, ay, aw, ah := ui.AutoRunButtonRect(screenW, screenH)
-        aHovered := pointIn(mx, my, ax, ay, aw, ah)
-        ui.DrawAutoRunButton(screen, aHovered, g.simAuto)
-        // ログ表示（自動実行中はポップアップでスクロール可）
-        if g.simAuto {
-            ui.DrawBattleLogOverlayScroll(screen, g.simLogs, g.simLogScroll)
-        } else if g.simLogPopup {
-            if g.simAutoEnded {
-                ui.DrawBattleLogOverlayScroll(screen, g.simLogs, g.simLogScroll)
-            } else {
-                ui.DrawBattleLogOverlay(screen, g.simLogs)
-            }
-        }
-        // 先攻表示（ヘッダ下）
-        if g.simTurn <= 0 { g.simTurn = 1 }
-        leftFirst := (g.simTurn%2 == 1)
-        label := "先攻: "
-        if leftFirst { label += g.simAtk.Name } else { label += g.simDef.Name }
-        ebitenutil.DebugPrintAt(screen, label, uicore.ListMarginPx()+uicore.S(40), uicore.ListMarginPx()+uicore.S(56))
-        // 既定のポップアップ（上の分岐で描画済み）
-        mx, my = ebiten.CursorPosition()
-        bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
-        ui.DrawBackButton(screen, pointIn(mx, my, bx, by, bw, bh))
-	}
+        g.drawSimBattle(screen)
+    case modeInventory:
+        g.drawInventory(screen)
+    }
 	if g.showHelp {
 		ebitenutil.DebugPrintAt(screen, "H: ヘルプ表示切替 / ESC: 閉じる\nBackspace: サンプル値を再読み込み", 16, screenH-64)
 	}
 }
 
+// drawList は一覧画面を描画し、UIボタン類を表示します。
+// （後続PR）描画処理は draw* 系へ段階的に分割予定
 // Layout は論理解像度（内部解像度）を返します。
 func (g *Game) Layout(_, _ int) (int, int) {
-	return screenW, screenH
+    return screenW, screenH
+}
+
+// drawList は一覧画面の描画を行います。
+func (g *Game) drawList(screen *ebiten.Image) {
+    // 本体（一覧）
+    ui.DrawCharacterList(screen, g.units, g.hoverIndex)
+    // 模擬戦ボタン（統一スタイル）
+    mx, my := ebiten.CursorPosition()
+    bx, by, bw, bh := ui.SimBattleButtonRect(screenW, screenH)
+    hovered := pointIn(mx, my, bx, by, bw, bh)
+    ui.DrawSimBattleButton(screen, hovered, len(g.units) > 1)
+    // ショートカットガイド
+    ebitenutil.DebugPrintAt(screen, "W: 武器一覧 / I: アイテム一覧", uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10))
+    // 選択フローのガイド
+    if g.simSelecting {
+        title := "模擬戦: 攻撃側を選択"
+        if g.simSelectStep == 1 { title = "模擬戦: 防御側を選択" }
+        ui.DrawChooseUnitPopup(screen, title, g.units, g.chooseHover)
+    }
+}
+
+// drawStatus はステータス画面の描画を行います。
+func (g *Game) drawStatus(screen *ebiten.Image) {
+    // 本体（ステータス）
+    ui.DrawStatus(screen, g.unit)
+    // 戻るボタン
+    mx, my := ebiten.CursorPosition()
+    bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+    hovered := pointIn(mx, my, bx, by, bw, bh)
+    ui.DrawBackButton(screen, hovered)
+    ebitenutil.DebugPrintAt(screen, fmt.Sprintf("選択中スロット: %d", g.currentSlot+1), uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10))
+    // レベルアップボタン
+    lvx, lvy, lvw, lvh := ui.LevelUpButtonRect(screenW, screenH)
+    lvHovered := pointIn(mx, my, lvx, lvy, lvw, lvh)
+    ui.DrawLevelUpButton(screen, lvHovered, g.unit.Level < game.LevelCap && !g.popupActive)
+    if g.popupActive {
+        ui.DrawLevelUpPopup(screen, g.unit, g.popupGains)
+    }
+    // Phase3: ステータス画面の「戦闘へ」ボタンは削除
+}
+
+// drawSimBattle は新バトルシミュレータの描画を行います。
+func (g *Game) drawSimBattle(screen *ebiten.Image) {
+    // 新バトルシミュレータ（battleレイアウトを使用）
+    canStart := g.simAtk.HP > 0 && g.simDef.HP > 0 && !g.simLogPopup
+    ui.DrawBattleWithTerrain(screen, g.simAtk, g.simDef, g.attTerrain, g.defTerrain, canStart)
+    // 地形ボタン
+    attIdx := g.attTerrainSel
+    defIdx := g.defTerrainSel
+    ui.DrawTerrainButtons(screen, attIdx, defIdx)
+    // 自動実行ボタン
+    mx, my := ebiten.CursorPosition()
+    ax, ay, aw, ah := ui.AutoRunButtonRect(screenW, screenH)
+    aHovered := pointIn(mx, my, ax, ay, aw, ah)
+    ui.DrawAutoRunButton(screen, aHovered, g.simAuto)
+    // ログ表示（自動実行中はポップアップでスクロール可）
+    if g.simAuto {
+        ui.DrawBattleLogOverlayScroll(screen, g.simLogs, g.simLogScroll)
+    } else if g.simLogPopup {
+        if g.simAutoEnded {
+            ui.DrawBattleLogOverlayScroll(screen, g.simLogs, g.simLogScroll)
+        } else {
+            ui.DrawBattleLogOverlay(screen, g.simLogs)
+        }
+    }
+    // 先攻表示（ヘッダ下）
+    if g.simTurn <= 0 { g.simTurn = 1 }
+    leftFirst := (g.simTurn%2 == 1)
+    label := "先攻: "
+    if leftFirst { label += g.simAtk.Name } else { label += g.simDef.Name }
+    ebitenutil.DebugPrintAt(screen, label, uicore.ListMarginPx()+uicore.S(40), uicore.ListMarginPx()+uicore.S(56))
+    // 既定のポップアップ（上の分岐で描画済み）
+    mx, my = ebiten.CursorPosition()
+    bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+    ui.DrawBackButton(screen, pointIn(mx, my, bx, by, bw, bh))
+}
+
+// drawInventory は在庫タブ画面の描画を行います。
+func (g *Game) drawInventory(screen *ebiten.Image) {
+    // 本体（タブに応じて）
+    if g.invTab == 0 { ui.DrawWeaponList(screen, g.weapons, g.hoverInv) } else { ui.DrawItemList(screen, g.items, g.hoverInv) }
+    // タブ描画
+    tabW, tabH := uicore.S(160), uicore.S(44)
+    lm := uicore.ListMarginPx()
+    tx := lm + uicore.S(20)
+    ty := lm + uicore.S(12)
+    // 武器タブ
+    uicore.DrawFramedRect(screen, float32(tx), float32(ty), float32(tabW), float32(tabH))
+    baseW := color.RGBA{40, 60, 110, 255}
+    if g.invTab == 0 { baseW = color.RGBA{70, 100, 160, 255} }
+    vector.DrawFilledRect(screen, float32(tx), float32(ty), float32(tabW), float32(tabH), baseW, false)
+    uicore.TextDraw(screen, "武器", uicore.FaceMain, tx+uicore.S(56), ty+uicore.S(30), uicore.ColText)
+    // アイテムタブ
+    tx2 := tx + tabW + uicore.S(10)
+    uicore.DrawFramedRect(screen, float32(tx2), float32(ty), float32(tabW), float32(tabH))
+    baseI := color.RGBA{40, 60, 110, 255}
+    if g.invTab == 1 { baseI = color.RGBA{70, 100, 160, 255} }
+    vector.DrawFilledRect(screen, float32(tx2), float32(ty), float32(tabW), float32(tabH), baseI, false)
+    uicore.TextDraw(screen, "アイテム", uicore.FaceMain, tx2+uicore.S(34), ty+uicore.S(30), uicore.ColText)
+    // 戻るボタン
+    mx, my := ebiten.CursorPosition()
+    bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+    hovered := pointIn(mx, my, bx, by, bw, bh)
+    ui.DrawBackButton(screen, hovered)
+    if g.selectingEquip {
+        ebitenutil.DebugPrintAt(screen, "クリックでスロットに装備", uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10))
+    }
 }
 
 // main はウィンドウを作成しゲームループを開始します。

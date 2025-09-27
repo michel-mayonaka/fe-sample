@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GOCACHE: ${{ github.workspace }}/.gocache
+      GOMODCACHE: ${{ github.workspace }}/.gomodcache
+      GOWORK: off
+      # GUI 依存のビルドは環境により失敗しうるため非strict
+      MCP_STRICT: "0"
+      CI: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+          cache: true
+
+      - name: Cache build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .gocache
+            .gomodcache
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-${{ hashFiles('.golangci.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Download modules
+        run: go mod download
+
+      - name: Install golangci-lint
+        run: |
+          GOBIN="$PWD/bin" go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          echo "$PWD/bin" >> $GITHUB_PATH
+
+      - name: Make MCP (vet/build/lint)
+        run: |
+          # 追加の厳格ルールは必要時に有効化できます（例: funlen/gocognit/cyclop）
+          # EXTRA_LINTERS='-E funlen -E gocognit -E cyclop' make mcp
+          make mcp

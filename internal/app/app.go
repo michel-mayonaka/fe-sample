@@ -1,3 +1,4 @@
+// Package app はユースケース層（アプリケーションサービス）を提供します。
 package app
 
 import (
@@ -16,12 +17,13 @@ import (
 type App struct {
     Weapons repo.WeaponsRepo
     Users   repo.UserRepo
+    Inv     repo.InventoryRepo
     RNG     *rand.Rand
 }
 
 // New はリポジトリと乱数源を注入して App を生成します。
-func New(users repo.UserRepo, weapons repo.WeaponsRepo, rng *rand.Rand) *App {
-    return &App{Weapons: weapons, Users: users, RNG: rng}
+func New(users repo.UserRepo, weapons repo.WeaponsRepo, inv repo.InventoryRepo, rng *rand.Rand) *App {
+    return &App{Weapons: weapons, Users: users, Inv: inv, RNG: rng}
 }
 
 // RunBattleRound は選択中ユニットと次ユニットの1ラウンド戦闘を解決し、
@@ -79,7 +81,7 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
     // UIへHP反映
     atk.HP = ga2.S.HP
     def.HP = gd2.S.HP
-    // 使用回数を消費（攻撃1回ごとに1消費）
+    // 使用回数を消費（攻撃1回ごとに1消費）: UI 表示更新
     if len(atk.Equip) > 0 && atk.Equip[0].Uses > 0 {
         use := atkCount
         if use > atk.Equip[0].Uses { use = atk.Equip[0].Uses }
@@ -93,23 +95,33 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
     units[atkIdx] = atk
     units[defIdx] = def
 
-    // ユーザテーブルへ反映・保存（両者）
+    // ユーザテーブルへ反映・保存（両者）: HP等は usr_characters へ、耐久は usr_weapons/items へ
     if a.Users != nil {
         if c, ok := a.Users.Find(atk.ID); ok {
             c.HP = atk.HP
             c.HPMax = atk.HPMax
-            if len(c.Equip) > 0 && len(atk.Equip) > 0 { c.Equip[0].Uses = atk.Equip[0].Uses }
             a.Users.Update(c)
         }
         if c2, ok := a.Users.Find(def.ID); ok {
             c2.HP = def.HP
             c2.HPMax = def.HPMax
-            if len(c2.Equip) > 0 && len(def.Equip) > 0 { c2.Equip[0].Uses = def.Equip[0].Uses }
             a.Users.Update(c2)
         }
         if err := a.Users.Save(); err != nil {
             return units, logs, true, fmt.Errorf("save user: %w", err)
         }
+    }
+
+    // 耐久は usr_weapons.json / usr_items.json に保存
+    // 攻撃側
+    if len(atk.Equip) > 0 && atkCount > 0 && a.Inv != nil {
+        _ = a.Inv.Consume(atk.Equip[0].ID, atkCount)
+        _ = a.Inv.Save()
+    }
+    // 防御側
+    if len(def.Equip) > 0 && defCount > 0 && a.Inv != nil {
+        _ = a.Inv.Consume(def.Equip[0].ID, defCount)
+        _ = a.Inv.Save()
     }
     return units, logs, true, nil
 }

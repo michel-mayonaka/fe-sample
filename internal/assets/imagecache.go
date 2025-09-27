@@ -1,3 +1,4 @@
+// Package assets は画像キャッシュなどUI用アセット管理を提供します。
 package assets
 
 import (
@@ -7,13 +8,16 @@ import (
 )
 
 // ImageCache はパス→画像の単純キャッシュです。
+// ImageCache はパス→画像を保持する簡易キャッシュです。
 type ImageCache struct {
     mu sync.RWMutex
     m  map[string]*ebiten.Image
 }
 
+// NewImageCache は空の ImageCache を生成して返します。
 func NewImageCache() *ImageCache { return &ImageCache{m: make(map[string]*ebiten.Image)} }
 
+// DefaultImageCache は共有の画像キャッシュです。
 var DefaultImageCache = NewImageCache()
 
 // LoadImage はキャッシュ経由で画像を取得します。

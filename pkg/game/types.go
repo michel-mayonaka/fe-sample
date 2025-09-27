@@ -1,14 +1,16 @@
 package game
 
-// 最小スキーマ（MVP段階で拡張）
+// Stats は戦闘計算で用いる最小の能力値セットです。
 type Stats struct{ HP, Str, Skl, Spd, Lck, Def, Res, Mov, Bld int }
 
+// Weapon は武器の基本性能を表します。
 type Weapon struct {
     MT, Hit, Crit, Wt int
     RMin, RMax        int
     Type              string // Sword/Lance/Axe etc.
 }
 
+// Unit は戦闘ロジックにおけるユニットの最小構成です。
 type Unit struct {
 	ID, Name, Class string
 	Lv              int
@@ -16,6 +18,7 @@ type Unit struct {
 	W               Weapon
 }
 
+// ForecastResult は命中表示値/与ダメ/必殺% の結果です。
 type ForecastResult struct {
     HitDisp int
     Dmg     int

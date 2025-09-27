@@ -1,3 +1,4 @@
+// Package adapter は UI モデルと戦闘ロジック間の変換を提供します。
 package adapter
 
 import (

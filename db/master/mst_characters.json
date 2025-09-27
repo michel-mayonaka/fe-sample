@@ -12,10 +12,71 @@
     "growth": {"Str": 45, "Mag": 10, "Skl": 55, "Spd": 65, "Lck": 50, "Def": 20, "Res": 35, "Mov": 0, "Bld": 0},
     "weapon": {"sword": "D", "lance": "B", "axe": "-", "bow": "-"},
     "magic": {"anima": "-", "light": "-", "dark": "-", "staff": "-"},
-    "equip": [
-      {"name": "アイアンランス", "uses": 35, "max": 45},
-      {"name": "ジャベリン", "uses": 12, "max": 20},
-      {"name": "傷薬", "uses": 3, "max": 3}
-    ]
+    "user_weapons_id": ["uw_iris_w1", "uw_iris_w2"],
+    "user_items_id":   ["ui_iris_i1"]
+  },
+  {
+    "id": "mac",
+    "name": "マック",
+    "class": "戦士",
+    "portrait": "assets/04_mac.png",
+    "level": 8,
+    "exp": 34,
+    "hp": 30,
+    "hp_max": 34,
+    "stats": {"Str": 13, "Mag": 0, "Skl": 10, "Spd": 11, "Lck": 7, "Def": 9, "Res": 3, "Mov": 5, "Bld": 8},
+    "growth": {"Str": 55, "Mag": 0, "Skl": 45, "Spd": 40, "Lck": 35, "Def": 35, "Res": 15, "Mov": 0, "Bld": 10},
+    "weapon": {"sword": "-", "lance": "-", "axe": "C", "bow": "-"},
+    "magic": {"anima": "-", "light": "-", "dark": "-", "staff": "-"},
+    "user_weapons_id": ["uw_mac_w1"],
+    "user_items_id":   ["ui_mac_i1"]
+  },
+  {
+    "id": "charlie",
+    "name": "チャーリー",
+    "class": "アーチャー",
+    "portrait": "assets/05_chary.png",
+    "level": 6,
+    "exp": 22,
+    "hp": 23,
+    "hp_max": 28,
+    "stats": {"Str": 9, "Mag": 0, "Skl": 12, "Spd": 13, "Lck": 9, "Def": 5, "Res": 3, "Mov": 5, "Bld": 5},
+    "growth": {"Str": 45, "Mag": 0, "Skl": 60, "Spd": 60, "Lck": 50, "Def": 20, "Res": 25, "Mov": 0, "Bld": 0},
+    "weapon": {"sword": "-", "lance": "-", "axe": "-", "bow": "C"},
+    "magic": {"anima": "-", "light": "-", "dark": "-", "staff": "-"},
+    "user_weapons_id": ["uw_charlie_w1"],
+    "user_items_id":   ["ui_charlie_i1"]
+  },
+  {
+    "id": "mercenary",
+    "name": "ロイド",
+    "class": "傭兵",
+    "portrait": "assets/02_loyd.png",
+    "level": 9,
+    "exp": 20,
+    "hp": 28,
+    "hp_max": 35,
+    "stats": {"Str": 11, "Mag": 0, "Skl": 13, "Spd": 14, "Lck": 10, "Def": 8, "Res": 3, "Mov": 5, "Bld": 6},
+    "growth": {"Str": 50, "Mag": 0, "Skl": 55, "Spd": 55, "Lck": 45, "Def": 30, "Res": 25, "Mov": 0, "Bld": 0},
+    "weapon": {"sword": "C", "lance": "-", "axe": "-", "bow": "-"},
+    "magic": {"anima": "-", "light": "-", "dark": "-", "staff": "-"},
+    "user_weapons_id": ["uw_loyd_w1"],
+    "user_items_id":   ["ui_loyd_i1"]
+  },
+  {
+    "id": "kenshi",
+    "name": "ハヤテ",
+    "class": "剣士",
+    "portrait": "assets/03_hayate.png",
+    "level": 8,
+    "exp": 18,
+    "hp": 24,
+    "hp_max": 31,
+    "stats": {"Str": 8, "Mag": 0, "Skl": 16, "Spd": 18, "Lck": 12, "Def": 6, "Res": 7, "Mov": 5, "Bld": 4},
+    "growth": {"Str": 40, "Mag": 0, "Skl": 60, "Spd": 70, "Lck": 50, "Def": 20, "Res": 30, "Mov": 0, "Bld": 0},
+    "weapon": {"sword": "B", "lance": "-", "axe": "-", "bow": "-"},
+    "magic": {"anima": "-", "light": "-", "dark": "-", "staff": "-"},
+    "user_weapons_id": ["uw_hayate_w1"],
+    "user_items_id":   ["ui_hayate_i1"]
   }
 ]

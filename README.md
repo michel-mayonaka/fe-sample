@@ -6,6 +6,10 @@
 - Go 1.25 以上（推奨: 最新 1.25 系）
 - 初回は依存取得のためネットワーク接続が必要
 
+補足（toolchain/代替手順）
+- Go 1.21 以上をお使いの場合は、`go env -w GOTOOLCHAIN=auto` を設定すると `go.mod` の `go 1.25.0` に合わせてツールチェーンを自動取得できます。
+- それ未満の環境では Go を 1.25 系へ更新してください（例: macOS/Homebrew は `brew update && brew upgrade go`）。
+
 ## セットアップ & 実行
 ```sh
 # Go バージョン確認（古い場合は更新）
@@ -34,6 +38,11 @@ make check
 - インストール（macOS/Homebrew 例）: `brew install golangci-lint`
 - 実行: `make lint` または `golangci-lint run`
 - 整形: `make fmt`
+
+CI（GitHub Actions）
+- 本リポジトリは `make mcp`（vet/build/lint）を CI で実行します。
+- Go 1.25.x を固定し、Go のビルドキャッシュ/モジュールキャッシュを保存します。
+- GUI 依存のビルドは CI 環境で失敗しうるため、既定でスキップ（`MCP_STRICT=0`）します。
 
 ## 表示仕様（解像度）
 - 論理解像度: 1920×1080（`Layout`）

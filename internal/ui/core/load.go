@@ -4,6 +4,7 @@ import (
     "ui_sample/internal/assets"
 )
 
+// SampleUnit はサンプル用の Unit を返します（ユーザJSONがあれば優先して使用）。
 func SampleUnit() Unit {
 	if ut, err := LoadUnitsFromUser("db/user/usr_characters.json"); err == nil && len(ut) > 0 {
 		for _, u := range ut {

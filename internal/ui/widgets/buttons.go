@@ -1,13 +1,14 @@
+// Package uiwidgets はボタン等の汎用UIウィジェット描画を提供します。
 package uiwidgets
 
 import (
     "github.com/hajimehoshi/ebiten/v2"
-    text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2
     "github.com/hajimehoshi/ebiten/v2/vector"
     "image/color"
     uicore "ui_sample/internal/ui/core"
 )
 
+// BackButtonRect は画面右上の戻るボタンの矩形を返します。
 func BackButtonRect(sw, _ int) (x, y, w, h int) {
     lm := uicore.ListMarginPx()
     panelX, panelY := lm, lm
@@ -19,6 +20,7 @@ func BackButtonRect(sw, _ int) (x, y, w, h int) {
     return
 }
 
+// DrawBackButton は戻るボタンを描画します。
 func DrawBackButton(dst *ebiten.Image, hovered bool) {
 	sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
 	x, y, w, h := BackButtonRect(sw, sh)
@@ -28,9 +30,10 @@ func DrawBackButton(dst *ebiten.Image, hovered bool) {
 	}
 	uicore.DrawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
 	vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), bg, false)
-    text.Draw(dst, "＜ 一覧へ", uicore.FaceMain, x+uicore.S(20), y+uicore.S(32), uicore.ColText)
+    uicore.TextDraw(dst, "＜ 一覧へ", uicore.FaceMain, x+uicore.S(20), y+uicore.S(32), uicore.ColText)
 }
 
+// LevelUpButtonRect はレベルアップボタンの矩形を返します。
 func LevelUpButtonRect(sw, sh int) (x, y, w, h int) {
     lm := uicore.ListMarginPx()
     w, h = uicore.S(220), uicore.S(56)
@@ -39,6 +42,7 @@ func LevelUpButtonRect(sw, sh int) (x, y, w, h int) {
     return
 }
 
+// DrawLevelUpButton はレベルアップボタンを描画します。
 func DrawLevelUpButton(dst *ebiten.Image, hovered, enabled bool) {
 	sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
 	x, y, w, h := LevelUpButtonRect(sw, sh)
@@ -55,9 +59,10 @@ func DrawLevelUpButton(dst *ebiten.Image, hovered, enabled bool) {
     if !enabled {
         label = "最大レベル"
     }
-    text.Draw(dst, label, uicore.FaceMain, x+uicore.S(24), y+uicore.S(36), uicore.ColText)
+    uicore.TextDraw(dst, label, uicore.FaceMain, x+uicore.S(24), y+uicore.S(36), uicore.ColText)
 }
 
+// ToBattleButtonRect は「戦闘へ」ボタンの矩形を返します。
 func ToBattleButtonRect(sw, sh int) (x, y, w, h int) {
     rx, ry, _, rh := LevelUpButtonRect(sw, sh)
     w, h = uicore.S(220), rh
@@ -66,6 +71,7 @@ func ToBattleButtonRect(sw, sh int) (x, y, w, h int) {
     return
 }
 
+// DrawToBattleButton は「戦闘へ」ボタンを描画します。
 func DrawToBattleButton(dst *ebiten.Image, hovered, enabled bool) {
     sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
     x, y, w, h := ToBattleButtonRect(sw, sh)
@@ -78,7 +84,7 @@ func DrawToBattleButton(dst *ebiten.Image, hovered, enabled bool) {
 	}
     uicore.DrawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
     vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), base, false)
-    text.Draw(dst, "戦闘へ", uicore.FaceMain, x+uicore.S(70), y+uicore.S(36), uicore.ColText)
+    uicore.TextDraw(dst, "戦闘へ", uicore.FaceMain, x+uicore.S(70), y+uicore.S(36), uicore.ColText)
 }
 
 // SimBattleButtonRect は一覧画面の右上に表示する「模擬戦」ボタンの矩形です。
@@ -107,7 +113,7 @@ func DrawSimBattleButton(dst *ebiten.Image, hovered, enabled bool) {
     if hovered && enabled {
         label = "> 模擬戦 <"
     }
-    text.Draw(dst, label, uicore.FaceMain, x+uicore.S(24), y+uicore.S(32), uicore.ColText)
+    uicore.TextDraw(dst, label, uicore.FaceMain, x+uicore.S(24), y+uicore.S(32), uicore.ColText)
 }
 
 // DrawAutoRunButton はバトル画面下部の「自動実行/停止」ボタンを描画します。
@@ -133,12 +139,12 @@ func DrawAutoRunButton(dst *ebiten.Image, hovered bool, running bool) {
     vector.DrawFilledRect(dst, float32(bx), float32(by), float32(bw), float32(bh), base, false)
     label := "自動実行"
     if running { label = "停止" }
-    text.Draw(dst, label, uicore.FaceMain, bx+uicore.S(70), by+uicore.S(38), uicore.ColText)
+    uicore.TextDraw(dst, label, uicore.FaceMain, bx+uicore.S(70), by+uicore.S(38), uicore.ColText)
 }
 
 // BattleStartButtonRectCompat は widgets から開始ボタン位置へアクセスするための薄い互換関数です。
 // 原則として screens に置くべきですが、現状の依存分離を保ちつつ見た目を揃えるための便宜的な実装です。
-func BattleStartButtonRectCompat(sw, sh int) (int, int, int, int) {
+func BattleStartButtonRectCompat(_ , _ int) (int, int, int, int) {
     // 実体は screens 側。widgets からは参照しない方針のため、
     // ここでは API 経由で取得するのが理想だが、循環参照を避けるため、呼び出し側で Rect を計算済み前提にする。
     // 本関数はダミーとして 0 を返す（呼び出し側で使わない）。

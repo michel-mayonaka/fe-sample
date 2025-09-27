@@ -42,19 +42,22 @@ type MagicRanks struct {
 
 // Character はマスターテーブルの1レコードです。
 type Character struct {
-	ID       string      `json:"id"`
-	Name     string      `json:"name"`
-	Class    string      `json:"class"`
-	Portrait string      `json:"portrait"` // 画像パス（任意）
-	Level    int         `json:"level"`
-	Exp      int         `json:"exp"`
-	HP       int         `json:"hp"`
-	HPMax    int         `json:"hp_max"`
-	Stats    Stats       `json:"stats"`
-	Growth   Growth      `json:"growth"`
-	Weapon   WeaponRanks `json:"weapon"`
-	Magic    MagicRanks  `json:"magic"`
-	Equip    []Item      `json:"equip"`
+    ID       string      `json:"id"`
+    Name     string      `json:"name"`
+    Class    string      `json:"class"`
+    Portrait string      `json:"portrait"` // 画像パス（任意）
+    Level    int         `json:"level"`
+    Exp      int         `json:"exp"`
+    HP       int         `json:"hp"`
+    HPMax    int         `json:"hp_max"`
+    Stats    Stats       `json:"stats"`
+    Growth   Growth      `json:"growth"`
+    Weapon   WeaponRanks `json:"weapon"`
+    Magic    MagicRanks  `json:"magic"`
+    Equip    []Item      `json:"equip,omitempty"`
+    // 参照方式: ユーザ所持テーブルのIDリストを参照（装備/所持）
+    UserWeaponsID []string `json:"user_weapons_id,omitempty"`
+    UserItemsID   []string `json:"user_items_id,omitempty"`
 }
 
 // Table は読み込んだキャラクターマスタの索引です。

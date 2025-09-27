@@ -60,11 +60,12 @@ func SimulateBattleCopyWithTerrain(atk, def uicore.Unit, attT, defT gcore.Terrai
         d.HP = gd4.S.HP
     }
     // 勝利ログ
-    if a.HP <= 0 && d.HP <= 0 {
+    switch {
+    case a.HP <= 0 && d.HP <= 0:
         logs = append(logs, "相打ち")
-    } else if a.HP <= 0 {
+    case a.HP <= 0:
         logs = append(logs, "勝利: "+d.Name)
-    } else if d.HP <= 0 {
+    case d.HP <= 0:
         logs = append(logs, "勝利: "+a.Name)
     }
     logs = append(logs, "模擬戦終了")

@@ -6,17 +6,20 @@ import (
 	"image/color"
 )
 
+// DrawPanel は金枠付きのパネル背景を描画します。
 func DrawPanel(dst *ebiten.Image, x, y, w, h float32) {
 	vector.DrawFilledRect(dst, x-2, y-2, w+4, h+4, ColBorder, false)
 	vector.DrawFilledRect(dst, x+2, y+2, w, h, ColPanelDark, false)
 	vector.DrawFilledRect(dst, x, y, w, h, ColPanelBG, false)
 }
 
+// DrawFramedRect は金枠付きの矩形を描画します。
 func DrawFramedRect(dst *ebiten.Image, x, y, w, h float32) {
 	vector.DrawFilledRect(dst, x-2, y-2, w+4, h+4, ColBorder, false)
 	vector.DrawFilledRect(dst, x, y, w, h, color.RGBA{30, 45, 78, 255}, false)
 }
 
+// DrawHPBar は HP バー（色は割合で変化）を描画します。
 func DrawHPBar(dst *ebiten.Image, x, y, w, h int, hp, maxHP int) {
     if maxHP <= 0 {
         maxHP = 1

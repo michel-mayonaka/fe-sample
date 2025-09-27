@@ -2,14 +2,15 @@ package uicore
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2
 	"math"
 )
 
+// DrawPortraitPlaceholder はポートレート未設定時のプレースホルダーを描画します。
 func DrawPortraitPlaceholder(dst *ebiten.Image, x, y, _, h float32) {
-	text.Draw(dst, "画像なし", FaceSmall, int(x+10), int(y+h/2), ColAccent)
+	TextDraw(dst, "画像なし", FaceSmall, int(x+10), int(y+h/2), ColAccent)
 }
 
+// DrawPortrait は画像を枠内に等比縮小して描画します。
 func DrawPortrait(dst *ebiten.Image, img *ebiten.Image, x, y, w, h float32) {
 	b := img.Bounds()
 	iw, ih := b.Dx(), b.Dy()

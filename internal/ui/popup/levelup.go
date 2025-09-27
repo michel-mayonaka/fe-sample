@@ -3,18 +3,19 @@ package uipopup
 import (
     "fmt"
     "github.com/hajimehoshi/ebiten/v2"
-    text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck // TODO: text/v2
     "github.com/hajimehoshi/ebiten/v2/vector"
     "image/color"
     "ui_sample/internal/model"
     uicore "ui_sample/internal/ui/core"
 )
 
+// LevelUpGains はレベルアップで上昇した値を表します。
 type LevelUpGains struct {
 	Inc    uicore.Stats
 	HPGain int
 }
 
+// RollLevelUp はユニットの成長率に基づき上昇ステータスを抽選します。
 func RollLevelUp(u uicore.Unit, rnd func() float64) LevelUpGains {
 	g := LevelUpGains{}
 	prob := func(p int) bool { return p > 0 && rnd()*100 < float64(p) }
@@ -48,6 +49,7 @@ func RollLevelUp(u uicore.Unit, rnd func() float64) LevelUpGains {
 	return g
 }
 
+// ApplyGains は抽選結果をユニットへ反映し、上限とHP整合を保ちます。
 func ApplyGains(u *uicore.Unit, gains LevelUpGains, levelCap int) {
 	if u.Level < levelCap {
 		u.Level++
@@ -90,6 +92,7 @@ func ApplyGains(u *uicore.Unit, gains LevelUpGains, levelCap int) {
 	}
 }
 
+// DrawLevelUpPopup はレベルアップ結果のポップアップを描画します。
 func DrawLevelUpPopup(dst *ebiten.Image, u uicore.Unit, gains LevelUpGains) {
     sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
     overlay := color.RGBA{0, 0, 0, 160}
@@ -98,13 +101,13 @@ func DrawLevelUpPopup(dst *ebiten.Image, u uicore.Unit, gains LevelUpGains) {
     px := (sw - pw) / 2
     py := (sh - ph) / 2
     uicore.DrawPanel(dst, float32(px), float32(py), float32(pw), float32(ph))
-    text.Draw(dst, "レベルアップ!", uicore.FaceTitle, px+uicore.S(24), py+uicore.S(56), uicore.ColAccent)
-    text.Draw(dst, fmt.Sprintf("Lv %d", u.Level), uicore.FaceMain, px+uicore.S(24), py+uicore.S(96), uicore.ColText)
+    uicore.TextDraw(dst, "レベルアップ!", uicore.FaceTitle, px+uicore.S(24), py+uicore.S(56), uicore.ColAccent)
+    uicore.TextDraw(dst, fmt.Sprintf("Lv %d", u.Level), uicore.FaceMain, px+uicore.S(24), py+uicore.S(96), uicore.ColText)
     y := py + uicore.S(140)
     line := uicore.S(34)
     drawInc := func(label string, v int) {
         if v > 0 {
-            text.Draw(dst, fmt.Sprintf("%s +%d", label, v), uicore.FaceMain, px+uicore.S(40), y, uicore.ColAccent)
+            uicore.TextDraw(dst, fmt.Sprintf("%s +%d", label, v), uicore.FaceMain, px+uicore.S(40), y, uicore.ColAccent)
             y += line
         }
     }
@@ -117,5 +120,5 @@ func DrawLevelUpPopup(dst *ebiten.Image, u uicore.Unit, gains LevelUpGains) {
     drawInc("守備", gains.Inc.Def)
     drawInc("魔防", gains.Inc.Res)
     drawInc("移動", gains.Inc.Mov)
-    text.Draw(dst, "クリックで閉じる", uicore.FaceSmall, px+pw-uicore.S(180), py+ph-uicore.S(24), uicore.ColText)
+    uicore.TextDraw(dst, "クリックで閉じる", uicore.FaceSmall, px+pw-uicore.S(180), py+ph-uicore.S(24), uicore.ColText)
 }

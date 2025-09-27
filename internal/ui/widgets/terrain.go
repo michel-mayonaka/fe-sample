@@ -2,7 +2,6 @@ package uiwidgets
 
 import (
     "github.com/hajimehoshi/ebiten/v2"
-    text "github.com/hajimehoshi/ebiten/v2/text"
     "github.com/hajimehoshi/ebiten/v2/vector"
     "image/color"
     uicore "ui_sample/internal/ui/core"
@@ -29,8 +28,8 @@ func TerrainButtonRect(sw, sh int, left bool, idx int) (x, y, w, h int) {
 func DrawTerrainButtons(dst *ebiten.Image, attSel, defSel int) {
     sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
     // ラベル
-    text.Draw(dst, "攻地形", uicore.FaceSmall, uicore.ListMarginPx()+uicore.S(40), sh-uicore.ListMarginPx()-uicore.S(230), uicore.ColAccent)
-    text.Draw(dst, "防地形", uicore.FaceSmall, sw-uicore.ListMarginPx()-uicore.S(560), sh-uicore.ListMarginPx()-uicore.S(230), uicore.ColAccent)
+    uicore.TextDraw(dst, "攻地形", uicore.FaceSmall, uicore.ListMarginPx()+uicore.S(40), sh-uicore.ListMarginPx()-uicore.S(230), uicore.ColAccent)
+    uicore.TextDraw(dst, "防地形", uicore.FaceSmall, sw-uicore.ListMarginPx()-uicore.S(560), sh-uicore.ListMarginPx()-uicore.S(230), uicore.ColAccent)
     // 左右3つずつ
     names := []string{"平地", "森", "砦"}
     for i := 0; i < 3; i++ {
@@ -46,6 +45,5 @@ func drawTerrainButton(dst *ebiten.Image, x, y, w, h int, label string, selected
     base := color.RGBA{40, 60, 100, 255}
     if selected { base = color.RGBA{70, 100, 160, 255} }
     vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), base, false)
-    text.Draw(dst, label, uicore.FaceSmall, x+uicore.S(20), y+uicore.S(26), uicore.ColText)
+    uicore.TextDraw(dst, label, uicore.FaceSmall, x+uicore.S(20), y+uicore.S(26), uicore.ColText)
 }
-
