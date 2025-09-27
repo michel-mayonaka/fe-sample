@@ -5,6 +5,12 @@
 ## internal/game
 - `const LevelUpExp = 100`: レベルアップに必要な経験値。
 - `const LevelCap = 20`: レベル上限。
+- `type Ctx`: フレーム共通情報とサービス群。`DT, Frame, ScreenW, ScreenH, Input, Assets, Audio, Camera, UI, Rand, Debug`。
+- `type Scene`: `Update(*Ctx) (Scene, error)`, `Draw(*ebiten.Image)`。
+- `type SceneStack`: `Current/Push/Pop/Replace/Size` を提供する LIFO スタック。
+- `package actor.IActor`: `Update(*game.Ctx) bool`, `Draw(*ebiten.Image)`, `Layer() int`。
+- `package service.Input`: 抽象アクション `Up/Down/Left/Right/Confirm/Cancel/Menu/Next/Prev` と、
+  便宜アクション `OpenWeapons/OpenItems/EquipToggle/Slot1..5/Unassign`、`Snapshot/Press/Down`。
 
 ## internal/model（マスタデータ / mst_）
 - `type Character`
@@ -86,6 +92,9 @@
 - `func (*Game) Draw(*ebiten.Image)`: 画面描画（UI呼び出し）。
 - `func (*Game) Layout(int,int) (int,int)`: 論理解像度を返す。
 - `func main()`: ウィンドウ作成とゲームループ開始。
+
+## 参考
+- 全体設計と移行計画は `docs/ARCHITECTURE.md` を参照。
 
 ## 変更時の指針
 - 新規/変更した公開要素（型/関数/定数/フィールド）は本ファイルを必ず更新。

@@ -18,6 +18,7 @@ import (
     "ui_sample/internal/repo"
     "ui_sample/internal/assets"
     "ui_sample/internal/game"
+    gamesvc "ui_sample/internal/game/service"
     uicore "ui_sample/internal/ui/core"
     "ui_sample/internal/ui"
     "ui_sample/internal/user"
@@ -81,6 +82,9 @@ type Game struct {
     // App（ユースケース）
     app *app.App
 
+    // 抽象入力（移行中）
+    ginput *gamesvc.Input
+
     // 一覧（武器/アイテム）
     weapons   []ui.WeaponRow
     items     []ui.ItemRow
@@ -91,6 +95,9 @@ type Game struct {
     selectingEquip bool
     selectingIsWeapon bool
     currentSlot int
+
+    // Backspace長押し判定用（データリロードの誤爆防止）
+    reloadHold int
 }
 
 type screenMode int
@@ -148,6 +155,9 @@ func terrainFort() gcore.Terrain   { return gcore.Terrain{Avoid: 15, Def: 2, Hit
 func NewGame() *Game {
     g := &Game{}
     g.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+    // 抽象入力初期化（Backspace→Menu に割当し、従来のリロード操作を維持）
+    g.ginput = gamesvc.NewInput()
+    g.ginput.BindKey(ebiten.KeyBackspace, gamesvc.Menu)
     g.attTerrainSel, g.defTerrainSel = 0, 0
     g.userPath = config.DefaultUserPath
 	if ut, err := user.LoadFromJSON(g.userPath); err == nil {
@@ -198,6 +208,8 @@ func appInitInventoryRepo(usrW, usrI, mstW string) (*repo.JSONInventoryRepo, err
 
 // Update は毎フレームの更新処理を行います。
 func (g *Game) Update() error {
+    // 抽象入力スナップショット（移行中のため併用）
+    if g.ginput != nil { g.ginput.Snapshot() }
     g.updateGlobalToggles()
 
 	// 入力（マウス）
@@ -212,7 +224,7 @@ func (g *Game) Update() error {
         bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
         // ログポップアップ表示中はポップアップを優先（クリック/Z/Enterで閉じる）
         if g.battleLogPopup {
-            if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || inpututil.IsKeyJustPressed(ebiten.KeyZ) || inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+            if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || (g.ginput != nil && g.ginput.Press(gamesvc.Confirm)) {
                 g.battleLogPopup = false
             }
             return nil
@@ -228,11 +240,11 @@ func (g *Game) Update() error {
         if canStart && pointIn(mx, my, bx2, by2, bw2, bh2) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
             g.runBattleRound()
         }
-        // キー操作: Z/Enterで戦闘、X/Escで戻る
-        if canStart && (inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyZ)) {
+        // キー操作: Confirmで戦闘、Cancelで戻る
+        if canStart && g.ginput != nil && g.ginput.Press(gamesvc.Confirm) {
             g.runBattleRound()
         }
-        if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+        if g.ginput != nil && g.ginput.Press(gamesvc.Cancel) {
             g.mode = modeStatus
         }
         // 地形切替（1/2/3: 攻撃側、Shift+1/2/3: 防御側）
@@ -260,7 +272,7 @@ func (g *Game) Update() error {
     case modeSimBattle:
         // ログポップアップ中は閉じる操作のみ受け付け
         if g.simLogPopup {
-            if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || inpututil.IsKeyJustPressed(ebiten.KeyZ) || inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+            if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || (g.ginput != nil && g.ginput.Press(gamesvc.Confirm)) {
                 g.simLogPopup = false
                 g.simAutoEnded = false
                 g.simLogScroll = 0
@@ -273,13 +285,11 @@ func (g *Game) Update() error {
             g.mode = modeList
             g.simActive = false
         }
-        if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+        if g.ginput != nil && g.ginput.Press(gamesvc.Cancel) {
             g.mode = modeList
             g.simActive = false
         }
-        // 武器/画像キャッシュのクリアとテーブル再注入（UI更新）
-        if g.app != nil { _ = g.app.ReloadData(); ui.SetWeaponTable(g.app.WeaponsTable()) }
-        assets.Clear()
+        // データ再読み込みは Backspace（Menu）に集約
         // 戦闘開始（コピーでシミュレーション）
         bx2, by2, bw2, bh2 := ui.BattleStartButtonRect(screenW, screenH)
         // 自動実行ボタン
@@ -306,7 +316,7 @@ func (g *Game) Update() error {
             g.simLogPopup = true
             g.simTurn++
         }
-        if canStart && (inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyZ)) {
+        if canStart && g.ginput != nil && g.ginput.Press(gamesvc.Confirm) {
             if leftFirst {
                 a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simAtk, g.simDef, g.attTerrain, g.defTerrain, g.rng)
                 g.simAtk, g.simDef = a, d
@@ -385,23 +395,34 @@ func (g *Game) Update() error {
 
 // updateGlobalToggles はヘルプ表示やデータ再読み込みなどのグローバル操作を処理します。
 func (g *Game) updateGlobalToggles() {
-    if ebiten.IsKeyPressed(ebiten.KeyBackspace) {
-        // データ再読み込み
-        if us, err := ui.LoadUnitsFromUser("db/user/usr_characters.json"); err == nil && len(us) > 0 {
-            g.units = us
-            if g.selIndex >= len(us) {
+    // Backspace 長押しで再読み込み（App+画像キャッシュを一括）
+    if g.ginput != nil && g.ginput.Down(gamesvc.Menu) {
+        g.reloadHold++
+        if g.reloadHold == 30 { // 約0.5秒（60FPS時）
+            if g.app != nil {
+                _ = g.app.ReloadData()
+                ui.SetWeaponTable(g.app.WeaponsTable())
+            }
+            assets.Clear()
+            // UIユニットを再構築
+            if us, err := ui.LoadUnitsFromUser("db/user/usr_characters.json"); err == nil && len(us) > 0 {
+                g.units = us
+                if g.selIndex >= len(us) {
+                    g.selIndex = 0
+                }
+                g.unit = us[g.selIndex]
+            } else {
+                g.unit = ui.SampleUnit()
+                g.units = []ui.Unit{g.unit}
                 g.selIndex = 0
             }
-            g.unit = us[g.selIndex]
-        } else {
-            g.unit = ui.SampleUnit()
-            g.units = []ui.Unit{g.unit}
-            g.selIndex = 0
         }
+    } else {
+        g.reloadHold = 0
     }
     if ebiten.IsKeyPressed(ebiten.KeyH) {
         g.showHelp = true
-    } else if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+    } else if g.ginput != nil && g.ginput.Down(gamesvc.Cancel) {
         g.showHelp = false
     }
 }
@@ -427,7 +448,7 @@ func (g *Game) updateListMode(mx, my int) {
     }
 
     // ショートカット: 武器/アイテム一覧を開く
-    if inpututil.IsKeyJustPressed(ebiten.KeyW) {
+    if g.ginput != nil && g.ginput.Press(gamesvc.OpenWeapons) {
         if g.app != nil && g.app.Inv != nil {
             g.weapons = ui.BuildWeaponRowsWithOwners(g.app.Inv.Weapons(), g.app.WeaponsTable(), g.userTable)
             g.invTab, g.hoverInv = 0, -1
@@ -436,7 +457,7 @@ func (g *Game) updateListMode(mx, my int) {
             return
         }
     }
-    if inpututil.IsKeyJustPressed(ebiten.KeyI) {
+    if g.ginput != nil && g.ginput.Press(gamesvc.OpenItems) {
         if g.app != nil && g.app.Inv != nil {
             if it, err := model.LoadItemsJSON("db/master/mst_items.json"); err == nil {
                 g.items = ui.BuildItemRowsWithOwners(g.app.Inv.Items(), it, g.userTable)
@@ -459,7 +480,7 @@ func (g *Game) updateListMode(mx, my int) {
     // 選択ポップアップ操作中
     if g.simSelecting {
         // キャンセル
-        if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyX) {
+        if g.ginput != nil && g.ginput.Press(gamesvc.Cancel) {
             g.simSelecting = false
             g.simSelectStep = 0
             g.chooseHover = -1
@@ -558,13 +579,13 @@ func (g *Game) updateStatusMode(mx, my int) {
         }
     }
     // スロット操作: 数字キー 1..5
-    if inpututil.IsKeyJustPressed(ebiten.Key1) { g.currentSlot = 0 }
-    if inpututil.IsKeyJustPressed(ebiten.Key2) { g.currentSlot = 1 }
-    if inpututil.IsKeyJustPressed(ebiten.Key3) { g.currentSlot = 2 }
-    if inpututil.IsKeyJustPressed(ebiten.Key4) { g.currentSlot = 3 }
-    if inpututil.IsKeyJustPressed(ebiten.Key5) { g.currentSlot = 4 }
+    if g.ginput != nil && g.ginput.Press(gamesvc.Slot1) { g.currentSlot = 0 }
+    if g.ginput != nil && g.ginput.Press(gamesvc.Slot2) { g.currentSlot = 1 }
+    if g.ginput != nil && g.ginput.Press(gamesvc.Slot3) { g.currentSlot = 2 }
+    if g.ginput != nil && g.ginput.Press(gamesvc.Slot4) { g.currentSlot = 3 }
+    if g.ginput != nil && g.ginput.Press(gamesvc.Slot5) { g.currentSlot = 4 }
     // スロット解除
-    if inpututil.IsKeyJustPressed(ebiten.KeyDelete) || inpututil.IsKeyJustPressed(ebiten.KeyBackspace) {
+    if (g.ginput != nil && g.ginput.Press(gamesvc.Unassign)) {
         if g.userTable != nil {
             if c, ok := g.userTable.Find(g.unit.ID); ok {
                 for len(c.Equip) <= g.currentSlot { c.Equip = append(c.Equip, user.EquipRef{}) }
@@ -583,7 +604,7 @@ func (g *Game) updateStatusMode(mx, my int) {
         }
     }
     // 装備付け替え開始（ショートカット）
-    if inpututil.IsKeyJustPressed(ebiten.KeyE) {
+    if g.ginput != nil && g.ginput.Press(gamesvc.EquipToggle) {
         if g.app != nil && g.app.Inv != nil {
             g.weapons = ui.BuildWeaponRowsWithOwners(g.app.Inv.Weapons(), g.app.WeaponsTable(), g.userTable)
             g.invTab = 0
@@ -593,7 +614,7 @@ func (g *Game) updateStatusMode(mx, my int) {
             g.mode = modeInventory
         }
     }
-    if inpututil.IsKeyJustPressed(ebiten.KeyI) {
+    if g.ginput != nil && g.ginput.Press(gamesvc.OpenItems) {
         if g.app != nil && g.app.Inv != nil {
             if it, err := model.LoadItemsJSON("db/master/mst_items.json"); err == nil {
                 g.items = ui.BuildItemRowsWithOwners(g.app.Inv.Items(), it, g.userTable)
@@ -608,7 +629,7 @@ func (g *Game) updateStatusMode(mx, my int) {
     // 戻るボタン/キー
     bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
     if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { g.mode = modeList }
-    if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) { g.mode = modeList }
+    if g.ginput != nil && g.ginput.Press(gamesvc.Cancel) { g.mode = modeList }
 }
 
 // updateInventory は在庫タブ画面の入力処理をまとめたものです。
@@ -713,7 +734,7 @@ func (g *Game) updateInventory() {
     // 戻る
     bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
     if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { g.mode = modeList }
-    if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) { g.mode = modeList }
+    if g.ginput != nil && g.ginput.Press(gamesvc.Cancel) { g.mode = modeList }
 }
 
 // refreshUnitByID は g.userTable の内容から該当IDの UIユニットを再構築して差し替えます。

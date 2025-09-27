@@ -18,52 +18,94 @@ Update順序を契約化して“どこで何をやるか”を固定化。デ�
 
 1. ディレクトリ構成（最初から育つ形）
 /cmd/game/main.go
+
 /internal/game/
-  app.go            // ebiten.Game（心臓）
-  ctx.go            // Frame Context（Δt, 入力スナップ, カメラ等）
-  scene.go          // Scene, SceneStack
+  app/                   # ebiten.Game（心臓）: 旧 app.go をここへ
+    app.go
+  ctx.go                 # Frame Context（Δt, 入力スナップ, カメラ等）
+  scene.go               # Scene, SceneStack
+
   scenes/
     title/
       title.go
     battle/
-      battle.go     // 盤面/ターン/AI入口
+      battle.go          # 盤面/ターン/AI入口（port経由でデータ参照）
     result/
+
   actor/
-    actor.go        // IActor: Update/Draw/Alive
-    unit.go         // FEユニット（最低限）
+    actor.go             # IActor: Update/Draw/Alive
+    unit.go              # FEユニット（表現用。ドメインのUnitStateはdomain/modelへ）
     cursor.go
-    fx.go           // 汎用エフェクト
-  service/
-    assets.go       // 画像/音/フォントのキャッシュ
-    input.go        // 抽象入力（Action/Axis）
-    audio.go        // BGM/SEキュー
+    fx.go                # 汎用エフェクト
+
+  service/               # ← UIサービス専用（入出力/表示系のみ）
+    assets.go            # 画像/音/フォントのキャッシュ
+    input.go             # 抽象入力（Action/Axis）
+    audio.go             # BGM/SEキュー
     camera.go
-    ui.go           // 文字描画, ウィジェット軽ラッパ
-    hotload.go      // データホットリロード（debugビルドのみ）
-  world/
-    world.go        // タイル/地形/高さ/遮蔽
-    turn.go         // フェーズ/状態機械
-    predict.go      // 命中/クリ/ダメ予測（純関数）
-    path.go         // A*（純関数＋キャッシュ）
+    ui.go                # 文字描画, ウィジェット軽ラッパ
+    hotload.go           # データホットリロード（debugビルドのみ, Master差し替え通知）
+
+  domain/                # ← UI非依存の“ゲームのルール”
+    model/               # 構造体: Save/UnitState/Stats/Defs…
+      defs.go            # ItemDef/WeaponDef/ClassDef/TerrainDef
+      state.go           # GameState/ItemRef/UnitState/Progress…
+      combat.go          # CombatInput/Outcome
+      world.go           # 盤面の軽量表現（座標/地形IDなど）
+      types.go           # 列挙/ID型/タグ
+    rules/               # 純関数: 予測/A*/致傷/状態機械
+      predict.go         # 命中/クリ/ダメ予測
+      path.go            # A*（純関数＋任意キャッシュフック）
+      turn.go            # フェーズ遷移（状態機械）
+      injury.go          # 致傷テーブル
+    port/                # “使う側が定義する”データアクセスIF
+      master.go          # MasterRepository interface
+      save.go            # SaveRepository interface
+
+  repository/            # ← port を実装する“外側”
+    master_tsv/          # TSV/CSVローダ（PC開発用）
+      master_tsv.go
+      index.go
+    master_embed/        # go:embed配布用（リリースビルド向け）
+      master_embed.go
+    save_file/           # JSONセーブ（PC）
+      save_file.go
+    save_web/            # IndexedDB/LocalStorage（WASM）
+      save_web.go
+    migrate/             # セーブ互換/移行
+      migrate.go
+      versions.go
+
+  world/                 # 画面側の盤面制御（描画や選択/ハイライト等）
+    world.go             # タイル/地形/高さ/遮蔽（表示・選択）
+    overlay.go           # 可視範囲/移動範囲/ハイライト
+    adapter.go           # domain.model.World 等との相互変換
+
   render/
-    layers.go       // 背景/世界/影/エフェクト/UI の順序制御
+    layers.go            # 背景/世界/影/エフェクト/UI の順序制御
+
   data/
-    tables/         // CSV/TSV（ユニット/武器/地形/状態/AI重み…）
-    maps/           // マップ（CSVタイル + JSONオブジェクト）
+    tables/              # CSV/TSV（ユニット/武器/地形/状態/AI重み…）
+    maps/                # マップ（CSVタイル + JSONオブジェクト）
+
   assets/
     images/atlas.png
-    images/atlas.json   // スプライト座標
+    images/atlas.json    # スプライト座標
     fonts/
     audio/
+
   util/
-    rng.go          // seed固定の乱数
-    geom.go         // 2D幾何・格子座標変換
-    file.go         // 読み込み
+    rng.go               # seed固定の乱数
+    geom.go              # 2D幾何・格子座標変換
+    file.go              # 読み込み
+    platform.go          # 環境分岐（デスクトップ/WASM）
+
 /test/
-  replay/           // リプレイ記録（入力列）
-  golden/           // 予測・経路のゴールデンファイル
+  replay/                # リプレイ記録（入力列）
+  golden/                # 予測・経路のゴールデンファイル
 Makefile
 go.mod
+
 
 2. コアAPI（最小の型とインタフェース）
 // scene.go
@@ -353,10 +395,83 @@ func (b *Battle) Update(ctx *game.Ctx) (game.Scene, error) {
 	return nil, nil
 }
 
-func (b *Battle) Draw(dst *ebiten.Image) {
+ func (b *Battle) Draw(dst *ebiten.Image) {
 	b.world.DrawTiles(dst)
 	for _, a := range b.actors { if a.Layer()<200 { a.Draw(dst) } }
 	b.world.DrawShadows(dst)
 	for _, a := range b.actors { if a.Layer()>=200 && a.Layer()<300 { a.Draw(dst) } }
 	b.hud.Draw(dst)
 }
+
+---
+
+進捗ログ（2025-09-28）
+
+- Phase0: スケルトン導入（完了）
+  - 追加: `internal/game/{ctx.go, scene.go, actor/actor.go, service/{input.go,assets.go,audio.go,camera.go,ui.go,hotload.go}, render/layers.go, util/rng.go}`
+  - 目的: Scene/Actor/Service の最小 API を先行追加し、既存 UI と併存可能に。
+- ドキュメント（完了）
+  - `docs/ARCHITECTURE.md`: 本ファイルの方針を現状に合わせて整理（更新順序契約/移行計画/現状→目標マッピング）。
+  - `docs/API.md`: `Ctx/Scene/SceneStack/IActor/service.Input` を追記。
+- 軽い実配線（着手）
+  - `cmd/ui_sample/main.go`: 抽象入力 `service.Input` を導入し、Backspace リロードのみ置換（`BindKey(Backspace→Menu)`→`Down(Menu)`）。従来の挙動を維持。
+  - ビルド確認: `go build ./internal/game/...` と `go build ./cmd/ui_sample` 成功。
+
+次アクション（Phase1 部分適用）
+
+- 入力: `updateList/Status/SimBattle` 内の一部キー操作を `service.Input` へ段階移行（Press/Down 切替ルールを明文化）。
+- リロード導線: `updateGlobalToggles` の Backspace リロードを `App.ReloadData()` に寄せ、画像キャッシュ `assets.Clear()` と一括化（UI層の直接I/O削減）。
+- 画面遷移: 小径で `SceneStack` を導入（Title→List または List→SimBattle）し、契約運用を実地化。
+- ドキュメント更新: 本ログ追記の継続、`docs/ARCHITECTURE.md` に Press/Down の運用表を追加。
+
+進捗ログ（2025-09-28 午前・Phase1 一部適用）
+
+- 抽象入力の段階導入（Confirm/Cancel）：
+  - `cmd/ui_sample/main.go`
+    - `modeBattle`: 戦闘開始=Confirm、戻る=Cancel、ログ閉じ=Confirm に置換（マウス操作は維持）。
+    - `modeSimBattle`: 戻る=Cancel、ログ閉じ=Confirm、キーボード戦闘開始=Confirm。自動実行スクロール等は従来の矢印/PgUp/PgDn を維持。
+    - 模擬戦のユニット選択ポップアップ: キャンセル=Cancel（Esc/X から移行）。
+    - ステータス→一覧/在庫→一覧の戻る: Cancel で統一（ボタン/マウスは維持）。
+- リロード導線の統一：
+  - Backspace 長押し（= `service.Input.Menu`）で `App.ReloadData()` を呼び、`ui.SetWeaponTable()` と `assets.Clear()` を一括適用。
+  - `modeSimBattle` 内の毎フレーム再読み込みを撤去（パフォーマンス改善・意図の一元化）。
+- 誤爆防止：
+  - リロードは「長押し（約0.5秒）」でのみ発火するようフレームカウンタを導入（`reloadHold`）。
+  - Status 画面の装備解除ショートカット（Delete/Backspace）は存続し、短押しではリロードが走らない。
+- ビルド確認: `go build ./cmd/ui_sample` 成功。
+
+次アクション（Phase1 継続）
+- 入力: List/Status での残キー（W/I/E/数字スロット）を `service.Input` へ順次寄せ替え（UI文言も更新）。
+- 画面遷移: `SceneStack` の最小導入（List→SimBattle）を試験的に実装し、Update順序契約の検証を開始。
+- テスト: `service.Input` の Snapshot/Press/Down の単体テストを追加。
+
+進捗ログ（2025-09-28 昼・Phase1 継続適用）
+
+- 抽象入力の拡張と適用：
+  - 追加アクション: `OpenWeapons/OpenItems/EquipToggle/Slot1..5/Unassign`。
+  - `cmd/ui_sample/main.go`
+    - 一覧: W/I → `OpenWeapons/OpenItems` に置換。
+    - ステータス: E → `EquipToggle`、数字1..5 → `Slot1..5`、装備解除 → `Unassign`（Delete）。
+  - 地形切替（1/2/3）は暫定で直接キーのまま（今後検討）。
+- ドキュメント更新：`docs/ARCHITECTURE.md`/`docs/API.md` に拡張アクションを追記。
+- ビルド確認: `go build ./cmd/ui_sample` 成功。
+
+ドキュメント移管（2025-09-28）
+
+- ARCHITECTURE.md は「あるべき姿」に限定。以下の現状/移行系の内容を本ファイルへ移管：
+  - 現状→目標マッピング（参考）
+    - Application: `internal/app`（ユースケース）… 継続利用。
+    - Domain/Rules: `pkg/game` … 継続利用（テスト済）。
+    - Repository: `internal/repo` … 継続利用（JSON/キャッシュ）。
+    - UI: `internal/ui/...` … 継続利用（将来 `service.UI` 経由へ薄層化）。
+    - Assets: `internal/assets` … 現状使用（将来 `service.Assets` に統合）。
+  - 段階的移行計画（Phase 0→4）
+    1) Phase0: `internal/game/{ctx,scene,actor,service,render,util}` 追加（非侵入）
+    2) Phase1: 入力抽象の導入と既存キー置換（本タスクで進行中）
+    3) Phase2: 部分画面で `SceneStack` 導入（List→SimBattle）
+    4) Phase3: 資産/画像キャッシュの `service.Assets` への集約＋App.Reload* 統合
+    5) Phase4: マップを `world+actor+render` で分割しレイヤ描画に移行
+  - 採用/保留（メモ）
+    - 採用: Scene/Actor/Service の最小 API、Update 順序契約、抽象入力
+    - 保留: ECS 本格導入、TSV/CSV への全面移行、Hotloader 実装、`embed` 化
+  - Hotloader 現状: 実装はプレースホルダ（no-op）。今後、`tables/*.tsv`/`maps/*.json` の監視→通知に対応予定。
