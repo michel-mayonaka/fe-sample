@@ -56,7 +56,7 @@ func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, at
     if frAtk, frAtkBk, frDef, frDefBk, canCounter, ok := forecastBothWithTerrainExplain(attacker, defender, attT, defT); ok {
         // 左側（攻撃側の予測）
         ax := leftX
-        ay := topY + 460
+        ay := topY + uicore.S(460)
         baseLine := fmt.Sprintf("命中 %d%%  与ダメ %d  必殺 %d%%", frAtk.HitDisp, frAtk.Dmg, frAtk.Crit)
         text.Draw(dst, baseLine, uicore.FaceMain, ax, ay, uicore.ColText)
         // 相性を同一行の末尾に配置
@@ -121,7 +121,12 @@ func drawBattleSide(dst *ebiten.Image, u uicore.Unit, x, y int) {
 	if len(u.Equip) > 0 {
 		wep = u.Equip[0].Name
 	}
-    text.Draw(dst, "武器: "+wep, uicore.FaceMain, x, y+420, uicore.ColText)
+    // 攻撃速度（一元化ロジック） - 小さめフォント + 行間確保
+    as := adapter.AttackSpeedOf(weaponTable(), u)
+    lineY := y + uicore.S(410)
+    text.Draw(dst, fmt.Sprintf("攻撃速度 %d", as), uicore.FaceSmall, x, lineY, uicore.ColText)
+    lineY += uicore.LineHSmallPx()
+    text.Draw(dst, "武器: "+wep, uicore.FaceSmall, x, lineY, uicore.ColText)
 }
 
 // dynamicWrap は左右列の折返し幅をウィンドウ幅とマージンから決めます。

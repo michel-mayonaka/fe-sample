@@ -20,3 +20,13 @@ func UIToGame(wt *model.WeaponTable, u uicore.Unit) gcore.Unit {
         W: gcore.Weapon{MT: w.Might, Hit: w.Hit, Crit: w.Crit, Wt: w.Weight, RMin: w.RangeMin, RMax: w.RangeMax, Type: w.Type},
     }
 }
+
+// AttackSpeedOf は UI ユニットの攻撃速度を返します（先頭装備を使用）。
+// 武器テーブル未設定時は速さ(Spd)を返します。
+func AttackSpeedOf(wt *model.WeaponTable, u uicore.Unit) int {
+    if wt == nil {
+        return u.Stats.Spd
+    }
+    gu := UIToGame(wt, u)
+    return gcore.AttackSpeed(gu)
+}

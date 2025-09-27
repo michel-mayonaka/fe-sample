@@ -45,7 +45,7 @@
     "equip": [
       {
         "name": "アイアンランス",
-        "uses": 11,
+        "uses": 10,
         "max": 45
       },
       {
@@ -66,7 +66,7 @@
     "class": "傭兵",
     "portrait": "assets/02_loyd.png",
     "level": 20,
-    "hp": 1,
+    "hp": 35,
     "hp_max": 35,
     "stats": {
       "Str": 17,
@@ -106,7 +106,7 @@
     "equip": [
       {
         "name": "アイアンソード",
-        "uses": 34,
+        "uses": 32,
         "max": 45
       },
       {

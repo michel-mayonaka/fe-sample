@@ -5,6 +5,7 @@ import (
     "github.com/hajimehoshi/ebiten/v2"
     text "github.com/hajimehoshi/ebiten/v2/text" //nolint:staticcheck
     "golang.org/x/image/font"
+    "ui_sample/internal/adapter"
     "ui_sample/internal/game"
     uicore "ui_sample/internal/ui/core"
 )
@@ -33,6 +34,8 @@ func DrawStatus(dst *ebiten.Image, u uicore.Unit) {
     statsTop := ty + uicore.S(160)
     line := uicore.S(34)
     colGap := uicore.S(180)
+    // 派生: 攻撃速度（一元化ロジックを呼び出し）。
+    atkSpeed := adapter.AttackSpeedOf(weaponTable(), u)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+0*colGap, statsTop+0*line, "力", u.Stats.Str, u.Growth.Str)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+0*colGap, statsTop+1*line, "魔力", u.Stats.Mag, u.Growth.Mag)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+0*colGap, statsTop+2*line, "技", u.Stats.Skl, u.Growth.Skl)
@@ -43,6 +46,8 @@ func DrawStatus(dst *ebiten.Image, u uicore.Unit) {
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+3*line, "体格", u.Stats.Bld, u.Growth.Bld)
     // 行を一段増やして移動を表示
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+1*colGap, statsTop+4*line, "移動", u.Stats.Mov, u.Growth.Mov)
+    // 派生表示（成長率なし）
+    drawStatLine(dst, uicore.FaceMain, tx+1*colGap, statsTop+5*line, "攻撃速度", atkSpeed)
     wrX := tx + 2*colGap + uicore.S(64)
     wrY := ty
     text.Draw(dst, "武器レベル", uicore.FaceMain, wrX, wrY, uicore.ColAccent)
@@ -84,4 +89,13 @@ func drawRankLine(dst *ebiten.Image, face font.Face, x, y int, label, rank strin
     }
     text.Draw(dst, label, face, x, y, uicore.ColText)
     text.Draw(dst, rank, face, x+uicore.S(120), y, uicore.ColAccent)
+}
+
+// 成長率のない派生値用の簡易行描画。
+func drawStatLine(dst *ebiten.Image, face font.Face, x, y int, label string, v int) {
+    text.Draw(dst, label, face, x, y, uicore.ColText)
+    // ラベル実幅を測って十分な余白を確保
+    lw := text.BoundString(face, label).Dx()
+    gap := uicore.S(20)
+    text.Draw(dst, fmt.Sprintf("%2d", v), face, x+lw+gap, y, uicore.ColAccent)
 }

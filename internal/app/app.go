@@ -42,26 +42,54 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
     gd := adapter.UIToGame(a.Weapons.Table(), def)
 
     logs := []string{"戦闘開始", atk.Name + " の攻撃"}
+    // 攻撃回数（耐久消費用）
+    atkCount, defCount := 0, 0
     ga2, gd2, line1 := gcore.ResolveRoundAt(ga, gd, attT, defT, a.RNG)
+    atkCount++
     if line1 != "" { logs = append(logs, line1) }
     // 反撃
-    if gd2.S.HP > 0 {
-        dist := 1
-        canCounter := gd2.W.RMin <= dist && dist <= gd2.W.RMax
-        if canCounter {
-            logs = append(logs, def.Name+" の反撃")
-            gd3, ga3, line2 := gcore.ResolveRoundAt(gd2, ga2, defT, attT, a.RNG)
-            if line2 != "" { logs = append(logs, line2) }
-            ga2, gd2 = ga3, gd3
-        }
+    dist := 1
+    canCounter := gd2.W.RMin <= dist && dist <= gd2.W.RMax
+    if gd2.S.HP > 0 && canCounter {
+        logs = append(logs, def.Name+" の反撃")
+        gd3, ga3, line2 := gcore.ResolveRoundAt(gd2, ga2, defT, attT, a.RNG)
+        defCount++
+        if line2 != "" { logs = append(logs, line2) }
+        ga2, gd2 = ga3, gd3
+    }
+    // 追撃（AS差>=3）
+    asAtk := gcore.AttackSpeed(ga)
+    asDef := gcore.AttackSpeed(gd)
+    if gd2.S.HP > 0 && gcore.DoubleAdvantage(ga, gd) {
+        logs = append(logs, atk.Name+" の追撃")
+        ga4, gd4, line3 := gcore.ResolveRoundAt(ga2, gd2, attT, defT, a.RNG)
+        atkCount++
+        if line3 != "" { logs = append(logs, line3) }
+        ga2, gd2 = ga4, gd4
+    } else if ga2.S.HP > 0 && canCounter && gcore.DoubleAdvantage(gd, ga) {
+        _ = asAtk; _ = asDef // for symmetry / readability
+        logs = append(logs, def.Name+" の追撃")
+        gd4, ga4, line4 := gcore.ResolveRoundAt(gd2, ga2, defT, attT, a.RNG)
+        defCount++
+        if line4 != "" { logs = append(logs, line4) }
+        ga2, gd2 = ga4, gd4
     }
     logs = append(logs, "戦闘終了")
 
     // UIへHP反映
     atk.HP = ga2.S.HP
     def.HP = gd2.S.HP
-    // 使用回数を1消費（攻撃側先頭装備）
-    if len(atk.Equip) > 0 && atk.Equip[0].Uses > 0 { atk.Equip[0].Uses-- }
+    // 使用回数を消費（攻撃1回ごとに1消費）
+    if len(atk.Equip) > 0 && atk.Equip[0].Uses > 0 {
+        use := atkCount
+        if use > atk.Equip[0].Uses { use = atk.Equip[0].Uses }
+        atk.Equip[0].Uses -= use
+    }
+    if len(def.Equip) > 0 && def.Equip[0].Uses > 0 {
+        use := defCount
+        if use > def.Equip[0].Uses { use = def.Equip[0].Uses }
+        def.Equip[0].Uses -= use
+    }
     units[atkIdx] = atk
     units[defIdx] = def
 
@@ -70,14 +98,13 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
         if c, ok := a.Users.Find(atk.ID); ok {
             c.HP = atk.HP
             c.HPMax = atk.HPMax
-            if len(c.Equip) > 0 && len(atk.Equip) > 0 {
-                c.Equip[0].Uses = atk.Equip[0].Uses
-            }
+            if len(c.Equip) > 0 && len(atk.Equip) > 0 { c.Equip[0].Uses = atk.Equip[0].Uses }
             a.Users.Update(c)
         }
         if c2, ok := a.Users.Find(def.ID); ok {
             c2.HP = def.HP
             c2.HPMax = def.HPMax
+            if len(c2.Equip) > 0 && len(def.Equip) > 0 { c2.Equip[0].Uses = def.Equip[0].Uses }
             a.Users.Update(c2)
         }
         if err := a.Users.Save(); err != nil {
