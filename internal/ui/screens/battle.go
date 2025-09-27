@@ -273,6 +273,41 @@ func DrawBattleLogOverlay(dst *ebiten.Image, logs []string) {
     text.Draw(dst, hint, uicore.FaceSmall, px+(pw-tw)/2, py+ph-16, color.RGBA{210, 220, 240, 255})
 }
 
+// DrawBattleLogOverlayScroll は DrawBattleLogOverlay と同レイアウトで、
+// 末尾からのオフセット（offset行）を指定してスクロール表示します。
+// offset=0 で最新、正の値で過去方向へスクロールします。
+func DrawBattleLogOverlayScroll(dst *ebiten.Image, logs []string, offset int) {
+    if len(logs) == 0 { return }
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    // 背景ディマー
+    vector.DrawFilledRect(dst, 0, 0, float32(sw), float32(sh), color.RGBA{0, 0, 0, 140}, false)
+    // 中央パネル（既存と同寸）
+    pw, ph := int(float32(sw)*0.7), 300
+    px := (sw - pw) / 2
+    py := (sh - ph) / 2
+    uicore.DrawFramedRect(dst, float32(px), float32(py), float32(pw), float32(ph))
+    vector.DrawFilledRect(dst, float32(px), float32(py), float32(pw), float32(ph), color.RGBA{25, 30, 50, 230}, false)
+    text.Draw(dst, "戦闘ログ", uicore.FaceMain, px+16, py+24, uicore.ColAccent)
+    // スクロール
+    maxLines := (ph - uicore.S(64)) / uicore.LineHSmallPx()
+    if maxLines < 1 { maxLines = 1 }
+    if offset < 0 { offset = 0 }
+    if offset > len(logs)-1 { offset = len(logs)-1 }
+    start := len(logs) - maxLines - offset
+    if start < 0 { start = 0 }
+    end := start + maxLines
+    if end > len(logs) { end = len(logs) }
+    y := py + 48
+    for i := start; i < end; i++ {
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, logs[i], px+uicore.S(16), y, uicore.ColText, pw-uicore.S(32), uicore.LineHSmallPx())
+        y += uicore.LineHSmallPx()
+    }
+    // ヒント
+    hint := "上下/ホイールでスクロール・停止で閉じる"
+    tw := text.BoundString(uicore.FaceSmall, hint).Dx()
+    text.Draw(dst, hint, uicore.FaceSmall, px+(pw-tw)/2, py+ph-12, color.RGBA{210, 220, 240, 255})
+}
+
 // DrawBattleLogs は画面下部に戦闘ログを表示します。
 func DrawBattleLogs(dst *ebiten.Image, logs []string) {
     if len(logs) == 0 {

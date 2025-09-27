@@ -1,7 +1,10 @@
 package ui
 
 import (
+    "image/color"
     "github.com/hajimehoshi/ebiten/v2"
+    text "github.com/hajimehoshi/ebiten/v2/text"
+    "github.com/hajimehoshi/ebiten/v2/vector"
     "math/rand"
     uicore "ui_sample/internal/ui/core"
     uipopup "ui_sample/internal/ui/popup"
@@ -37,6 +40,10 @@ func DrawBattleWithTerrain(dst *ebiten.Image, atk, def Unit, attT, defT gcore.Te
     uiscreens.DrawBattleWithTerrain(dst, atk, def, attT, defT, startEnabled)
 }
 func DrawBattleLogOverlay(dst *ebiten.Image, logs []string) { uiscreens.DrawBattleLogOverlay(dst, logs) }
+func DrawBattleLogs(dst *ebiten.Image, logs []string)        { uiscreens.DrawBattleLogs(dst, logs) }
+func DrawBattleLogOverlayScroll(dst *ebiten.Image, logs []string, offset int) {
+    uiscreens.DrawBattleLogOverlayScroll(dst, logs, offset)
+}
 
 // 模擬戦API
 func SimulateBattleCopy(atk, def Unit, rng *rand.Rand) (Unit, Unit, []string) {
@@ -68,6 +75,29 @@ func DrawToBattleButton(dst *ebiten.Image, hovered, enabled bool) {
 }
 func BattleStartButtonRect(sw, sh int) (int, int, int, int) {
     return uiscreens.BattleStartButtonRect(sw, sh)
+}
+// 自動実行ボタンは開始ボタンの右隣に配置する（同サイズ/間隔S(20)）。
+func AutoRunButtonRect(sw, sh int) (int, int, int, int) {
+    bx, by, bw, bh := uiscreens.BattleStartButtonRect(sw, sh)
+    gap := uicore.S(20)
+    return bx + bw + gap, by, bw, bh
+}
+
+// DrawAutoRunButton は自動実行/停止のトグルボタンを描画します。
+func DrawAutoRunButton(dst *ebiten.Image, hovered, running bool) {
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    bx, by, bw, bh := AutoRunButtonRect(sw, sh)
+    uicore.DrawFramedRect(dst, float32(bx), float32(by), float32(bw), float32(bh))
+    base := color.RGBA{110, 90, 40, 255}
+    if running {
+        base = color.RGBA{150, 60, 60, 255}
+    } else if hovered {
+        base = color.RGBA{140, 110, 50, 255}
+    }
+    vector.DrawFilledRect(dst, float32(bx), float32(by), float32(bw), float32(bh), base, false)
+    label := "自動実行"
+    if running { label = "停止" }
+    text.Draw(dst, label, uicore.FaceMain, bx+uicore.S(70), by+uicore.S(38), uicore.ColText)
 }
 
 // 地形ボタンUI

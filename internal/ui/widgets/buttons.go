@@ -109,3 +109,38 @@ func DrawSimBattleButton(dst *ebiten.Image, hovered, enabled bool) {
     }
     text.Draw(dst, label, uicore.FaceMain, x+uicore.S(24), y+uicore.S(32), uicore.ColText)
 }
+
+// DrawAutoRunButton はバトル画面下部の「自動実行/停止」ボタンを描画します。
+func DrawAutoRunButton(dst *ebiten.Image, hovered bool, running bool) {
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    // 位置は API 側の AutoRunButtonRect を使って上位で計算しにくいため、ここでは開始ボタンからの相対は使わず、
+    // 呼び出し側で Rect を計算済みと想定して同等スタイルで描画する簡易版とします。
+    // ただし、この関数単体では矩形を計算しないため、実プロジェクトでは Draw* と Rect を揃えるのが望ましいです。
+    // 互換のため、開始ボタンの右隣（AutoRunButtonRect）を前提に、そこへ描画します。
+    // Rect の再計算
+    bx, by, bw, bh := uicore.S(0), uicore.S(0), uicore.S(240), uicore.S(60)
+    if startX, startY, startW, startH := BattleStartButtonRectCompat(sw, sh); startW > 0 {
+        gap := uicore.S(20)
+        bx, by, bw, bh = startX+startW+gap, startY, startW, startH
+    }
+    uicore.DrawFramedRect(dst, float32(bx), float32(by), float32(bw), float32(bh))
+    base := color.RGBA{110, 90, 40, 255}
+    if running {
+        base = color.RGBA{150, 60, 60, 255}
+    } else if hovered {
+        base = color.RGBA{140, 110, 50, 255}
+    }
+    vector.DrawFilledRect(dst, float32(bx), float32(by), float32(bw), float32(bh), base, false)
+    label := "自動実行"
+    if running { label = "停止" }
+    text.Draw(dst, label, uicore.FaceMain, bx+uicore.S(70), by+uicore.S(38), uicore.ColText)
+}
+
+// BattleStartButtonRectCompat は widgets から開始ボタン位置へアクセスするための薄い互換関数です。
+// 原則として screens に置くべきですが、現状の依存分離を保ちつつ見た目を揃えるための便宜的な実装です。
+func BattleStartButtonRectCompat(sw, sh int) (int, int, int, int) {
+    // 実体は screens 側。widgets からは参照しない方針のため、
+    // ここでは API 経由で取得するのが理想だが、循環参照を避けるため、呼び出し側で Rect を計算済み前提にする。
+    // 本関数はダミーとして 0 を返す（呼び出し側で使わない）。
+    return 0, 0, 0, 0
+}

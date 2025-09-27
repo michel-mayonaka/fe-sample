@@ -59,9 +59,14 @@ type Game struct {
     simSelectStep int // 0=攻撃側選択,1=防御側選択
     chooseHover int
     simTurn int // 1始まり。奇数=左先攻, 偶数=右先攻
+    simLogScroll int
+    simAutoEnded bool
     // 地形選択
     attTerrainSel int
     defTerrainSel int
+    // 自動実行
+    simAuto bool
+    simAutoCooldown int
 
     // 戦闘プレビュー用地形（暫定: 手動切替）
     attTerrain gcore.Terrain
@@ -366,6 +371,8 @@ func (g *Game) Update() error {
         if g.simLogPopup {
             if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || inpututil.IsKeyJustPressed(ebiten.KeyZ) || inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
                 g.simLogPopup = false
+                g.simAutoEnded = false
+                g.simLogScroll = 0
             }
             return nil
         }
@@ -384,6 +391,13 @@ func (g *Game) Update() error {
         assets.Clear()
         // 戦闘開始（コピーでシミュレーション）
         bx2, by2, bw2, bh2 := ui.BattleStartButtonRect(screenW, screenH)
+        // 自動実行ボタン
+        ax, ay, aw, ah := ui.AutoRunButtonRect(screenW, screenH)
+        aHovered := pointIn(mx, my, ax, ay, aw, ah)
+        if aHovered && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+            g.simAuto = !g.simAuto
+            if g.simAuto { g.simLogPopup = false }
+        }
         // 実行可能条件: 両者HP>0
         canStart := g.simAtk.HP > 0 && g.simDef.HP > 0
         leftFirst := (g.simTurn%2 == 1)
@@ -413,6 +427,40 @@ func (g *Game) Update() error {
             }
             g.simLogPopup = true
             g.simTurn++
+        }
+        // 自動実行: 一定クールダウンで連続ターンを再生（決着で停止）
+        if g.simAuto && canStart && !g.simLogPopup {
+            if g.simAutoCooldown > 0 {
+                g.simAutoCooldown--
+            } else {
+                if leftFirst {
+                    a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simAtk, g.simDef, g.attTerrain, g.defTerrain, g.rng)
+                    g.simAtk, g.simDef = a, d
+                    g.simLogs = append(g.simLogs, append([]string{fmt.Sprintf("ターン %d 先攻: %s", g.simTurn, g.simAtk.Name)}, logs...)...)
+                } else {
+                    a, d, logs := ui.SimulateBattleCopyWithTerrain(g.simDef, g.simAtk, g.defTerrain, g.attTerrain, g.rng)
+                    g.simDef, g.simAtk = a, d
+                    g.simLogs = append(g.simLogs, append([]string{fmt.Sprintf("ターン %d 先攻: %s", g.simTurn, g.simDef.Name)}, logs...)...)
+                }
+                g.simTurn++
+                g.simAutoCooldown = 10
+                if g.simAtk.HP <= 0 || g.simDef.HP <= 0 {
+                    g.simAuto = false
+                    g.simLogPopup = true
+                    g.simAutoEnded = true
+                }
+            }
+        }
+        // 自動実行ポップアップのスクロール（ホイール/矢印/PgUp/PgDn）
+        if g.simAuto {
+            _, wy := ebiten.Wheel()
+            if wy != 0 { g.simLogScroll -= int(wy) }
+            if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) { g.simLogScroll++ }
+            if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) { if g.simLogScroll > 0 { g.simLogScroll-- } }
+            if inpututil.IsKeyJustPressed(ebiten.KeyPageUp) { g.simLogScroll += 5 }
+            if inpututil.IsKeyJustPressed(ebiten.KeyPageDown) { g.simLogScroll -= 5; if g.simLogScroll < 0 { g.simLogScroll = 0 } }
+            // 最新追従（自動実行中は新ログでスクロールが負方向にならないよう下限0を保つ）
+            if g.simLogScroll < 0 { g.simLogScroll = 0 }
         }
         // 地形ボタン（クリック選択）
         mx, my := ebiten.CursorPosition()
@@ -488,16 +536,29 @@ func (g *Game) Draw(screen *ebiten.Image) {
         attIdx := g.attTerrainSel
         defIdx := g.defTerrainSel
         ui.DrawTerrainButtons(screen, attIdx, defIdx)
+        // 自動実行ボタン
+        mx, my := ebiten.CursorPosition()
+        ax, ay, aw, ah := ui.AutoRunButtonRect(screenW, screenH)
+        aHovered := pointIn(mx, my, ax, ay, aw, ah)
+        ui.DrawAutoRunButton(screen, aHovered, g.simAuto)
+        // ログ表示（自動実行中はポップアップでスクロール可）
+        if g.simAuto {
+            ui.DrawBattleLogOverlayScroll(screen, g.simLogs, g.simLogScroll)
+        } else if g.simLogPopup {
+            if g.simAutoEnded {
+                ui.DrawBattleLogOverlayScroll(screen, g.simLogs, g.simLogScroll)
+            } else {
+                ui.DrawBattleLogOverlay(screen, g.simLogs)
+            }
+        }
         // 先攻表示（ヘッダ下）
         if g.simTurn <= 0 { g.simTurn = 1 }
         leftFirst := (g.simTurn%2 == 1)
         label := "先攻: "
         if leftFirst { label += g.simAtk.Name } else { label += g.simDef.Name }
         ebitenutil.DebugPrintAt(screen, label, uicore.ListMarginPx()+uicore.S(40), uicore.ListMarginPx()+uicore.S(56))
-        if g.simLogPopup {
-            ui.DrawBattleLogOverlay(screen, g.simLogs)
-        }
-        mx, my := ebiten.CursorPosition()
+        // 既定のポップアップ（上の分岐で描画済み）
+        mx, my = ebiten.CursorPosition()
         bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
         ui.DrawBackButton(screen, pointIn(mx, my, bx, by, bw, bh))
 	}
