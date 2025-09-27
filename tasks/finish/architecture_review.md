@@ -68,3 +68,4 @@
 - tasks/todo_sqlite_prep.md
 
 ステータス: Closed（2025-09-27）。以後は各 TODO ファイルで進捗を管理します。
+
