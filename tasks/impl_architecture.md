@@ -486,3 +486,32 @@ func (b *Battle) Update(ctx *game.Ctx) (game.Scene, error) {
 - 重複ロジックの抽出：
   - `closeSimLogIfRequested`/`handleSimBack`/`updateSimBattleCore` を追加し、Scene更新から利用。
 - ビルド確認: `go build ./cmd/ui_sample` 成功。
+
+フォローアップ修正（2025-09-28 夕）
+
+- 回帰対応: List→Status/Inventory へ遷移不能になっていた問題を修正。
+  - `cmd/ui_sample/scenes.go`
+    - `statusScene` と `invScene` を新規追加。
+    - `listScene.Update` で `modeStatus/modeInventory` を検知して各 Scene を Push。
+  - `cmd/ui_sample/main.go`
+    - Pop 条件を `simScene/statusScene/invScene` に拡張。
+  - 動作: List→Status/Inventory/SimBattle の遷移／戻るが復旧。
+  - `go build ./cmd/ui_sample` 成功。
+
+次セッションへの引き継ぎ（優先度順）
+
+1) app 層への寄せ（Phase2 準備）
+   - `internal/app` に SceneStack 管理を移譲（`App.Update(ctx)/Draw` を追加）。
+   - `game.Ctx` を `DT/Frame` 付きで生成し、`NewGame` にタイマを導入。
+   - `App.ReloadData()` を Backspace 長押しのハンドラに集約（main から切り離し）。
+
+2) 入力抽象の適用完了
+   - 地形切替（1/2/3, Shift+）を `service.Input` の拡張（TerrainAtt1..3 / TerrainDef1..3）で置換。
+   - 画面ヘルプ文言（W/I/E/DELETE）を抽象アクション名・説明に同期。
+
+3) ドキュメント
+   - `docs/ARCHITECTURE.md`: Ctx/Scene/Update順序の簡易図を追加（図示のみ、進捗は記載しない）。
+
+4) テスト
+   - `service.Input` の `Snapshot/Press/Down` のユニットテスト（長押し/連打境界）。
+   - Scene 遷移の最小 E2E（list→status→back, list→inv→back, list→sim→back）。

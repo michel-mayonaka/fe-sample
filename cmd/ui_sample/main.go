@@ -224,8 +224,11 @@ func (g *Game) Update() error {
         ctx := &game.Ctx{ScreenW: screenW, ScreenH: screenH, Input: g.ginput}
         if sc := g.stack.Current(); sc != nil {
             if next, _ := sc.Update(ctx); next != nil { g.stack.Push(next) }
-            // Pop 条件: simScene で一覧へ戻ったらポップ
-            if _, ok := sc.(*simScene); ok && g.mode == modeList { g.stack.Pop() }
+            // Pop 条件: Scene から一覧へ戻ったらポップ
+            switch sc.(type) {
+            case *simScene, *statusScene, *invScene:
+                if g.mode == modeList { g.stack.Pop() }
+            }
         }
         return nil
     }
