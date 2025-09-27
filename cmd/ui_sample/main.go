@@ -56,6 +56,7 @@ type Game struct {
 
     // 戦闘ログ（攻撃→反撃の結果など）
     battleLogs []string
+    battleLogPopup bool
 }
 
 type screenMode int
@@ -124,6 +125,7 @@ func (g *Game) runBattleRound() {
             }
         }
         g.battleLogs = append(g.battleLogs, "戦闘終了")
+        g.battleLogPopup = true
     }
     // 使用回数を1つ消費（攻撃側のみ、従来仕様を踏襲）
     if len(atk.Equip) > 0 && atk.Equip[0].Uses > 0 {
@@ -334,16 +336,26 @@ func (g *Game) Update() error {
     case modeBattle:
         // 戻る
         bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
+        // ログポップアップ表示中はポップアップを優先（クリック/Z/Enterで閉じる）
+        if g.battleLogPopup {
+            if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || inpututil.IsKeyJustPressed(ebiten.KeyZ) || inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+                g.battleLogPopup = false
+            }
+            return nil
+        }
         if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
             g.mode = modeStatus
         }
         // 戦闘開始
         bx2, by2, bw2, bh2 := ui.BattleStartButtonRect(screenW, screenH)
-        if pointIn(mx, my, bx2, by2, bw2, bh2) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+        // 実行可能条件: ログポップアップ非表示 かつ 両者HP>0
+        defIdx := (g.selIndex + 1) % len(g.units)
+        canStart := !g.battleLogPopup && g.units[g.selIndex].HP > 0 && g.units[defIdx].HP > 0
+        if canStart && pointIn(mx, my, bx2, by2, bw2, bh2) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
             g.runBattleRound()
         }
         // キー操作: Z/Enterで戦闘、X/Escで戻る
-        if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyZ) {
+        if canStart && (inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyZ)) {
             g.runBattleRound()
         }
         if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
@@ -420,8 +432,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
         defIdx := (g.selIndex + 1) % len(g.units)
         atk := g.units[g.selIndex]
         def := g.units[defIdx]
-        ui.DrawBattleWithTerrain(screen, atk, def, g.attTerrain, g.defTerrain)
-        ui.DrawBattleLogs(screen, g.battleLogs)
+        canStart := !g.battleLogPopup && atk.HP > 0 && def.HP > 0
+        ui.DrawBattleWithTerrain(screen, atk, def, g.attTerrain, g.defTerrain, canStart)
+        if g.battleLogPopup {
+            ui.DrawBattleLogOverlay(screen, g.battleLogs)
+        }
         mx, my := ebiten.CursorPosition()
         bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
         ui.DrawBackButton(screen, pointIn(mx, my, bx, by, bw, bh))

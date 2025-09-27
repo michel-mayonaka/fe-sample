@@ -32,10 +32,10 @@ func DrawCharacterList(dst *ebiten.Image, units []Unit, hover int) {
 }
 func DrawStatus(dst *ebiten.Image, u Unit)        { uiscreens.DrawStatus(dst, u) }
 func DrawBattle(dst *ebiten.Image, atk, def Unit) { uiscreens.DrawBattle(dst, atk, def) }
-func DrawBattleWithTerrain(dst *ebiten.Image, atk, def Unit, attT, defT gcore.Terrain) {
-    uiscreens.DrawBattleWithTerrain(dst, atk, def, attT, defT)
+func DrawBattleWithTerrain(dst *ebiten.Image, atk, def Unit, attT, defT gcore.Terrain, startEnabled bool) {
+    uiscreens.DrawBattleWithTerrain(dst, atk, def, attT, defT, startEnabled)
 }
-func DrawBattleLogs(dst *ebiten.Image, logs []string) { uiscreens.DrawBattleLogs(dst, logs) }
+func DrawBattleLogOverlay(dst *ebiten.Image, logs []string) { uiscreens.DrawBattleLogOverlay(dst, logs) }
 
 // 模擬戦API
 func DrawSimulationBattle(dst *ebiten.Image, atk, def Unit, logs []string) {

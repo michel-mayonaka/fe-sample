@@ -20,11 +20,12 @@ func BattleStartButtonRect(sw, sh int) (x, y, w, h int) {
 
 // DrawBattle は後方互換（平地扱い）。
 func DrawBattle(dst *ebiten.Image, attacker, defender uicore.Unit) {
-    DrawBattleWithTerrain(dst, attacker, defender, gcore.Terrain{}, gcore.Terrain{})
+    DrawBattleWithTerrain(dst, attacker, defender, gcore.Terrain{}, gcore.Terrain{}, true)
 }
 
 // DrawBattleWithTerrain は左右の地形を指定してプレビューを描画します。
-func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, attT, defT gcore.Terrain) {
+// startEnabled が false の場合、開始ボタンはグレーアウト表示になります。
+func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, attT, defT gcore.Terrain, startEnabled bool) {
     sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
     uicore.DrawPanel(dst, uicore.ListMargin, uicore.ListMargin, float32(sw-2*uicore.ListMargin), float32(sh-2*uicore.ListMargin))
     leftX := uicore.ListMargin + 40
@@ -35,8 +36,14 @@ func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, at
     text.Draw(dst, "戦闘プレビュー", uicore.FaceTitle, sw/2-120, uicore.ListMargin+56, uicore.ColAccent)
     bx, by, bw, bh := BattleStartButtonRect(sw, sh)
     uicore.DrawFramedRect(dst, float32(bx), float32(by), float32(bw), float32(bh))
-    vector.DrawFilledRect(dst, float32(bx), float32(by), float32(bw), float32(bh), color.RGBA{110, 90, 40, 255}, false)
-    text.Draw(dst, "戦闘開始", uicore.FaceMain, bx+70, by+38, uicore.ColText)
+    fill := color.RGBA{110, 90, 40, 255}
+    labelCol := uicore.ColText
+    if !startEnabled {
+        fill = color.RGBA{80, 80, 80, 200}
+        labelCol = color.RGBA{200, 200, 200, 180}
+    }
+    vector.DrawFilledRect(dst, float32(bx), float32(by), float32(bw), float32(bh), fill, false)
+    text.Draw(dst, "戦闘開始", uicore.FaceMain, bx+70, by+38, labelCol)
 
     // 予測値表示（/pkg/game.ForecastAt）
     if frAtk, frAtkBk, frDef, frDefBk, canCounter, ok := forecastBothWithTerrainExplain(attacker, defender, attT, defT); ok {
@@ -243,6 +250,38 @@ func triangleLabel(attType, defType string) (string, color.Color) {
         }
     }
     return "中立", color.RGBA{180, 180, 180, 255}
+}
+
+// DrawBattleLogOverlay は全画面を半透明で覆い、中央にログを表示します。
+// 末尾に「クリックまたはZ/Enterで閉じる」ガイドを表示します。
+func DrawBattleLogOverlay(dst *ebiten.Image, logs []string) {
+    if len(logs) == 0 {
+        return
+    }
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    // 背景ディマー
+    vector.DrawFilledRect(dst, 0, 0, float32(sw), float32(sh), color.RGBA{0, 0, 0, 140}, false)
+    // 中央パネル
+    pw, ph := int(float32(sw)*0.7), 300
+    px := (sw - pw) / 2
+    py := (sh - ph) / 2
+    uicore.DrawFramedRect(dst, float32(px), float32(py), float32(pw), float32(ph))
+    vector.DrawFilledRect(dst, float32(px), float32(py), float32(pw), float32(ph), color.RGBA{25, 30, 50, 230}, false)
+    text.Draw(dst, "戦闘ログ", uicore.FaceMain, px+16, py+32, uicore.ColAccent)
+    // ログ本文（下に新しいもの）
+    maxLines := (ph - 80) / uicore.LineHSmall
+    start := 0
+    if len(logs) > maxLines {
+        start = len(logs) - maxLines
+    }
+    y := py + 58
+    for i := start; i < len(logs); i++ {
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, logs[i], px+16, y, uicore.ColText, pw-32, uicore.LineHSmall)
+        y += uicore.LineHSmall
+    }
+    hint := "クリック または Z/Enter で閉じる"
+    tw := text.BoundString(uicore.FaceSmall, hint).Dx()
+    text.Draw(dst, hint, uicore.FaceSmall, px+(pw-tw)/2, py+ph-16, color.RGBA{210, 220, 240, 255})
 }
 
 // DrawBattleLogs は画面下部に戦闘ログを表示します。
