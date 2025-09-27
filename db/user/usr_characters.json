@@ -5,6 +5,7 @@
     "class": "ペガサスナイト",
     "portrait": "assets/01_iris.png",
     "level": 20,
+    "hp": 4,
     "hp_max": 26,
     "stats": {
       "Str": 17,
@@ -42,7 +43,7 @@
     "equip": [
       {
         "name": "アイアンランス",
-        "uses": 30,
+        "uses": 21,
         "max": 45
       },
       {
@@ -63,7 +64,6 @@
     "class": "傭兵",
     "portrait": "assets/02_loyd.png",
     "level": 20,
-    "hp": 3,
     "hp_max": 35,
     "stats": {
       "Str": 17,

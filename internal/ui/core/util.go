@@ -1,9 +1,13 @@
 package uicore
 
 import (
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"strconv"
-	"ui_sample/internal/user"
+    "github.com/hajimehoshi/ebiten/v2"
+    text "github.com/hajimehoshi/ebiten/v2/text"
+    "github.com/hajimehoshi/ebiten/v2/ebitenutil"
+    "golang.org/x/image/font"
+    "image/color"
+    "strconv"
+    "ui_sample/internal/user"
 )
 
 func Itoa(n int) string { return strconv.Itoa(n) }
@@ -42,4 +46,30 @@ func LoadUnitsFromUser(path string) ([]Unit, error) {
 		units = append(units, UnitFromUser(c))
 	}
 	return units, nil
+}
+
+// DrawWrapped は文字列を最大幅 maxW で折り返して描画します。
+// 戻り値は最後に描画した行のY座標（次の行を書く起点）です。
+func DrawWrapped(dst *ebiten.Image, face font.Face, s string, x, y int, col color.Color, maxW, lineH int) int {
+    if maxW <= 0 {
+        text.Draw(dst, s, face, x, y, col)
+        return y + lineH
+    }
+    // ルーン単位で貪欲折り返し
+    line := ""
+    for _, r := range s {
+        trial := line + string(r)
+        if text.BoundString(face, trial).Dx() > maxW {
+            text.Draw(dst, line, face, x, y, col)
+            y += lineH
+            line = string(r)
+            continue
+        }
+        line = trial
+    }
+    if line != "" {
+        text.Draw(dst, line, face, x, y, col)
+        y += lineH
+    }
+    return y
 }

@@ -35,6 +35,7 @@ func DrawBattle(dst *ebiten.Image, atk, def Unit) { uiscreens.DrawBattle(dst, at
 func DrawBattleWithTerrain(dst *ebiten.Image, atk, def Unit, attT, defT gcore.Terrain) {
     uiscreens.DrawBattleWithTerrain(dst, atk, def, attT, defT)
 }
+func DrawBattleLogs(dst *ebiten.Image, logs []string) { uiscreens.DrawBattleLogs(dst, logs) }
 
 // 模擬戦API
 func DrawSimulationBattle(dst *ebiten.Image, atk, def Unit, logs []string) {

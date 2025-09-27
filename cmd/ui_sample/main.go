@@ -3,6 +3,7 @@
 package main
 
 import (
+    "fmt"
     "image/color"
     "math/rand"
     "time"
@@ -52,6 +53,9 @@ type Game struct {
     // 戦闘プレビュー用地形（暫定: 手動切替）
     attTerrain gcore.Terrain
     defTerrain gcore.Terrain
+
+    // 戦闘ログ（攻撃→反撃の結果など）
+    battleLogs []string
 }
 
 type screenMode int
@@ -82,11 +86,22 @@ func (g *Game) runBattleRound() {
     if err == nil {
         ga := toGameUnit(wt, atk)
         gd := toGameUnit(wt, def)
-        // 地形（暫定: 平地固定）
-        attT := gcore.Terrain{}
-        defT := gcore.Terrain{}
+        // 地形（現在のプレビュー設定を適用）
+        attT := g.attTerrain
+        defT := g.defTerrain
+        // ログ初期化
+        g.battleLogs = append(g.battleLogs[:0], "戦闘開始")
+        g.battleLogs = append(g.battleLogs, atk.Name+" の攻撃")
         // 1ラウンド攻撃
         ga2, gd2, _ := gcore.ResolveRoundAt(ga, gd, attT, defT, g.rng)
+        // 直近の ResolveRoundAt 内部メッセージは取得していないため、HP差から簡易ログを補足
+        if gd.S.HP != gd2.S.HP {
+            dmg := gd.S.HP - gd2.S.HP
+            if dmg < 0 { dmg = 0 }
+            g.battleLogs = append(g.battleLogs, fmt.Sprintf("命中! %dダメージ (HP %d)", dmg, gd2.S.HP))
+        } else {
+            g.battleLogs = append(g.battleLogs, "ミス!")
+        }
         // 反映
         def.HP = gd2.S.HP
         atk.HP = ga2.S.HP // 現状は変化しないが将来の効果に備えて
@@ -95,11 +110,20 @@ func (g *Game) runBattleRound() {
             dist := 1
             canCounter := gd2.W.RMin <= dist && dist <= gd2.W.RMax
             if canCounter {
+                g.battleLogs = append(g.battleLogs, def.Name+" の反撃")
                 gd3, ga3, _ := gcore.ResolveRoundAt(gd2, ga2, defT, attT, g.rng)
+                if ga2.S.HP != ga3.S.HP {
+                    dmg := ga2.S.HP - ga3.S.HP
+                    if dmg < 0 { dmg = 0 }
+                    g.battleLogs = append(g.battleLogs, fmt.Sprintf("命中! %dダメージ (HP %d)", dmg, ga3.S.HP))
+                } else {
+                    g.battleLogs = append(g.battleLogs, "ミス!")
+                }
                 atk.HP = ga3.S.HP
                 def.HP = gd3.S.HP
             }
         }
+        g.battleLogs = append(g.battleLogs, "戦闘終了")
     }
     // 使用回数を1つ消費（攻撃側のみ、従来仕様を踏襲）
     if len(atk.Equip) > 0 && atk.Equip[0].Uses > 0 {
@@ -294,6 +318,7 @@ func (g *Game) Update() error {
         if pointIn(mx, my, sbx, sby, sbw, sbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
             if len(g.units) > 1 {
                 g.mode = modeBattle
+                g.battleLogs = nil
             }
         }
         // キー操作: X/Escで戻る、Z/Enterで戦闘へ
@@ -303,6 +328,7 @@ func (g *Game) Update() error {
         if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyZ) {
             if len(g.units) > 1 {
                 g.mode = modeBattle
+                g.battleLogs = nil
             }
         }
     case modeBattle:
@@ -395,6 +421,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
         atk := g.units[g.selIndex]
         def := g.units[defIdx]
         ui.DrawBattleWithTerrain(screen, atk, def, g.attTerrain, g.defTerrain)
+        ui.DrawBattleLogs(screen, g.battleLogs)
         mx, my := ebiten.CursorPosition()
         bx, by, bw, bh := ui.BackButtonRect(screenW, screenH)
         ui.DrawBackButton(screen, pointIn(mx, my, bx, by, bw, bh))

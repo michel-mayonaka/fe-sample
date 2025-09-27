@@ -43,46 +43,51 @@ func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, at
         // 左側（攻撃側の予測）
         ax := leftX
         ay := topY + 460
-        text.Draw(dst, fmt.Sprintf("命中 %d%%  与ダメ %d  必殺 %d%%", frAtk.HitDisp, frAtk.Dmg, frAtk.Crit), uicore.FaceMain, ax, ay, uicore.ColText)
+        baseLine := fmt.Sprintf("命中 %d%%  与ダメ %d  必殺 %d%%", frAtk.HitDisp, frAtk.Dmg, frAtk.Crit)
+        text.Draw(dst, baseLine, uicore.FaceMain, ax, ay, uicore.ColText)
+        // 相性を同一行の末尾に配置
+        if wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json"); err == nil {
+            aType := weaponTypeOf(wt, attacker)
+            dType := weaponTypeOf(wt, defender)
+            lbl, col := triangleLabel(aType, dType)
+            w := text.BoundString(uicore.FaceMain, baseLine).Dx()
+            text.Draw(dst, "  相性: ", uicore.FaceMain, ax+w+8, ay, uicore.ColText)
+            w2 := text.BoundString(uicore.FaceMain, "  相性: ").Dx()
+            text.Draw(dst, lbl, uicore.FaceMain, ax+w+8+w2, ay, col)
+        }
         // 右側（反撃側の予測）
         dx := rightX
         dy := topY + 460
         if canCounter {
-            text.Draw(dst, fmt.Sprintf("(反撃) 命中 %d%%  与ダメ %d  必殺 %d%%", frDef.HitDisp, frDef.Dmg, frDef.Crit), uicore.FaceMain, dx, dy, uicore.ColText)
+            baseLineR := fmt.Sprintf("(反撃) 命中 %d%%  与ダメ %d  必殺 %d%%", frDef.HitDisp, frDef.Dmg, frDef.Crit)
+            _ = uicore.DrawWrapped(dst, uicore.FaceMain, baseLineR, dx, dy, uicore.ColText, 520, uicore.LineHMain)
         } else {
-            text.Draw(dst, "(反撃不可) 命中 -  与ダメ -  必殺 -", uicore.FaceMain, dx, dy, color.RGBA{180,180,180,255})
+            _ = uicore.DrawWrapped(dst, uicore.FaceMain, "(反撃不可) 命中 -  与ダメ -  必殺 -", dx, dy, color.RGBA{180,180,180,255}, 520, uicore.LineHMain)
         }
         // 地形表示
-        text.Draw(dst, terrainLabel(attT), uicore.FaceSmall, ax, ay+26, color.RGBA{200,220,255,255})
-        text.Draw(dst, terrainLabel(defT), uicore.FaceSmall, dx, dy+26, color.RGBA{200,220,255,255})
-        // 内訳（簡潔表示）
-        text.Draw(dst, fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, terrainLabel(attT), ax, ay+26, color.RGBA{200,220,255,255}, 820, uicore.LineHSmall)
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, terrainLabel(defT), dx, dy+26, color.RGBA{200,220,255,255}, 520, uicore.LineHSmall)
+        // 内訳（簡潔表示）: 折り返し描画
+        leftHitLine := fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
             frAtkBk.WeapHit, frAtkBk.Skl2, frAtkBk.LckHalf, frAtkBk.AttTileHit,
-            frAtkBk.DefSpd2, frAtkBk.DefLck, frAtkBk.DefTileAvoid, frAtkBk.TriangleHit, frAtkBk.HitDisp,
-        ), uicore.FaceSmall, ax, ay+50, color.RGBA{210,230,255,255})
-        text.Draw(dst, fmt.Sprintf("[与ダメ内訳] 力:%d + 威力:%d + 相性:%+d - 守備合計:%d = %d",
-            frAtkBk.AtkStr, frAtkBk.WpnMt, frAtkBk.TriangleMt, frAtkBk.DefTotal, frAtkBk.Dmg,
-        ), uicore.FaceSmall, ax, ay+70, color.RGBA{210,230,255,255})
+            frAtkBk.DefSpd2, frAtkBk.DefLck, frAtkBk.DefTileAvoid, frAtkBk.TriangleHit, frAtkBk.HitDisp)
+        y2 := uicore.DrawWrapped(dst, uicore.FaceSmall, leftHitLine, ax, ay+50, color.RGBA{210,230,255,255}, 820, uicore.LineHSmall)
+        leftDmgLine := fmt.Sprintf("[与ダメ内訳] 力:%d + 威力:%d + 相性:%+d - 守備合計:%d = %d",
+            frAtkBk.AtkStr, frAtkBk.WpnMt, frAtkBk.TriangleMt, frAtkBk.DefTotal, frAtkBk.Dmg)
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, leftDmgLine, ax, y2, color.RGBA{210,230,255,255}, 820, uicore.LineHSmall)
         if canCounter {
-            text.Draw(dst, fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
+            rightHit := fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
                 frDefBk.WeapHit, frDefBk.Skl2, frDefBk.LckHalf, frDefBk.AttTileHit,
-                frDefBk.DefSpd2, frDefBk.DefLck, frDefBk.DefTileAvoid, frDefBk.TriangleHit, frDefBk.HitDisp,
-            ), uicore.FaceSmall, dx, dy+50, color.RGBA{210,230,255,255})
-            text.Draw(dst, fmt.Sprintf("[与ダメ内訳] 力:%d + 威力:%d + 相性:%+d - 守備合計:%d = %d",
-                frDefBk.AtkStr, frDefBk.WpnMt, frDefBk.TriangleMt, frDefBk.DefTotal, frDefBk.Dmg,
-            ), uicore.FaceSmall, dx, dy+70, color.RGBA{210,230,255,255})
+                frDefBk.DefSpd2, frDefBk.DefLck, frDefBk.DefTileAvoid, frDefBk.TriangleHit, frDefBk.HitDisp)
+            yR := uicore.DrawWrapped(dst, uicore.FaceSmall, rightHit, dx, dy+50, color.RGBA{210,230,255,255}, 520, uicore.LineHSmall)
+            rightDmg := fmt.Sprintf("[与ダメ内訳] 力:%d + 威力:%d + 相性:%+d - 守備合計:%d = %d",
+                frDefBk.AtkStr, frDefBk.WpnMt, frDefBk.TriangleMt, frDefBk.DefTotal, frDefBk.Dmg)
+            _ = uicore.DrawWrapped(dst, uicore.FaceSmall, rightDmg, dx, yR, color.RGBA{210,230,255,255}, 520, uicore.LineHSmall)
         }
     }
 
-    // 相性ラベル
-    if wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json"); err == nil {
-        aType := weaponTypeOf(wt, attacker)
-        dType := weaponTypeOf(wt, defender)
-        lbl, col := triangleLabel(aType, dType)
-        text.Draw(dst, "相性: "+lbl, uicore.FaceMain, leftX, topY+490, col)
-    }
-    // ヘルプ: 地形切替
-    text.Draw(dst, "[地形切替] 攻: 1=平地 2=森 3=砦 / 防: Shift+1/2/3", uicore.FaceSmall, leftX, topY+516, color.RGBA{190,200,210,255})
+    // ヘルプ: 地形切替（下部寄せ）
+    text.Draw(dst, "[地形切替] 攻: 1=平地 2=森 3=砦 / 防: Shift+1/2/3", uicore.FaceSmall, leftX, sh-uicore.ListMargin-190, color.RGBA{190,200,210,255})
 }
 
 func drawBattleSide(dst *ebiten.Image, u uicore.Unit, x, y int) {
@@ -238,4 +243,28 @@ func triangleLabel(attType, defType string) (string, color.Color) {
         }
     }
     return "中立", color.RGBA{180, 180, 180, 255}
+}
+
+// DrawBattleLogs は画面下部に戦闘ログを表示します。
+func DrawBattleLogs(dst *ebiten.Image, logs []string) {
+    if len(logs) == 0 {
+        return
+    }
+    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
+    w, h := sw-2*uicore.ListMargin-80, 160
+    x := uicore.ListMargin + 40
+    y := sh - uicore.ListMargin - h - 10
+    uicore.DrawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
+    vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), color.RGBA{25, 30, 50, 220}, false)
+    text.Draw(dst, "戦闘ログ", uicore.FaceMain, x+12, y+24, uicore.ColAccent)
+    maxLines := (h - 40) / uicore.LineHSmall
+    lineY := y + 40
+    start := 0
+    if len(logs) > maxLines {
+        start = len(logs) - maxLines
+    }
+    for i := start; i < len(logs); i++ {
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, logs[i], x+12, lineY, uicore.ColText, w-24, uicore.LineHSmall)
+        lineY += uicore.LineHSmall
+    }
 }
