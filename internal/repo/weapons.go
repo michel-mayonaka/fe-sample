@@ -1,0 +1,38 @@
+package repo
+
+import (
+    "ui_sample/internal/model"
+)
+
+// WeaponsRepo は武器定義へアクセスするための最小インタフェースです。
+type WeaponsRepo interface {
+    // Find は武器名で定義を取得します。
+    Find(name string) (model.Weapon, bool)
+    // Table は内部テーブルへの参照を返します（読み取り専用の想定）。
+    Table() *model.WeaponTable
+}
+
+// JSONWeaponsRepo は JSON から読み込む簡易実装です（起動時に1度ロード）。
+type JSONWeaponsRepo struct {
+    path  string
+    table *model.WeaponTable
+}
+
+// NewJSONWeaponsRepo は武器定義をロードしてキャッシュします。
+func NewJSONWeaponsRepo(path string) (*JSONWeaponsRepo, error) {
+    wt, err := model.LoadWeaponsJSON(path)
+    if err != nil {
+        return nil, err
+    }
+    return &JSONWeaponsRepo{path: path, table: wt}, nil
+}
+
+func (r *JSONWeaponsRepo) Find(name string) (model.Weapon, bool) {
+    if r == nil || r.table == nil {
+        return model.Weapon{}, false
+    }
+    return r.table.Find(name)
+}
+
+func (r *JSONWeaponsRepo) Table() *model.WeaponTable { return r.table }
+

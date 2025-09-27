@@ -3,7 +3,6 @@
 package main
 
 import (
-    "fmt"
     "image/color"
     "math/rand"
     "time"
@@ -11,8 +10,10 @@ import (
     "github.com/hajimehoshi/ebiten/v2"
     "github.com/hajimehoshi/ebiten/v2/ebitenutil"
     "github.com/hajimehoshi/ebiten/v2/inpututil"
+    "ui_sample/internal/app"
+    "ui_sample/internal/config"
+    "ui_sample/internal/repo"
     "ui_sample/internal/game"
-    "ui_sample/internal/model"
     "ui_sample/internal/ui"
     "ui_sample/internal/user"
     gcore "ui_sample/pkg/game"
@@ -57,6 +58,9 @@ type Game struct {
     // 戦闘ログ（攻撃→反撃の結果など）
     battleLogs []string
     battleLogPopup bool
+
+    // App（ユースケース）
+    app *app.App
 }
 
 type screenMode int
@@ -74,103 +78,39 @@ func pointIn(px, py, x, y, w, h int) bool {
 
 // 簡易戦闘の1ラウンドを実行し、結果をUIとユーザJSONへ反映します。
 func (g *Game) runBattleRound() {
-    if len(g.units) < 2 {
-        return
+    if g.app == nil { return }
+    updated, logs, popup, _ := g.app.RunBattleRound(g.units, g.selIndex, g.attTerrain, g.defTerrain)
+    // UI状態に反映
+    g.units = updated
+    if g.selIndex >= 0 && g.selIndex < len(g.units) {
+        g.unit = g.units[g.selIndex]
     }
-    atkIdx := g.selIndex
-    defIdx := (g.selIndex + 1) % len(g.units)
-    atk := g.units[atkIdx]
-    def := g.units[defIdx]
-
-    // 武器定義を読み込み、/pkg/game.Unit へ変換
-    wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json")
-    if err == nil {
-        ga := toGameUnit(wt, atk)
-        gd := toGameUnit(wt, def)
-        // 地形（現在のプレビュー設定を適用）
-        attT := g.attTerrain
-        defT := g.defTerrain
-        // ログ初期化
-        g.battleLogs = append(g.battleLogs[:0], "戦闘開始")
-        g.battleLogs = append(g.battleLogs, atk.Name+" の攻撃")
-        // 1ラウンド攻撃
-        ga2, gd2, _ := gcore.ResolveRoundAt(ga, gd, attT, defT, g.rng)
-        // 直近の ResolveRoundAt 内部メッセージは取得していないため、HP差から簡易ログを補足
-        if gd.S.HP != gd2.S.HP {
-            dmg := gd.S.HP - gd2.S.HP
-            if dmg < 0 { dmg = 0 }
-            g.battleLogs = append(g.battleLogs, fmt.Sprintf("命中! %dダメージ (HP %d)", dmg, gd2.S.HP))
-        } else {
-            g.battleLogs = append(g.battleLogs, "ミス!")
-        }
-        // 反映
-        def.HP = gd2.S.HP
-        atk.HP = ga2.S.HP // 現状は変化しないが将来の効果に備えて
-        // 反撃（距離1想定、射程判定）
-        if def.HP > 0 {
-            dist := 1
-            canCounter := gd2.W.RMin <= dist && dist <= gd2.W.RMax
-            if canCounter {
-                g.battleLogs = append(g.battleLogs, def.Name+" の反撃")
-                gd3, ga3, _ := gcore.ResolveRoundAt(gd2, ga2, defT, attT, g.rng)
-                if ga2.S.HP != ga3.S.HP {
-                    dmg := ga2.S.HP - ga3.S.HP
-                    if dmg < 0 { dmg = 0 }
-                    g.battleLogs = append(g.battleLogs, fmt.Sprintf("命中! %dダメージ (HP %d)", dmg, ga3.S.HP))
-                } else {
-                    g.battleLogs = append(g.battleLogs, "ミス!")
-                }
-                atk.HP = ga3.S.HP
-                def.HP = gd3.S.HP
+    g.battleLogs = logs
+    g.battleLogPopup = popup
+    // ローカルの userTable が存在する場合は同期（簡易）
+    if g.userTable != nil {
+        atkIdx := g.selIndex
+        defIdx := (g.selIndex + 1) % len(g.units)
+        atk := g.units[atkIdx]
+        def := g.units[defIdx]
+        if c, ok := g.userTable.Find(atk.ID); ok {
+            c.HP = atk.HP
+            c.HPMax = atk.HPMax
+            if len(c.Equip) > 0 && len(atk.Equip) > 0 {
+                c.Equip[0].Uses = atk.Equip[0].Uses
             }
+            g.userTable.UpdateCharacter(c)
         }
-        g.battleLogs = append(g.battleLogs, "戦闘終了")
-        g.battleLogPopup = true
+        if c2, ok := g.userTable.Find(def.ID); ok {
+            c2.HP = def.HP
+            c2.HPMax = def.HPMax
+            g.userTable.UpdateCharacter(c2)
+        }
     }
-    // 使用回数を1つ消費（攻撃側のみ、従来仕様を踏襲）
-    if len(atk.Equip) > 0 && atk.Equip[0].Uses > 0 {
-        atk.Equip[0].Uses--
-    }
-
-	// 反映
-	g.units[atkIdx] = atk
-	g.units[defIdx] = def
-	g.unit = atk
-
-	// 保存（両者）
-	if g.userTable != nil {
-		if c, ok := g.userTable.Find(atk.ID); ok {
-			c.HP = atk.HP
-			c.HPMax = atk.HPMax
-			// 装備の使用回数反映（先頭のみ簡易）
-			if len(c.Equip) > 0 && len(atk.Equip) > 0 {
-				c.Equip[0].Uses = atk.Equip[0].Uses
-			}
-			g.userTable.UpdateCharacter(c)
-		}
-		if c2, ok := g.userTable.Find(def.ID); ok {
-			c2.HP = def.HP
-			c2.HPMax = def.HPMax
-			g.userTable.UpdateCharacter(c2)
-		}
-		_ = g.userTable.Save(g.userPath)
-	}
 }
 
 // toGameUnit は UIユニットを /pkg/game.Unit に変換します。
-func toGameUnit(wt *model.WeaponTable, u ui.Unit) gcore.Unit {
-    var w model.Weapon
-    if len(u.Equip) > 0 {
-        if ww, ok := wt.Find(u.Equip[0].Name); ok {
-            w = ww
-        }
-    }
-    return gcore.Unit{
-        ID: u.ID, Name: u.Name, Class: u.Class, Lv: u.Level,
-        S: gcore.Stats{HP: u.HP, Str: u.Stats.Str, Skl: u.Stats.Skl, Spd: u.Stats.Spd, Lck: u.Stats.Lck, Def: u.Stats.Def, Res: u.Stats.Res, Mov: u.Stats.Mov},
-        W: gcore.Weapon{MT: w.Might, Hit: w.Hit, Crit: w.Crit, Wt: w.Weight, RMin: w.RangeMin, RMax: w.RangeMax, Type: w.Type},
-    }
-}
+// toGameUnit は adapter に移行済み（使用箇所は削除）。
 
 func terrainPlain() gcore.Terrain  { return gcore.Terrain{Avoid: 0, Def: 0, Hit: 0} }
 func terrainForest() gcore.Terrain { return gcore.Terrain{Avoid: 20, Def: 1, Hit: 0} }
@@ -180,7 +120,7 @@ func terrainFort() gcore.Terrain   { return gcore.Terrain{Avoid: 15, Def: 2, Hit
 func NewGame() *Game {
     g := &Game{}
 	g.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
-	g.userPath = "db/user/usr_characters.json"
+	g.userPath = config.DefaultUserPath
 	if ut, err := user.LoadFromJSON(g.userPath); err == nil {
 		g.userTable = ut
 	}
@@ -200,7 +140,22 @@ func NewGame() *Game {
     // 地形の初期値（平地）
     g.attTerrain = gcore.Terrain{}
     g.defTerrain = gcore.Terrain{}
+
+    // App 初期化
+    if ur, err := appInitUserRepo(g.userPath); err == nil {
+        if wr, err2 := appInitWeaponsRepo(config.DefaultWeaponsPath); err2 == nil {
+            g.app = app.New(ur, wr, g.rng)
+        }
+    }
     return g
+}
+
+func appInitUserRepo(path string) (*repo.JSONUserRepo, error) {
+    return repo.NewJSONUserRepo(path)
+}
+
+func appInitWeaponsRepo(path string) (*repo.JSONWeaponsRepo, error) {
+    return repo.NewJSONWeaponsRepo(path)
 }
 
 // Update は毎フレームの更新処理を行います。
