@@ -13,7 +13,14 @@ import (
     "ui_sample/internal/user"
 )
 
-// Status はステータス画面の Scene です（character_list 準拠の構成）。
+// Status はステータス画面の Scene 実装です。
+//
+// 主な責務:
+// - 選択ユニットの基礎情報・装備・能力を表示
+// - レベルアップのポップアップ表示と確定
+// - 装備スロット選択から在庫画面への遷移
+//
+// 更新フローは character_list と同一で、Update → scHandleInput → scAdvance → scFlush の順で処理します。
 type Status struct{
     E *scenes.Env
     pop bool
@@ -42,23 +49,28 @@ const (
 type Intent struct{ Kind IntentKind; Index int }
 func (Intent) IsSceneIntent() {}
 
-type stContract interface{
-    stHandleInput(ctx *game.Ctx) []scenes.Intent
-    stAdvance([]scenes.Intent)
-    stFlush(ctx *game.Ctx)
+// scContract はパッケージ内コンパイル保証のためのインターフェースです。
+// Status が必要な sc* メソッドを実装していることを確認します。
+type scContract interface{
+    scHandleInput(ctx *game.Ctx) []scenes.Intent
+    scAdvance([]scenes.Intent)
+    scFlush(ctx *game.Ctx)
 }
-var _ stContract = (*Status)(nil)
+var _ scContract = (*Status)(nil)
 
+// Update は状態更新の入口です。
+// フロー: scHandleInput → scAdvance → scFlush。次シーンを返す場合は在庫画面などの遷移先を返却します。
 func (s *Status) Update(ctx *game.Ctx) (game.Scene, error) {
     s.sw, s.sh = ctx.ScreenW, ctx.ScreenH
-    intents := s.stHandleInput(ctx)
-    s.stAdvance(intents)
-    s.stFlush(ctx)
+    intents := s.scHandleInput(ctx)
+    s.scAdvance(intents)
+    s.scFlush(ctx)
     nxt := s.next
     s.next = nil
     return nxt, nil
 }
 
+// Draw はステータス UI、戻る/レベルアップボタン、必要に応じてポップアップを描画します。
 func (s *Status) Draw(dst *ebiten.Image) {
     // 本体（ステータス）
     unit := s.E.Selected()
@@ -76,9 +88,10 @@ func (s *Status) Draw(dst *ebiten.Image) {
     ebitenutil.DebugPrintAt(dst, "装備: E/数字/DELETE で操作", uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10))
 }
 
-// --- 内部: handle → advance → flush -------------------------------------------------
+// --- 内部: scHandleInput → scAdvance → scFlush --------------------------------------
 
-func (s *Status) stHandleInput(ctx *game.Ctx) []scenes.Intent {
+// scHandleInput は“入力→意図(Intent)”へ変換し、ホバー状態やポップアップの直後状態を更新します。
+func (s *Status) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     intents := make([]scenes.Intent, 0, 4)
     mx, my := ebiten.CursorPosition()
     wasPopup := s.E != nil && s.E.PopupActive
@@ -119,7 +132,8 @@ func (s *Status) stHandleInput(ctx *game.Ctx) []scenes.Intent {
     return intents
 }
 
-func (s *Status) stAdvance(intents []scenes.Intent) {
+// scAdvance は意図に基づき、戻る・ポップアップ閉鎖・レベルアップ・在庫遷移などの状態変更を行います。
+func (s *Status) scAdvance(intents []scenes.Intent) {
     for _, any := range intents {
         it, ok := any.(Intent); if !ok { continue }
         switch it.Kind {
@@ -172,4 +186,5 @@ func (s *Status) stAdvance(intents []scenes.Intent) {
     }
 }
 
-func (s *Status) stFlush(_ *game.Ctx) { /* 今はなし */ }
+// scFlush はフレーム末尾の副作用処理用フックです（現状なし）。
+func (s *Status) scFlush(_ *game.Ctx) { /* 今はなし */ }

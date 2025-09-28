@@ -13,7 +13,14 @@ import (
     gcore "ui_sample/pkg/game"
 )
 
-// Sim シーン（模擬戦）: character_list 準拠の更新フロー
+// Sim は模擬戦画面の Scene 実装です。
+//
+// 主な責務:
+// - 攻撃側/防御側の一時ユニットを保持し、戦闘をシミュレート
+// - 地形選択・自動実行トグルなどの入力を意図(Intent)へ変換
+// - ログのポップアップ表示と遷移終了（戻る）判定
+//
+// 更新フローは character_list と同一で、Update → scHandleInput → scAdvance → scFlush の順で処理します。
 type Sim struct{
     E *scenes.Env
     simAtk uicore.Unit
@@ -55,21 +62,26 @@ const (
 type Intent struct{ Kind IntentKind; Index int }
 func (Intent) IsSceneIntent() {}
 
-type smContract interface{
-    smHandleInput(ctx *game.Ctx) []scenes.Intent
-    smAdvance([]scenes.Intent)
-    smFlush(ctx *game.Ctx)
+// scContract はパッケージ内コンパイル保証のためのインターフェースです。
+// Sim が必要な sc* メソッドを実装していることを確認します。
+type scContract interface{
+    scHandleInput(ctx *game.Ctx) []scenes.Intent
+    scAdvance([]scenes.Intent)
+    scFlush(ctx *game.Ctx)
 }
-var _ smContract = (*Sim)(nil)
+var _ scContract = (*Sim)(nil)
 
+// Update は状態更新の入口です。
+// フロー: scHandleInput → scAdvance → scFlush。次シーンは本シーン内で完結するため nil を返します。
 func (s *Sim) Update(ctx *game.Ctx) (game.Scene, error) {
     s.sw, s.sh = ctx.ScreenW, ctx.ScreenH
-    intents := s.smHandleInput(ctx)
-    s.smAdvance(intents)
-    s.smFlush(ctx)
+    intents := s.scHandleInput(ctx)
+    s.scAdvance(intents)
+    s.scFlush(ctx)
     return nil, nil
 }
 
+// runOne は 1 ターン分の戦闘を実行し、結果ログを追加します。
 func (s *Sim) runOne(leftFirst bool){
     if leftFirst {
         a,d,lines := scenes.SimulateBattleCopyWithTerrain(s.simAtk, s.simDef, s.attTerrain, s.defTerrain, s.E.RNG)
@@ -81,6 +93,7 @@ func (s *Sim) runOne(leftFirst bool){
     s.logPopup=true; s.turn++
 }
 
+// Draw は模擬戦の盤面・UI とログポップアップを描画します。
 func (s *Sim) Draw(dst *ebiten.Image){
     canStart := s.simAtk.HP>0 && s.simDef.HP>0 && !s.logPopup
     scenes.DrawBattleWithTerrain(dst, s.simAtk, s.simDef, s.attTerrain, s.defTerrain, canStart)
@@ -98,9 +111,10 @@ func (s *Sim) Draw(dst *ebiten.Image){
     uiwidgets.DrawBackButton(dst, s.backHovered)
 }
 
-// --- 内部: handle → advance → flush -------------------------------------------------
+// --- 内部: scHandleInput → scAdvance → scFlush --------------------------------------
 
-func (s *Sim) smHandleInput(ctx *game.Ctx) []scenes.Intent {
+// scHandleInput は“入力→意図(Intent)”へ変換し、描画用のホバー状態を更新します。
+func (s *Sim) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     intents := make([]scenes.Intent, 0, 6)
     mx, my := ebiten.CursorPosition()
     // ホバー更新
@@ -141,7 +155,8 @@ func (s *Sim) smHandleInput(ctx *game.Ctx) []scenes.Intent {
     return intents
 }
 
-func (s *Sim) smAdvance(intents []scenes.Intent) {
+// scAdvance は意図を解釈して状態機械を前進させ、副作用（戦闘実行/ログ切替/遷移フラグ）を反映します。
+func (s *Sim) scAdvance(intents []scenes.Intent) {
     for _, any := range intents {
         it, ok := any.(Intent); if !ok { continue }
         switch it.Kind {
@@ -171,4 +186,5 @@ func (s *Sim) smAdvance(intents []scenes.Intent) {
     }
 }
 
-func (s *Sim) smFlush(_ *game.Ctx) { /* 今はなし */ }
+// scFlush はフレーム末尾の副作用処理用フックです（現状なし）。
+func (s *Sim) scFlush(_ *game.Ctx) { /* 今はなし */ }

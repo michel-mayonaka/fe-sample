@@ -62,9 +62,9 @@ func NewList(e *scenes.Env) *List { return &List{E: e, hoverIndex: -1} }
 // 戻り値: 次に積むシーン（なければ nil）、エラー（通常 nil）。
 func (s *List) Update(ctx *game.Ctx) (game.Scene, error) {
     s.sw, s.sh = ctx.ScreenW, ctx.ScreenH
-    intents := s.clHandleInput(ctx)
-    s.clAdvance(intents)
-    s.clFlush(ctx)
+    intents := s.scHandleInput(ctx)
+    s.scAdvance(intents)
+    s.scFlush(ctx)
     nxt := s.next
     s.next = nil
     return nxt, nil
@@ -88,12 +88,12 @@ func (s *List) Draw(dst *ebiten.Image) {
 }
 
 // パッケージ内コンパイル保証: 必須の cl* メソッドを実装しているか
-type clContract interface {
-    clHandleInput(ctx *game.Ctx) []scenes.Intent
-    clAdvance(intents []scenes.Intent)
-    clFlush(ctx *game.Ctx)
+type scContract interface {
+    scHandleInput(ctx *game.Ctx) []scenes.Intent
+    scAdvance(intents []scenes.Intent)
+    scFlush(ctx *game.Ctx)
 }
-var _ clContract = (*List)(nil)
+var _ scContract = (*List)(nil)
 
 // IntentKind は入力の意味（意図）を表します。
 type IntentKind int
@@ -128,10 +128,10 @@ type Intent struct {
 // 戻り値: なし。
 func (Intent) IsSceneIntent() {}
 
-// clHandleInput は“入力→意図(Intent)”へ変換し、描画用キャッシュを更新します。
+// scHandleInput は“入力→意図(Intent)”へ変換し、描画用キャッシュを更新します。
 // 引数: ctx — 入力状態を参照するフレームコンテキスト。
 // 戻り値: フレーム内に発生した意図の列（処理優先度順）。
-func (s *List) clHandleInput(ctx *game.Ctx) []scenes.Intent {
+func (s *List) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     intents := make([]scenes.Intent, 0, 3)
     // マウス座標はフレーム先頭で固定し、結果をメンバへ保存
     mx, my := ebiten.CursorPosition()
@@ -179,10 +179,10 @@ func (s *List) clHandleInput(ctx *game.Ctx) []scenes.Intent {
     return intents
 }
 
-// clAdvance は状態機械を進め、副作用（遷移生成など）を集約します。
+// scAdvance は状態機械を進め、副作用（遷移生成など）を集約します。
 // 引数: intents — このフレームに発生した意図列。
 // 戻り値: なし。
-func (s *List) clAdvance(intents []scenes.Intent) {
+func (s *List) scAdvance(intents []scenes.Intent) {
     for _, any := range intents {
         it, ok := any.(Intent)
         if !ok { continue }
@@ -227,10 +227,10 @@ func (s *List) clAdvance(intents []scenes.Intent) {
     }
 }
 
-// clFlush はフレーム末尾の副作用処理（Audio/GC 等）をまとめます。
+// scFlush はフレーム末尾の副作用処理（Audio/GC 等）をまとめます。
 // 引数: ctx — フレームコンテキスト（未使用時は _ で可）。
 // 戻り値: なし。
-func (s *List) clFlush(_ *game.Ctx) {
+func (s *List) scFlush(_ *game.Ctx) {
     // 今は特になし（将来の Audio 発火や遅延解放に備えたフック）
 }
 

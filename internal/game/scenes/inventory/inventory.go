@@ -7,14 +7,20 @@ import (
     "image/color"
     "ui_sample/internal/game"
     gamesvc "ui_sample/internal/game/service"
-    "ui_sample/internal/model"
     uicore "ui_sample/internal/game/service/ui"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     scenes "ui_sample/internal/game/scenes"
     "ui_sample/internal/user"
 )
 
-// Inventory は在庫画面の Scene です（character_list 準拠の構成）。
+// Inventory は在庫画面の Scene 実装です。
+//
+// 主な責務:
+// - 武器/アイテムのタブ切替と一覧表示
+// - スロット選択時の装備割り当て（オーナー移動を含む）
+// - 戻る操作でのシーン終了
+//
+// 更新フローは character_list と同一で、Update → scHandleInput → scAdvance → scFlush の順で処理します。
 type Inventory struct{
     E *scenes.Env
     pop bool
@@ -22,9 +28,16 @@ type Inventory struct{
     // ホバー状態（描画に使用）
     tabHover int // -1=なし, 0=武器, 1=アイテム
     backHovered bool
+    wv *WeaponView
+    iv *ItemView
 }
 
-func NewInventory(e *scenes.Env) *Inventory { return &Inventory{E:e, tabHover: -1} }
+func NewInventory(e *scenes.Env) *Inventory {
+    s := &Inventory{E:e, tabHover: -1}
+    s.wv = NewWeaponView(e, s)
+    s.iv = NewItemView(e, s)
+    return s
+}
 func (s *Inventory) ShouldPop() bool { return s.pop }
 
 // Intent 種別
@@ -45,32 +58,31 @@ type Intent struct{
 }
 func (Intent) IsSceneIntent() {}
 
-// 内部コントラクト（コンパイル保証）
-type ivContract interface {
-    ivHandleInput(ctx *game.Ctx) []scenes.Intent
-    ivAdvance(intents []scenes.Intent)
-    ivFlush(ctx *game.Ctx)
+// scContract はパッケージ内コンパイル保証のためのインターフェースです。
+// Inventory が必要な sc* メソッドを実装していることを確認します。
+type scContract interface {
+    scHandleInput(ctx *game.Ctx) []scenes.Intent
+    scAdvance(intents []scenes.Intent)
+    scFlush(ctx *game.Ctx)
 }
-var _ ivContract = (*Inventory)(nil)
+var _ scContract = (*Inventory)(nil)
 
+// Update は状態更新の入口です。
+// フロー: scHandleInput → scAdvance → scFlush。次シーンはこの関数では返しません（呼び出し元で積み替え）。
 func (s *Inventory) Update(ctx *game.Ctx) (game.Scene, error) {
     s.sw, s.sh = ctx.ScreenW, ctx.ScreenH
-    intents := s.ivHandleInput(ctx)
-    s.ivAdvance(intents)
-    s.ivFlush(ctx)
+    // サブビュー更新（タブに応じて）
+    if s.E.InvTab == 0 { _, _ = s.wv.Update(ctx) } else { _, _ = s.iv.Update(ctx) }
+    intents := s.scHandleInput(ctx)
+    s.scAdvance(intents)
+    s.scFlush(ctx)
     return nil, nil
 }
 
+// Draw はタブとリスト、戻るボタン等の UI を描画します。
 func (s *Inventory) Draw(dst *ebiten.Image) {
     // 本体（タブに応じて）
-    if s.E.InvTab == 0 {
-        weapons := scenes.BuildWeaponRowsWithOwners(s.E.App.Inventory().Weapons(), s.E.App.WeaponsTable(), s.E.UserTable)
-        scenes.DrawWeaponList(dst, weapons, s.E.HoverInv)
-    } else {
-        it, _ := model.LoadItemsJSON("db/master/mst_items.json")
-        items := scenes.BuildItemRowsWithOwners(s.E.App.Inventory().Items(), it, s.E.UserTable)
-        scenes.DrawItemList(dst, items, s.E.HoverInv)
-    }
+    if s.E.InvTab == 0 { s.wv.Draw(dst) } else { s.iv.Draw(dst) }
     // タブ描画
     tabW, tabH := uicore.S(160), uicore.S(44)
     lm := uicore.ListMarginPx()
@@ -97,6 +109,7 @@ func (s *Inventory) Draw(dst *ebiten.Image) {
     if s.E.SelectingEquip { ebitenutil.DebugPrintAt(dst, "クリックでスロットに装備", uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10)) }
 }
 
+// equipWeapon は指定のユーザ武器を現在スロットへ装備し、既装備のオーナーを巻き戻します。
 func (s *Inventory) equipWeapon(userWeaponID string) {
     if s.E.UserTable == nil { return }
     unit := s.E.Selected()
@@ -121,6 +134,7 @@ func (s *Inventory) equipWeapon(userWeaponID string) {
     }
 }
 
+// equipItem は指定のユーザアイテムを現在スロットへ装備し、既装備のオーナーを巻き戻します。
 func (s *Inventory) equipItem(userItemID string) {
     if s.E.UserTable == nil { return }
     unit := s.E.Selected()
@@ -144,6 +158,7 @@ func (s *Inventory) equipItem(userItemID string) {
     }
 }
 
+// refreshUnitByID はユーザテーブルの変更を UI 表示用ユニット配列へ反映します。
 func (s *Inventory) refreshUnitByID(id string) {
     if s.E == nil || s.E.UserTable == nil { return }
     c, ok := s.E.UserTable.Find(id); if !ok { return }
@@ -151,9 +166,10 @@ func (s *Inventory) refreshUnitByID(id string) {
     for i := range s.E.Units { if s.E.Units[i].ID == id { s.E.Units[i] = u; if s.E.SelIndex==i { /* keep selected */ } } }
 }
 
-// --- 内部: handle → advance → flush -------------------------------------------------
+// --- 内部: scHandleInput → scAdvance → scFlush --------------------------------------
 
-func (s *Inventory) ivHandleInput(ctx *game.Ctx) []scenes.Intent {
+// scHandleInput は“入力→意図(Intent)”へ変換し、ホバー状態を更新します。
+func (s *Inventory) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     intents := make([]scenes.Intent, 0, 3)
     mx, my := ebiten.CursorPosition()
     // ホバー更新
@@ -165,15 +181,6 @@ func (s *Inventory) ivHandleInput(ctx *game.Ctx) []scenes.Intent {
     if scenes.PointIn(mx, my, tx, ty, tabW, tabH) { s.tabHover = 0 }
     tx2 := tx + tabW + uicore.S(10)
     if scenes.PointIn(mx, my, tx2, ty, tabW, tabH) { s.tabHover = 1 }
-
-    // リストホバー（件数はユーザ在庫から取得）
-    s.E.HoverInv = -1
-    count := 0
-    if s.E.InvTab == 0 { count = len(s.E.App.Inventory().Weapons()) } else { count = len(s.E.App.Inventory().Items()) }
-    for i := 0; i < count; i++ {
-        x, y, w, h := scenes.ListItemRect(s.sw, s.sh, i)
-        if scenes.PointIn(mx, my, x, y, w, h) { s.E.HoverInv = i }
-    }
 
     // ボタンホバー
     bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
@@ -187,15 +194,13 @@ func (s *Inventory) ivHandleInput(ctx *game.Ctx) []scenes.Intent {
             case 1: intents = append(intents, Intent{Kind: intentTabItems})
             }
             if s.backHovered { intents = append(intents, Intent{Kind: intentBack}) }
-            if s.E.SelectingEquip && s.E.HoverInv >= 0 {
-                intents = append(intents, Intent{Kind: intentChooseRow, Index: s.E.HoverInv})
-            }
         }
     }
     return intents
 }
 
-func (s *Inventory) ivAdvance(intents []scenes.Intent) {
+// scAdvance は意図に基づき、タブ切替・装備確定・戻る等の状態変更を行います。
+func (s *Inventory) scAdvance(intents []scenes.Intent) {
     for _, any := range intents {
         it, ok := any.(Intent); if !ok { continue }
         switch it.Kind {
@@ -205,17 +210,9 @@ func (s *Inventory) ivAdvance(intents []scenes.Intent) {
             if s.E.App != nil && s.E.App.Inventory() != nil { s.E.InvTab, s.E.HoverInv = 0, -1 }
         case intentTabItems:
             if s.E.App != nil && s.E.App.Inventory() != nil { s.E.InvTab, s.E.HoverInv = 1, -1 }
-        case intentChooseRow:
-            if !s.E.SelectingEquip || it.Index < 0 { continue }
-            if s.E.InvTab == 0 {
-                owns := s.E.App.Inventory().Weapons()
-                if it.Index < len(owns) { s.equipWeapon(owns[it.Index].ID); s.pop = true }
-            } else {
-                owns := s.E.App.Inventory().Items()
-                if it.Index < len(owns) { s.equipItem(owns[it.Index].ID); s.pop = true }
-            }
         }
     }
 }
 
-func (s *Inventory) ivFlush(_ *game.Ctx) { /* 今はなし */ }
+// scFlush はフレーム末尾の副作用処理用フックです（現状なし）。
+func (s *Inventory) scFlush(_ *game.Ctx) { /* 今はなし */ }
