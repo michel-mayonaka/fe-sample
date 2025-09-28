@@ -5,7 +5,8 @@ import (
     "math/rand"
     "ui_sample/internal/adapter"
     uicore "ui_sample/internal/game/service/ui"
-    scenes "ui_sample/internal/game/scenes"
+    gdata "ui_sample/internal/game/data"
+    "ui_sample/internal/model"
     gcore "ui_sample/pkg/game"
 )
 
@@ -20,7 +21,9 @@ func SimulateBattleCopyWithTerrain(atk, def uicore.Unit, attT, defT gcore.Terrai
     d := def
     logs := []string{"模擬戦開始", fmt.Sprintf("%s vs %s", a.Name, d.Name)}
     // 武器テーブル（共有/フォールバック）
-    wt := scenes.WeaponTable()
+    var wt *model.WeaponTable
+    if p := gdata.Provider(); p != nil { wt = p.WeaponsTable() }
+    // 最終的に provider 前提にするが、安全のため nil チェック
     if wt == nil { return a, d, append(logs, "[エラー] 武器定義を読み込めませんでした") }
     ga := adapter.UIToGame(wt, a)
     gd := adapter.UIToGame(wt, d)
@@ -67,4 +70,3 @@ func SimulateBattleCopyWithTerrain(atk, def uicore.Unit, attT, defT gcore.Terrai
     logs = append(logs, "模擬戦終了")
     return a, d, logs
 }
-

@@ -7,6 +7,8 @@ import (
     "ui_sample/internal/adapter"
     "ui_sample/internal/game"
     uicore "ui_sample/internal/game/service/ui"
+    gdata "ui_sample/internal/game/data"
+    "ui_sample/internal/model"
 )
 
 const slotCap = 5
@@ -53,7 +55,9 @@ func drawStatusHeader(dst *ebiten.Image, u uicore.Unit, px, py, pw, ph, tx, ty i
 
 // 基本ステータス（成長率付き）+ 派生（攻撃速度）
 func drawCoreStats(dst *ebiten.Image, u uicore.Unit, tx, statsTop, line, colGap int) {
-    atkSpeed := adapter.AttackSpeedOf(weaponTable(), u)
+    var wt *model.WeaponTable
+    if p := gdata.Provider(); p != nil { wt = p.WeaponsTable() }
+    atkSpeed := adapter.AttackSpeedOf(wt, u)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+0*colGap, statsTop+0*line, "力", u.Stats.Str, u.Growth.Str)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+0*colGap, statsTop+1*line, "魔力", u.Stats.Mag, u.Growth.Mag)
     drawStatLineWithGrowth(dst, uicore.FaceMain, tx+0*colGap, statsTop+2*line, "技", u.Stats.Skl, u.Growth.Skl)
@@ -145,4 +149,3 @@ func drawStatLine(dst *ebiten.Image, face font.Face, x, y int, label string, v i
     gap := uicore.S(20)
     uicore.TextDraw(dst, fmt.Sprintf("%2d", v), face, x+lw+gap, y, uicore.ColAccent)
 }
-

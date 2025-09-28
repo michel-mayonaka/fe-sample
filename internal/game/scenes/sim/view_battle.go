@@ -8,7 +8,7 @@ import (
     "golang.org/x/image/font"
     "ui_sample/internal/adapter"
     uicore "ui_sample/internal/game/service/ui"
-    scenes "ui_sample/internal/game/scenes"
+    gdata "ui_sample/internal/game/data"
     "ui_sample/internal/model"
     gcore "ui_sample/pkg/game"
 )
@@ -66,7 +66,8 @@ func drawStartButton(dst *ebiten.Image, sw, sh int, enabled bool) {
 func drawForecastLeft(dst *ebiten.Image, x, y int, atk, def uicore.Unit, fr gcore.ForecastResult, bk gcore.ForecastBreakdown) {
     baseLine := fmt.Sprintf("命中 %d%%  与ダメ %d  必殺 %d%%", fr.HitDisp, fr.Dmg, fr.Crit)
     uicore.TextDraw(dst, baseLine, uicore.FaceMain, x, y, uicore.ColText)
-    if wt := scenes.WeaponTable(); wt != nil {
+    if p := gdata.Provider(); p != nil {
+        if wt := p.WeaponsTable(); wt != nil {
         aType := weaponTypeOf(wt, atk)
         dType := weaponTypeOf(wt, def)
         lbl, col := triangleRelationLabelColor(gcore.TriangleRelationOf(aType, dType))
@@ -74,6 +75,7 @@ func drawForecastLeft(dst *ebiten.Image, x, y int, atk, def uicore.Unit, fr gcor
         uicore.TextDraw(dst, "  相性: ", uicore.FaceMain, x+w+8, y, uicore.ColText)
         w2 := int(font.MeasureString(uicore.FaceMain, "  相性: ") >> 6)
         uicore.TextDraw(dst, lbl, uicore.FaceMain, x+w+8+w2, y, col)
+        }
     }
     // 内訳
     wrap := dynamicWrap(dst.Bounds().Dx(), uicore.ListMarginPx(), true)
@@ -125,7 +127,9 @@ func drawBattleSide(dst *ebiten.Image, u uicore.Unit, x, y int) {
     wep := "-"
     if len(u.Equip) > 0 { wep = u.Equip[0].Name }
     // 攻撃速度
-    as := adapter.AttackSpeedOf(scenes.WeaponTable(), u)
+    var wt *model.WeaponTable
+    if p := gdata.Provider(); p != nil { wt = p.WeaponsTable() }
+    as := adapter.AttackSpeedOf(wt, u)
     lineY := y + uicore.S(410)
     uicore.TextDraw(dst, fmt.Sprintf("攻撃速度 %d", as), uicore.FaceSmall, x, lineY, uicore.ColText)
     lineY += uicore.LineHSmallPx()
@@ -145,7 +149,8 @@ func dynamicWrap(sw, lm int, left bool) int {
 
 // explain 版
 func forecastBothWithTerrainExplain(atk, def uicore.Unit, attT, defT gcore.Terrain) (gcore.ForecastResult, gcore.ForecastBreakdown, gcore.ForecastResult, gcore.ForecastBreakdown, bool, bool) {
-    wt := scenes.WeaponTable()
+    var wt *model.WeaponTable
+    if p := gdata.Provider(); p != nil { wt = p.WeaponsTable() }
     if wt == nil {
         return gcore.ForecastResult{}, gcore.ForecastBreakdown{}, gcore.ForecastResult{}, gcore.ForecastBreakdown{}, false, false
     }
@@ -207,4 +212,3 @@ func DrawBattleLogOverlay(dst *ebiten.Image, logs []string) {
     tw := int(font.MeasureString(uicore.FaceSmall, hint) >> 6)
     uicore.TextDraw(dst, hint, uicore.FaceSmall, px+(pw-tw)/2, py+ph-16, color.RGBA{210, 220, 240, 255})
 }
-
