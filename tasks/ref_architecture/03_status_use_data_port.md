@@ -29,9 +29,8 @@
 - 呼び出し箇所を `Env.App` に戻す。
 
 ## Progress / Notes
-- YYYY-MM-DD: 着手
-- YYYY-MM-DD: 切替完了・確認
+- 2025-09-28: 着手
+- 2025-09-28: 切替完了・mcp通過（Status→DataPort）
 
 ## 関連
 - `docs/ARCHITECTURE.md` 3章/6.2/12.3
-

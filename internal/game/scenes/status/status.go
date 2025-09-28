@@ -154,7 +154,7 @@ func (s *Status) scAdvance(intents []scenes.Intent) {
                     s.E.UserTable.UpdateCharacter(c)
                 }
             }
-            if s.E.App != nil { _ = s.E.App.PersistUnit(unit) }
+            if s.E.Data != nil { _ = s.E.Data.PersistUnit(unit) }
         case intentOpenInvSlot:
             i := it.Index
             s.E.CurrentSlot = i
