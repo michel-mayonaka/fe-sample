@@ -96,6 +96,10 @@
     - 目的: 参照経路/命名/コメントを横断チェック。`-race -cover` を含む最終検証。
     - 完了条件: `go test ./... -race -cover` 成功、既知課題は `tasks/known_issues.md` へ集約。
 
+15. 15_usecase_split_files（Usecase のファイル分割）
+    - 目的: `internal/usecase/app.go` を役割別ファイル（`facade.go`/`data.go`/`battle.go`/`inventory.go`）に分割し、保守性を向上。
+    - 完了条件: `make mcp` 成功。機能挙動不変（コンパイル時の型実装も維持）。
+
 ## 各工程の成果物と完了報告フォーマット
 - 各工程の md に以下を記載（テンプレートは最初の工程作成時に提示）
   - 目的・背景
