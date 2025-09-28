@@ -6,20 +6,29 @@ import (
     "ui_sample/internal/user"
 )
 
-// InventoryRepo はユーザ在庫（武器/アイテム）への最小アクセスです。
+// InventoryRepo は「在庫」集約への最小アクセスです。
+//
+// 集約の考え方:
+// - usr_weapons と usr_items を横断管理し、同一の保存境界として扱います。
+// - 一覧UI/耐久消費など、武器とアイテムをまたぐ操作を一貫して扱うための設計です。
+// - 将来のDB移行時も単一トランザクションへ収めやすくする狙いがあります。
+// - 装備付け替えなどの所有者移譲ロジックは Usecase 側に置き、Repo は
+//   スナップショット取得と保存・再読み込みに責務を限定します。
 type InventoryRepo interface {
     // Consume はIDに応じて耐久を count 減らします（下限0）。
     Consume(id string, count int) error
-    // Save は在庫ファイルへ保存します。
+    // Save は在庫（武器・アイテム）を保存します（JSON/将来はDBトランザクション）。
     Save() error
-    // Reload は JSON を再読み込みします。
+    // Reload は在庫スナップショットを再読み込みします。
     Reload() error
     // Snapshots
     Weapons() []user.OwnWeapon
     Items() []user.OwnItem
 }
 
-// JSONInventoryRepo は2つのJSONを扱う軽量実装です。
+// JSONInventoryRepo は usr_weapons.json / usr_items.json を束ねて扱う軽量実装です。
+// Weapons()/Items() はコピーを返し、呼び出し側での破壊的変更を防ぎます。
+// Consume/Save/Reload は在庫集約として同一境界で動作します。
 type JSONInventoryRepo struct {
     weaponsPath string
     itemsPath   string

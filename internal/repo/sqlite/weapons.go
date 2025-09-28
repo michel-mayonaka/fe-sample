@@ -16,14 +16,17 @@ type WeaponsRepo struct {
     table *model.WeaponTable
 }
 
+// NewWeaponsRepo は武器定義リポジトリのスケルトン実装を返します（未配線）。
 func NewWeaponsRepo(db *sql.DB) *WeaponsRepo { return &WeaponsRepo{DB: db} }
 
+// Find は武器名で定義を検索します（スケルトン）。
 func (r *WeaponsRepo) Find(name string) (model.Weapon, bool) {
     if r.table == nil { return model.Weapon{}, false }
     return r.table.Find(name)
 }
 
+// Table は武器テーブルを返します（スケルトン）。
 func (r *WeaponsRepo) Table() *model.WeaponTable { return r.table }
 
+// Reload は定義を再読み込みします（スケルトン）。
 func (r *WeaponsRepo) Reload() error { return nil }
-
