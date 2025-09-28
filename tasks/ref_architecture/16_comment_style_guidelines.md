@@ -36,8 +36,7 @@
 
 ## Progress / Notes
 - 2025-09-28: タスク追加
-- YYYY-MM-DD: 実施・確認
+- 2025-09-28: `docs/COMMENT_STYLE.md` を追加、代表パッケージ（scenes/inventory, scenes/sim, scenes, render, util）にパッケージコメントを付与、mcp通過
 
 ## 関連
 - `docs/ARCHITECTURE.md`（コメントとドキュメントの役割分担）
-
