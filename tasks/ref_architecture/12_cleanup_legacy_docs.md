@@ -29,9 +29,8 @@
 - 削除したファイルを復元、またはリンクを元に戻す。
 
 ## Progress / Notes
-- YYYY-MM-DD: 着手
-- YYYY-MM-DD: 完了
+- 2025-09-28: 着手
+- 2025-09-28: 完了（小文字版なしを確認・リンクは `ARCHITECTURE.md` に統一済み）
 
 ## 関連
 - `docs/ARCHITECTURE.md`
-
