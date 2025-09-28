@@ -6,11 +6,10 @@ import (
 )
 
 // DrawLayer は指定したレイヤ範囲の Actor を描画します。
-func DrawLayer(dst *ebiten.Image, actors []actor.IActor, min, max int) {
+func DrawLayer(dst *ebiten.Image, actors []actor.IActor, minLayer, maxLayer int) {
     for _, a := range actors {
-        if l := a.Layer(); l >= min && l < max {
+        if l := a.Layer(); l >= minLayer && l < maxLayer {
             a.Draw(dst)
         }
     }
 }
-

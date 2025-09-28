@@ -39,68 +39,70 @@
 
 ## 工程一覧（1 工程 = 1 セッション）
 
-1. 01_define_ports（Port 骨子の追加）
+ステータス凡例: [完了] [進行中] [次セッション] [保留/N/A]
+
+1. 01_define_ports（Port 骨子の追加） [完了]
    - 目的: `scenes` に `ports_data.go`/`ports_battle.go`/`ports_inventory.go` を追加し、小さな境界を定義（実装なし）。
    - 完了条件: ビルド成功、`usecase.App` が各 Port を満たすコンパイル保証コメントを追加。
    - 影響範囲: 型定義のみ。既存呼び出しの変更は行わない。
 
-2. 02_env_wire_ports（Env に Port 参照を追加）
+2. 02_env_wire_ports（Env に Port 参照を追加） [完了]
    - 目的: `Env` に `DataPort/BattlePort/InventoryPort` フィールドを追加し、現状の `UseCases` と並存配線（ブリッジ）。
    - 完了条件: 既存動作を変えずにビルド成功。`NewUIAppGame` で Port を注入。
 
-3. 03_status_use_data_port（Status 画面の依存切替）
+3. 03_status_use_data_port（Status 画面の依存切替） [完了]
    - 目的: `PersistUnit` 呼び出しを `UseCases` から `DataPort` へ切替。
    - 完了条件: ビルド成功、Status の保存動作を手動確認。
 
-4. 04_inventory_use_inventory_port（在庫画面の依存切替）
+4. 04_inventory_use_inventory_port（在庫画面の依存切替） [完了]
    - 目的: 在庫参照・装備確定を `InventoryPort` 経由に統一（UI 直書きを排除）。
    - 完了条件: ビルド成功、装備移譲・巻き戻し・保存を手動確認。
 
-5. 05_battle_use_battle_port（戦闘開始フローの導線接続）
+5. 05_battle_use_battle_port（戦闘開始フローの導線接続） [保留/N/A]
    - 目的: 本番戦闘導線があれば `BattlePort.RunBattleRound` を接続（なければスキップ）。
    - 完了条件: ビルド成功、想定ログ・HP/耐久の反映を確認。
 
-6. 06_provider_unify_lookup（Provider 参照の統一チェック）
+6. 06_provider_unify_lookup（Provider 参照の統一チェック） [完了]
    - 目的: UI からのテーブル参照が `gdata.Provider` に統一されていることを確認・是正。
    - 完了条件: 直参照が 0 件、ビルド成功。
 
-7. 07_provider_extend_items（ItemsTable の Provider 化）
+7. 07_provider_extend_items（ItemsTable の Provider 化） [完了]
    - 目的: `TableProvider` に `ItemsTable()` を追加し、アイテム参照経路を統一。
    - 完了条件: ビルド成功、在庫アイテム表示が従来通り機能。
 
-8. 08_session_helpers（UI 状態ヘルパの移管）
+8. 08_session_helpers（UI 状態ヘルパの移管） [完了]
    - 目的: `Selected/SetSelected` など UI 状態操作を `Session` に移動し、呼び出しを差し替え。
    - 完了条件: ビルド成功、一覧/ステータスの選択挙動を確認。
 
-9. 09_usecase_tests_inventory（ユースケースの最小テスト追加）
+9. 09_usecase_tests_inventory（ユースケースの最小テスト追加） [完了]
    - 目的: `EquipWeapon/EquipItem` の所有者移動＋保存一貫性テストを追加（フェイクリポジトリ）。
    - 完了条件: `go test ./...` 成功、主要ハッピーパス/境界系の網羅。
 
-10. 10_remove_aggregated_usecases（合成 UseCases の段階的撤去）
+10. 10_remove_aggregated_usecases（合成 UseCases の段階的撤去） [完了]
     - 目的: Env/Scene から合成 `UseCases` を除去し、Port 参照のみへ移行。
     - 完了条件: ビルド成功、影響画面の動作確認。
 
-11. 11_docs_sync（ドキュメント同期）
+11. 11_docs_sync（ドキュメント同期） [完了]
     - 目的: `docs/API.md`/`README.md` の更新（Port/Provider 方針、利用例、依存図）。
     - 完了条件: ドキュメントにコンパイル可能なサンプル・参照が掲載されている。
 
-12. 12_cleanup_legacy_docs（重複ドキュメント整理）
+12. 12_cleanup_legacy_docs（重複ドキュメント整理） [完了]
     - 目的: `docs/architecture.md`（小文字）の統合/リンク整理。
     - 完了条件: 重複/齟齬のない状態、README からのリンク確認。
 
-13. 13_repo_sqlite_skeleton（将来の SQLite スケルトン）
+13. 13_repo_sqlite_skeleton（将来の SQLite スケルトン） [完了]
     - 目的: `repo/sqlite` の骨組み追加（未配線）。
     - 完了条件: ビルド警告なし、TODO/インターフェース整合コメントを残す。
 
-14. 14_final_audit（仕上げと棚卸し）
+14. 14_final_audit（仕上げと棚卸し） [次セッション]
     - 目的: 参照経路/命名/コメントを横断チェック。`-race -cover` を含む最終検証。
     - 完了条件: `go test ./... -race -cover` 成功、既知課題は `tasks/known_issues.md` へ集約。
 
-15. 15_usecase_split_files（Usecase のファイル分割）
+15. 15_usecase_split_files（Usecase のファイル分割） [完了]
     - 目的: `internal/usecase/app.go` を役割別ファイル（`facade.go`/`data.go`/`battle.go`/`inventory.go`）に分割し、保守性を向上。
     - 完了条件: `make mcp` 成功。機能挙動不変（コンパイル時の型実装も維持）。
 
-16. 16_comment_style_guidelines（コメント記法の統一方針）
+16. 16_comment_style_guidelines（コメント記法の統一方針） [完了]
     - 目的: GoDoc の書式（日本語一行要約「X は …」/パッケージコメント必須/最小限）を明文化し、コードと docs の役割分担を固定。
     - 完了条件: `docs/COMMENT_STYLE.md` 追加、主要パッケージにパッケージコメントを付与（最低限）。
 
