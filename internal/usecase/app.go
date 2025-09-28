@@ -10,6 +10,7 @@ import (
     uicore "ui_sample/internal/game/service/ui"
     "ui_sample/internal/user"
     gcore "ui_sample/pkg/game"
+    "ui_sample/internal/config"
 )
 
 // App はユースケースの最小集合を束ねます。
@@ -136,6 +137,13 @@ func (a *App) WeaponsTable() *model.WeaponTable {
     return a.Weapons.Table()
 }
 
+// ItemsTable はアイテム定義テーブルを返します（軽量用途: JSONから都度ロード）。
+// 将来的にキャッシュやRepo経由に最適化可能です。
+func (a *App) ItemsTable() *model.ItemDefTable {
+    it, _ := model.LoadItemsJSON(config.DefaultItemsPath)
+    return it
+}
+
 // PersistUnit は UI ユニットの現在値をユーザセーブへ反映して保存します。
 func (a *App) PersistUnit(u uicore.Unit) error {
     if a == nil || a.Users == nil { return nil }
@@ -201,4 +209,3 @@ func (a *App) EquipItem(unitID string, slot int, userItemID string) error {
     t.UpdateCharacter(c)
     return a.Users.Save()
 }
-

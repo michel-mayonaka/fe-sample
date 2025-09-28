@@ -7,6 +7,7 @@ import "ui_sample/internal/model"
 // 将来的に Items/Classes 等を追加可能ですが、まずは武器のみ。
 type TableProvider interface {
     WeaponsTable() *model.WeaponTable
+    ItemsTable() *model.ItemDefTable
 }
 
 var provider TableProvider
@@ -16,4 +17,3 @@ func SetProvider(p TableProvider) { provider = p }
 
 // Provider は現在のテーブルプロバイダを返します（未設定時は nil）。
 func Provider() TableProvider { return provider }
-

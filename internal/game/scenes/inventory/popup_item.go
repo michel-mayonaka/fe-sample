@@ -12,6 +12,7 @@ import (
     "ui_sample/internal/model"
     "ui_sample/internal/user"
     scenes "ui_sample/internal/game/scenes"
+    gdata "ui_sample/internal/game/data"
 )
 
 // ItemRow はユーザ所持アイテム（耐久）+マスタ情報の結合行です（アイテムビュー用）。
@@ -45,7 +46,8 @@ func (v *ItemView) Update(ctx *game.Ctx) (game.Scene, error) {
 
 // Draw はアイテム一覧の描画を行います。
 func (v *ItemView) Draw(dst *ebiten.Image) {
-    it, _ := model.LoadItemsJSON("db/master/mst_items.json")
+    var it *model.ItemDefTable
+    if p := gdata.Provider(); p != nil { it = p.ItemsTable() }
     rows := BuildItemRowsWithOwners(v.E.Inv.Inventory().Items(), it, v.E.UserTable)
     DrawItemListView(dst, rows, v.hover)
 }

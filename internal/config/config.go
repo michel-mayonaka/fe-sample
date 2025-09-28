@@ -7,4 +7,5 @@ const (
     DefaultWeaponsPath = "db/master/mst_weapons.json"
     DefaultUserWeaponsPath = "db/user/usr_weapons.json"
     DefaultUserItemsPath   = "db/user/usr_items.json"
+    DefaultItemsPath       = "db/master/mst_items.json"
 )
