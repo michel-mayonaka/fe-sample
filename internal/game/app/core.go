@@ -43,7 +43,6 @@ func NewUIAppGame() *Game {
 
     // Env（共有状態）
     env := &scenes.Env{
-        App: a,
         Data: a,
         Battle: a,
         Inv: a,

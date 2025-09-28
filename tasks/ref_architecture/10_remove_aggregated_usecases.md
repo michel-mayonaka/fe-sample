@@ -30,9 +30,8 @@
 - フィールド削除前のコミットへ戻す（段階的に進める）。
 
 ## Progress / Notes
-- YYYY-MM-DD: 着手
-- YYYY-MM-DD: 完了
+- 2025-09-28: 着手
+- 2025-09-28: 置換/削除完了（Env.App/UseCases撤去、core配線更新、`go build` OK）
 
 ## 関連
 - `docs/ARCHITECTURE.md` 12.4
-

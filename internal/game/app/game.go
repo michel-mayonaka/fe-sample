@@ -64,8 +64,8 @@ func (g *Game) updateGlobalToggles() {
     if g.Input != nil && g.Input.Down(gamesvc.Menu) {
         g.reloadHold++
         if g.reloadHold == 30 { // 約0.5秒（60FPS時）
-            if g.Env != nil && g.Env.App != nil {
-                _ = g.Env.App.ReloadData()
+            if g.Env != nil && g.Env.Data != nil {
+                _ = g.Env.Data.ReloadData()
                 // 画像キャッシュはUI側の責務としてここでクリア
                 assets.Clear()
             }
