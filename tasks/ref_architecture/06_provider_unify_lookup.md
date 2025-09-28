@@ -28,9 +28,8 @@
 - 変更前の参照に戻す（局所差分）。
 
 ## Progress / Notes
-- YYYY-MM-DD: 着手
-- YYYY-MM-DD: 統一完了
+- 2025-09-28: 着手
+- 2025-09-28: WeaponsTable は scenes 全箇所 Provider 経由を確認（N/A: Items は次工程でProvider拡張予定）
 
 ## 関連
 - `docs/ARCHITECTURE.md` 2章/7章
-
