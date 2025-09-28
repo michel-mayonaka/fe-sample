@@ -34,15 +34,3 @@ type Env struct {
 
     *Session // UI 間で共有する一時状態（埋め込みでプロモート）
 }
-
-func (e *Env) Selected() uicore.Unit {
-    if e == nil || len(e.Units) == 0 { return uicore.SampleUnit() }
-    if e.SelIndex < 0 || e.SelIndex >= len(e.Units) { return e.Units[0] }
-    return e.Units[e.SelIndex]
-}
-
-func (e *Env) SetSelected(u uicore.Unit) {
-    if e == nil || len(e.Units) == 0 { return }
-    if e.SelIndex < 0 || e.SelIndex >= len(e.Units) { return }
-    e.Units[e.SelIndex] = u
-}

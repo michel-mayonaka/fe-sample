@@ -28,9 +28,8 @@
 - 参照を元に戻し、Sessionメソッドをコメントアウト。
 
 ## Progress / Notes
-- YYYY-MM-DD: 着手
-- YYYY-MM-DD: 差し替え完了
+- 2025-09-28: 着手
+- 2025-09-28: `Session.Selected/SetSelected` 実装・Envメソッド撤去・mcp通過
 
 ## 関連
 - `docs/ARCHITECTURE.md` 5章/12.1
-
