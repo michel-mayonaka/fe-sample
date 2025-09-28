@@ -15,9 +15,10 @@
 - `app/`            ebiten.Game の心臓。フレーム駆動、SceneStack 管理。
 - `ctx.go`          フレームコンテキスト（DT/Frame/Screen/Input/Services）。
 - `scene.go`        `Scene` インタフェースと `SceneStack` 実装。
-- `scenes/`         画面群（title/battle/result など）。
+- `scenes/`         画面群（character_list/status/inventory/sim など）。
 - `actor/`          `IActor` と具体 Actor（unit/cursor/fx）。
 - `service/`        入出力・資産・音・カメラ・UI・ホットリロード。
+- `data/`           Sceneへ渡す読み取り専用テーブル群のDIプロバイダ（`TableProvider`）。
 - `domain/`         UI 非依存のゲームルール（model/rules/port）。
 - `repository/`     port 実装（tsv/embed/save_file/save_web/migrate）。
 - `world/`          表示側の盤面制御（タイル/ハイライト/アダプタ）。
@@ -52,6 +53,20 @@ Update(*game.Ctx) bool; Draw(*ebiten.Image); Layer() int
 7) Draw（レイヤ順）
 
 すべての Scene はこの順序を遵守します。
+
+## データ提供（DI）: TableProvider
+- 目的: Scene をデータ取得実装（JSON/SQLite/メモリ）から切り離す。
+- 仕組み: `internal/game/data.TableProvider` を App が実装し、`data.SetProvider(app)` で注入。
+- 利用: Scene は `data.Provider().WeaponsTable()` など読み取り用メソッドのみを参照する。
+- 移行: 旧 `scenes.WeaponTable` は削除済み。ツール実行時の直読みは Provider 不在時の開発用途に限定。
+
+## Scene 設計（例: sim）
+- 司令塔: `sim/sim.go`（`Sim`/`NewSim`/`Update`/`Draw`）。
+- 入力: `sim/input.go`（入力→Intent）。
+- 遷移: `sim/logic.go`（状態機械・自動実行・runOne）。
+- 描画: `sim/view_rects.go`（Rect）、`sim/view_battle.go`（プレビュー/内訳/ログOverlay）。
+- ポップアップ: `sim/popup_*.go`（例: `popup_log.go`）。
+- ロジック: `sim/engine.go`（簡易戦闘；将来 `service/battle` へ抽出予定）。
 
 ## データ駆動とホットリロード
 - マスタは `mst_*`、ユーザは `usr_*` の接頭辞で管理。

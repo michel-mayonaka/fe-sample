@@ -32,7 +32,7 @@
 - `func (*Table) Find(id string) (Character, bool)`: 取得。
 備考: ファイル名は `usr_*.json`。パスは `db/user/`。
 
-## internal/ui（UI描画とデータモデル）
+## internal/game/service/ui（UI描画ユーティリティ）
 - `type Unit`
   - `Name`, `Class`, `Level`, `Exp`, `HP`, `HPMax`: 基本情報。
   - `Stats Stats`: 能力値（力/魔力/技/速さ/幸運/守備/魔防/移動）。
@@ -46,21 +46,34 @@
 - `type Item`: 装備の耐久（`Name`, `Uses` 残り, `Max` 上限）。
 - `type WeaponRanks`: 物理武器ランク。
 - `type MagicRanks`: 魔法系ランク。
-- `func SampleUnit() Unit`
-  - ユーザテーブル（`db/user/usr_*.json`）のみから読み込み、UI用データに変換。
-- `func DrawStatus(dst *ebiten.Image, u Unit)`
-  - 1920×1080 を想定。左にポートレート、中央に基本情報/HP/能力値+成長率、右に「武器レベル」「魔法レベル」、下部に装備（耐久）を描画。
-- 戦闘関連:
-  - `DrawBattle(atk, def)`: 簡易プレビューを描画
-  - `RollLevelUp/ApplyGains`: 成長抽選/反映（クラス上限でクランプ）
-- ヘルパー（内部利用）
-  - `drawPanel`: 影付きパネル。
-  - `drawFramedRect`: 金縁の矩形。
-  - `drawPortraitPlaceholder`: ポートレート未設定時の表示。
-  - `drawPortrait`: 等比・線形補間で画像を枠内に表示。
-  - `drawHPBar`: HP割合で色が変化するバー。
-  - `drawStatLine`, `drawStatLineWithGrowth`: 能力値（成長率付き）。
-  - `drawRankLine`: ランク表示。
+- 代表的関数:
+  - `TextDraw`, `DrawPanel`, `DrawFramedRect`, `DrawHPBar`, `DrawPortrait(Placeholder)` など描画ヘルパ。
+  - `ListMarginPx`, `S`, `LineHSmallPx` などメトリクス計算。
+  - `MaybeUpdateFontFaces` などフォント管理。
+
+補足: 画面描画は各 Scene に配置（例: ステータス/戦闘プレビュー）。本パッケージは汎用ウィジェットを提供します。
+
+## internal/adapter（UI<->ロジック変換）
+- `func UIToGame(wt *model.WeaponTable, u ui.Unit) gcore.Unit`: UIユニットから戦闘用`gcore.Unit`へ変換（先頭装備）。
+- `func AttackSpeedOf(wt *model.WeaponTable, u ui.Unit) int`: 攻撃速度（武器重量考慮、未設定時は速さ）。
+
+## internal/game/data（テーブルDIプロバイダ）
+- `type TableProvider interface { WeaponsTable() *model.WeaponTable }`
+- `func SetProvider(p TableProvider)`: アプリ側実装を注入（推奨ルート）。
+- `func Provider() TableProvider`: 現在のプロバイダ取得。
+
+利用指針:
+- Scene は `data.Provider().WeaponsTable()`（または `Env.App.WeaponsTable()`）経由でテーブル参照。
+- 旧 `scenes.SetWeaponTable/WeaponTable` は廃止。JSON直読みフォールバックは開発ツール用途のみ。
+
+## internal/game/scenes/sim（模擬戦シーン）
+- `type Sim`: シーン本体。`NewSim(env, atk, def)`で生成。
+- 更新フロー: `Update → scHandleInput → scAdvance → scFlush`。
+- 主要フィールド: `simAtk/simDef`（左/右ユニット）, `attTerrain/defTerrain`, `auto`（自動実行）, `logs`（戦闘ログ）。
+- 入力（Intent）: `intentBack/intentRunOne/intentToggleAuto/intentSetTerrainAtt/intentSetTerrainDef`。
+- 描画: `DrawBattleWithTerrain`（内部）、`ui/widgets` のボタン群を併用。
+- ポップアップ: `LogView`（`popup_log.go`）に分離、Confirmで閉じる。
+- ロジック: `engine.go` に簡易戦闘 `SimulateBattleCopy(WithTerrain)` を配置（将来 service へ抽出予定）。
 
 フォント: Ebiten examples の M+ 1p Regular を OpenType で初期化（失敗時は basicfont にフォールバック）。
 
