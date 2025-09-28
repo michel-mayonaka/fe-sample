@@ -22,6 +22,11 @@
 4) コミット: Conventional Commits で `[story]` を含むサマリ推奨。
 5) 進捗更新: セッション終了時にステータスと日付入りログを追記。
 
+## 完了ストーリーのアーカイブ運用
+- 完了したストーリーは `stories/finish/` 配下へ移動します。
+- 推奨コマンド: `make finish-story SLUG=ref-architecture` または `make finish-story PATH=stories/20250928-ref-architecture`
+- 移動時に `README.md` の先頭ステータスを `[完了]` に自動更新します（スクリプトが置換）。
+
 ## テンプレート
 - 雛形は `stories/_TEMPLATE/README.md` に配置。
 - 直接コピーする場合: `cp -R stories/_TEMPLATE stories/20250928-your-story && vi stories/20250928-your-story/README.md`
@@ -30,4 +35,3 @@
 - 1 セッション = 1〜数工程。差分は小さく、ロールバック容易に。
 - ストーリーは“目的と受け入れ基準”を先に固定。途中の仕様変更は「決定事項」に追記。
 - 実装前後で `make mcp`、必要に応じて `go test -race -cover` を実施。
-

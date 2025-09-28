@@ -97,3 +97,7 @@ mcp: check-all $(MCP_LINT_TARGET)
 .PHONY: new-story
 new-story:
 	@./scripts/new_story.sh "$(SLUG)"
+
+.PHONY: finish-story
+finish-story:
+	@./scripts/finish_story.sh "$(SLUG)" "$(PATH)"
