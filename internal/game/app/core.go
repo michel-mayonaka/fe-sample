@@ -8,6 +8,7 @@ import (
     "ui_sample/internal/config"
     "ui_sample/internal/game"
     "ui_sample/internal/game/scenes"
+    characterlist "ui_sample/internal/game/scenes/character_list"
     gamesvc "ui_sample/internal/game/service"
     "ui_sample/internal/repo"
     uicore "ui_sample/internal/game/service/ui"
@@ -48,7 +49,7 @@ func NewUIAppGame() *Game {
         if p, ok := sc.(interface{ ShouldPop() bool }); ok { return p.ShouldPop() }
         return false
     }
-    g.Runner.Stack.Push(scenes.NewList(env))
+    g.Runner.Stack.Push(characterlist.NewList(env))
 
     // ウィンドウ・TPS
     SetupWindow()

@@ -96,6 +96,10 @@ func (i *Input) SnapshotWith(isDown func(k ebiten.Key) bool) {
             i.curr[a] = true
         }
     }
+    // マウス左クリックは Confirm に合流させる（入力の意味を統一）
+    if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+        i.curr[Confirm] = true
+    }
     // 地形切替（1/2/3, Shift+1/2/3 を攻守に割当）
     shift := isDown(ebiten.KeyShift) || isDown(ebiten.KeyShiftLeft) || isDown(ebiten.KeyShiftRight)
     if isDown(ebiten.Key1) {

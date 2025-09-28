@@ -1,4 +1,4 @@
-package scenes
+package status
 
 import (
     "github.com/hajimehoshi/ebiten/v2"
@@ -9,12 +9,14 @@ import (
     uicore "ui_sample/internal/game/service/ui"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     scpopup "ui_sample/internal/game/scenes/common/popup"
+    scenes "ui_sample/internal/game/scenes"
+    inventory "ui_sample/internal/game/scenes/inventory"
     "ui_sample/internal/user"
 )
 
 // Status はステータス画面の Scene です。
-type Status struct{ E *Env; pop bool; sw, sh int }
-func NewStatus(e *Env) *Status { return &Status{E:e} }
+type Status struct{ E *scenes.Env; pop bool; sw, sh int }
+func NewStatus(e *scenes.Env) *Status { return &Status{E:e} }
 func (s *Status) ShouldPop() bool { return s.pop }
 
 func (s *Status) Update(ctx *game.Ctx) (game.Scene, error) {
@@ -24,13 +26,13 @@ func (s *Status) Update(ctx *game.Ctx) (game.Scene, error) {
     wasPopup := s.E != nil && s.E.PopupActive
     // 戻る
     bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
-    if pointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { s.pop = true; return nil, nil }
+    if scenes.PointIn(mx, my, bx, by, bw, bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { s.pop = true; return nil, nil }
     if ctx != nil && ctx.Input != nil && ctx.Input.Press(gamesvc.Cancel) { s.pop = true; return nil, nil }
 
     // レベルアップ
     lbx, lby, lbw, lbh := uiwidgets.LevelUpButtonRect(s.sw, s.sh)
     unit := s.E.Selected()
-    if unit.Level < game.LevelCap && !s.E.PopupActive && pointIn(mx,my,lbx,lby,lbw,lbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+    if unit.Level < game.LevelCap && !s.E.PopupActive && scenes.PointIn(mx,my,lbx,lby,lbw,lbh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
         gains := scpopup.RollLevelUp(unit, s.E.RNG.Float64)
         scpopup.ApplyGains(&unit, gains, game.LevelCap)
         s.E.SetSelected(unit)
@@ -55,8 +57,8 @@ func (s *Status) Update(ctx *game.Ctx) (game.Scene, error) {
 
     // 装備スロットクリックで在庫へ
     for i := 0; i < 5; i++ {
-        x, y, w, h := EquipSlotRect(s.sw, s.sh, i)
-        if pointIn(mx, my, x, y, w, h) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+        x, y, w, h := scenes.EquipSlotRect(s.sw, s.sh, i)
+        if scenes.PointIn(mx, my, x, y, w, h) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
             s.E.CurrentSlot = i
             s.E.SelectingEquip = true
             s.E.HoverInv = -1
@@ -73,7 +75,7 @@ func (s *Status) Update(ctx *game.Ctx) (game.Scene, error) {
                     }
                 }
             }
-            return NewInventory(s.E), nil
+            return inventory.NewInventory(s.E), nil
         }
     }
 
@@ -81,12 +83,12 @@ func (s *Status) Update(ctx *game.Ctx) (game.Scene, error) {
     if ctx != nil && ctx.Input != nil && ctx.Input.Press(gamesvc.EquipToggle) {
         s.E.InvTab, s.E.HoverInv = 0, -1
         s.E.SelectingEquip, s.E.SelectingIsWeapon = true, true
-        return NewInventory(s.E), nil
+        return inventory.NewInventory(s.E), nil
     }
     if ctx != nil && ctx.Input != nil && ctx.Input.Press(gamesvc.OpenItems) {
         s.E.InvTab, s.E.HoverInv = 1, -1
         s.E.SelectingEquip, s.E.SelectingIsWeapon = true, false
-        return NewInventory(s.E), nil
+        return inventory.NewInventory(s.E), nil
     }
     return nil, nil
 }
@@ -94,14 +96,14 @@ func (s *Status) Update(ctx *game.Ctx) (game.Scene, error) {
 func (s *Status) Draw(dst *ebiten.Image) {
     // 本体（ステータス）
     unit := s.E.Selected()
-    DrawStatus(dst, unit)
+    scenes.DrawStatus(dst, unit)
     // 戻るボタン
     mx, my := ebiten.CursorPosition()
     bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
-    uiwidgets.DrawBackButton(dst, pointIn(mx, my, bx, by, bw, bh))
+    uiwidgets.DrawBackButton(dst, scenes.PointIn(mx, my, bx, by, bw, bh))
     // レベルアップボタン
     lvx, lvy, lvw, lvh := uiwidgets.LevelUpButtonRect(s.sw, s.sh)
-    lvHovered := pointIn(mx, my, lvx, lvy, lvw, lvh)
+    lvHovered := scenes.PointIn(mx, my, lvx, lvy, lvw, lvh)
     uiwidgets.DrawLevelUpButton(dst, lvHovered, unit.Level < game.LevelCap && !s.E.PopupActive)
     if s.E.PopupActive { scpopup.DrawLevelUpPopup(dst, unit, s.E.PopupGains) }
     ebitenutil.DebugPrintAt(dst, "装備: E/数字/DELETE で操作", uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10))
