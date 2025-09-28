@@ -30,9 +30,8 @@
 - テストファイルを削除。
 
 ## Progress / Notes
-- YYYY-MM-DD: 着手
-- YYYY-MM-DD: 追加・成功
+- 2025-09-28: 着手
+- 2025-09-28: 最小テスト追加（inventory_test.go）。`make mcp` 成功。
 
 ## 関連
 - `docs/ARCHITECTURE.md` 8章
-
