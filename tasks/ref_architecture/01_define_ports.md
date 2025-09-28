@@ -35,9 +35,8 @@
 - 追加ファイルを削除し、元の状態へ戻すのみ。
 
 ## Progress / Notes
-- YYYY-MM-DD: 着手
-- YYYY-MM-DD: Port定義追加・mcp通過
+- 2025-09-28: 着手
+- 2025-09-28: Port定義追加・mcp通過
 
 ## 関連
 - `docs/ARCHITECTURE.md` 3章/4章/12章
-
