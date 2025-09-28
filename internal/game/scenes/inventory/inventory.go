@@ -10,7 +10,6 @@ import (
     uicore "ui_sample/internal/game/service/ui"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     scenes "ui_sample/internal/game/scenes"
-    "ui_sample/internal/user"
 )
 
 // Inventory は在庫画面の Scene 実装です。
@@ -109,54 +108,7 @@ func (s *Inventory) Draw(dst *ebiten.Image) {
     if s.E.SelectingEquip { ebitenutil.DebugPrintAt(dst, "クリックでスロットに装備", uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10)) }
 }
 
-// equipWeapon は指定のユーザ武器を現在スロットへ装備し、既装備のオーナーを巻き戻します。
-func (s *Inventory) equipWeapon(userWeaponID string) {
-    if s.E.UserTable == nil { return }
-    unit := s.E.Selected()
-    if c, ok := s.E.UserTable.Find(unit.ID); ok {
-        var prev user.EquipRef
-        if s.E.CurrentSlot < len(c.Equip) { prev = c.Equip[s.E.CurrentSlot] }
-        // 既装備のオーナーから外す
-        ownerID := ""; ownerSlot := -1
-        for _, oc := range s.E.UserTable.Slice() {
-            for idx, er := range oc.Equip { if er.UserWeaponsID == userWeaponID { ownerID = oc.ID; ownerSlot = idx; break } }
-            if ownerID != "" { break }
-        }
-        if ownerID != "" { if oc, ok2 := s.E.UserTable.Find(ownerID); ok2 {
-            for len(oc.Equip) <= ownerSlot { oc.Equip = append(oc.Equip, user.EquipRef{}) }
-            oc.Equip[ownerSlot] = prev
-            s.E.UserTable.UpdateCharacter(oc)
-        }}
-        for len(c.Equip) <= s.E.CurrentSlot { c.Equip = append(c.Equip, user.EquipRef{}) }
-        c.Equip[s.E.CurrentSlot] = user.EquipRef{UserWeaponsID: userWeaponID}
-        s.E.UserTable.UpdateCharacter(c); _ = s.E.UserTable.Save(s.E.UserPath)
-        s.refreshUnitByID(c.ID)
-    }
-}
-
-// equipItem は指定のユーザアイテムを現在スロットへ装備し、既装備のオーナーを巻き戻します。
-func (s *Inventory) equipItem(userItemID string) {
-    if s.E.UserTable == nil { return }
-    unit := s.E.Selected()
-    if c, ok := s.E.UserTable.Find(unit.ID); ok {
-        var prev user.EquipRef
-        if s.E.CurrentSlot < len(c.Equip) { prev = c.Equip[s.E.CurrentSlot] }
-        ownerID := ""; ownerSlot := -1
-        for _, oc := range s.E.UserTable.Slice() {
-            for idx, er := range oc.Equip { if er.UserItemsID == userItemID { ownerID = oc.ID; ownerSlot = idx; break } }
-            if ownerID != "" { break }
-        }
-        if ownerID != "" { if oc, ok2 := s.E.UserTable.Find(ownerID); ok2 {
-            for len(oc.Equip) <= ownerSlot { oc.Equip = append(oc.Equip, user.EquipRef{}) }
-            oc.Equip[ownerSlot] = prev
-            s.E.UserTable.UpdateCharacter(oc)
-        }}
-        for len(c.Equip) <= s.E.CurrentSlot { c.Equip = append(c.Equip, user.EquipRef{}) }
-        c.Equip[s.E.CurrentSlot] = user.EquipRef{UserItemsID: userItemID}
-        s.E.UserTable.UpdateCharacter(c); _ = s.E.UserTable.Save(s.E.UserPath)
-        s.refreshUnitByID(c.ID)
-    }
-}
+// 装備確定の実処理は各サブビュー（WeaponView/ItemView）へ移動しました。
 
 // refreshUnitByID はユーザテーブルの変更を UI 表示用ユニット配列へ反映します。
 func (s *Inventory) refreshUnitByID(id string) {
