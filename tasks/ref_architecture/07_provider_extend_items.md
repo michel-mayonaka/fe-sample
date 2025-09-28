@@ -29,9 +29,8 @@
 - IF拡張差分を戻し、直接ロードに戻す。
 
 ## Progress / Notes
-- YYYY-MM-DD: 着手
-- YYYY-MM-DD: 置換完了
+- 2025-09-28: 着手
+- 2025-09-28: Provider拡張・置換完了（`ItemsTable` 提供/参照統一）
 
 ## 関連
 - `docs/ARCHITECTURE.md` 4章/7章
-
