@@ -18,6 +18,12 @@
   - 抽象化されたリポジトリインターフェースと実装（JSON/将来 SQLite）。
   - 例: `UserRepo`, `WeaponsRepo`, `InventoryRepo`。
 
+  Repo の単位（集約）方針:
+  - 目的は「保存境界を安全に扱うこと」。モデルと常に1:1である必要はない。
+  - 本プロジェクトでは「在庫」を1つの集約と見なし、`InventoryRepo` が `usr_weapons` と `usr_items` を横断管理する。
+  - 理由: 一覧UI/耐久消費/装備付け替えなど“武器とアイテムをまたぐ操作”を同一トランザクション（将来DB）や同一保存タイミングで扱えるため。
+  - 代替: 厳密に1:1へ分割する場合は `UserWeaponsRepo` と `UserItemsRepo` に分け、Usecase で協調保存する（Save/Reload の同期コストが増える）。
+
 - Model / User / Adapter
   - Model: マスタ定義（武器・アイテム等）。
   - User: ユーザセーブのスキーマとテーブル（ID 索引）。
@@ -177,6 +183,14 @@ Session（UI 状態）:
 
 - クエリは参照専用・副作用なし。`gdata.Provider()` を用いることで UI からの参照経路を 1 本化できる。
 - コマンドは副作用を伴う。Usecase に集約することで UI 直書きのリスク（半更新・整合崩れ）を回避。
+
+Provider と Repository の違い（明確化）:
+- Provider（読み取り専用）
+  - 役割: 参照テーブルの提供（例: `WeaponsTable()`/`ItemsTable()`）。
+  - 特性: 追加・更新・保存は行わない（Query に特化）。
+- Repository（更新を含む）
+  - 役割: ユーザ状態や在庫などの保存境界を扱う（例: `UserRepo`、`InventoryRepo`）。
+  - 特性: 更新（`Update/Consume`）と保存（`Save`）、再読み込み（`Reload`）。将来的に DB トランザクションの境界。
 
 ## 8. テスト方針
 
