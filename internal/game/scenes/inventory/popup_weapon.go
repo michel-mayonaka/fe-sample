@@ -49,7 +49,7 @@ func (v *WeaponView) Update(ctx *game.Ctx) (game.Scene, error) {
 func (v *WeaponView) Draw(dst *ebiten.Image) {
     var wt *model.WeaponTable
     if p := gdata.Provider(); p != nil { wt = p.WeaponsTable() }
-    rows := BuildWeaponRowsWithOwners(v.E.App.Inventory().Weapons(), wt, v.E.UserTable)
+    rows := BuildWeaponRowsWithOwners(v.E.Inv.Inventory().Weapons(), wt, v.E.UserTable)
     DrawWeaponListView(dst, rows, v.hover)
 }
 
@@ -68,7 +68,7 @@ func (v *WeaponView) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     mx, my := ebiten.CursorPosition()
     // 行ホバー更新
     v.hover = -1
-    count := len(v.E.App.Inventory().Weapons())
+    count := len(v.E.Inv.Inventory().Weapons())
     for i := 0; i < count; i++ {
         x, y, w, h := scenes.ListItemRect(v.sw, v.sh, i)
         if scenes.PointIn(mx, my, x, y, w, h) { v.hover = i }
@@ -86,9 +86,9 @@ func (v *WeaponView) scAdvance(intents []scenes.Intent) {
         it, ok := any.(wvIntent); if !ok { continue }
         switch it.Kind {
         case wvChooseRow:
-            owns := v.E.App.Inventory().Weapons()
+            owns := v.E.Inv.Inventory().Weapons()
             if it.Index >= 0 && it.Index < len(owns) {
-                _ = v.E.App.EquipWeapon(v.E.Selected().ID, v.E.CurrentSlot, owns[it.Index].ID)
+                _ = v.E.Inv.EquipWeapon(v.E.Selected().ID, v.E.CurrentSlot, owns[it.Index].ID)
                 v.Host.refreshUnitByID(v.E.Selected().ID)
                 v.Host.pop = true
             }

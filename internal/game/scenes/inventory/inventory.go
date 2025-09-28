@@ -159,9 +159,9 @@ func (s *Inventory) scAdvance(intents []scenes.Intent) {
         case intentBack:
             s.pop = true
         case intentTabWeapons:
-            if s.E.App != nil && s.E.App.Inventory() != nil { s.E.InvTab, s.E.HoverInv = 0, -1 }
+            if s.E.Inv != nil && s.E.Inv.Inventory() != nil { s.E.InvTab, s.E.HoverInv = 0, -1 }
         case intentTabItems:
-            if s.E.App != nil && s.E.App.Inventory() != nil { s.E.InvTab, s.E.HoverInv = 1, -1 }
+            if s.E.Inv != nil && s.E.Inv.Inventory() != nil { s.E.InvTab, s.E.HoverInv = 1, -1 }
         }
     }
 }

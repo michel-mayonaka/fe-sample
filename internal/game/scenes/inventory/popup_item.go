@@ -46,7 +46,7 @@ func (v *ItemView) Update(ctx *game.Ctx) (game.Scene, error) {
 // Draw はアイテム一覧の描画を行います。
 func (v *ItemView) Draw(dst *ebiten.Image) {
     it, _ := model.LoadItemsJSON("db/master/mst_items.json")
-    rows := BuildItemRowsWithOwners(v.E.App.Inventory().Items(), it, v.E.UserTable)
+    rows := BuildItemRowsWithOwners(v.E.Inv.Inventory().Items(), it, v.E.UserTable)
     DrawItemListView(dst, rows, v.hover)
 }
 
@@ -65,7 +65,7 @@ func (v *ItemView) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     mx, my := ebiten.CursorPosition()
     // 行ホバー更新
     v.hover = -1
-    count := len(v.E.App.Inventory().Items())
+    count := len(v.E.Inv.Inventory().Items())
     for i := 0; i < count; i++ {
         x, y, w, h := scenes.ListItemRect(v.sw, v.sh, i)
         if scenes.PointIn(mx, my, x, y, w, h) { v.hover = i }
@@ -83,9 +83,9 @@ func (v *ItemView) scAdvance(intents []scenes.Intent) {
         it, ok := any.(ivIntent); if !ok { continue }
         switch it.Kind {
         case ivChooseRow:
-            owns := v.E.App.Inventory().Items()
+            owns := v.E.Inv.Inventory().Items()
             if it.Index >= 0 && it.Index < len(owns) {
-                _ = v.E.App.EquipItem(v.E.Selected().ID, v.E.CurrentSlot, owns[it.Index].ID)
+                _ = v.E.Inv.EquipItem(v.E.Selected().ID, v.E.CurrentSlot, owns[it.Index].ID)
                 v.Host.refreshUnitByID(v.E.Selected().ID)
                 v.Host.pop = true
             }

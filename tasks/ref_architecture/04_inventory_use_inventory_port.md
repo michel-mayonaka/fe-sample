@@ -29,9 +29,8 @@
 - 呼び出しを元のUI直更新に戻す（差分小）。
 
 ## Progress / Notes
-- YYYY-MM-DD: 着手
-- YYYY-MM-DD: 切替・確認
+- 2025-09-28: 着手
+- 2025-09-28: 切替・mcp通過（在庫→Port）
 
 ## 関連
 - `docs/ARCHITECTURE.md` 3章/6.1/7章/12.3
-
