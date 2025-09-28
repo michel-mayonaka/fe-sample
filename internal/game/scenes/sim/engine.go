@@ -1,15 +1,15 @@
-package scenes
+package sim
 
 import (
     "fmt"
     "math/rand"
     "ui_sample/internal/adapter"
-    "ui_sample/internal/model"
     uicore "ui_sample/internal/game/service/ui"
+    scenes "ui_sample/internal/game/scenes"
     gcore "ui_sample/pkg/game"
 )
 
-// SimulateBattleCopy はコピーを用いた簡易模擬戦を行い、結果ログを返します（永続化なし）。
+// SimulateBattleCopy はコピーを用いた簡易模擬戦（平地）
 func SimulateBattleCopy(atk, def uicore.Unit, rng *rand.Rand) (uicore.Unit, uicore.Unit, []string) {
     return SimulateBattleCopyWithTerrain(atk, def, gcore.Terrain{}, gcore.Terrain{}, rng)
 }
@@ -20,10 +20,7 @@ func SimulateBattleCopyWithTerrain(atk, def uicore.Unit, attT, defT gcore.Terrai
     d := def
     logs := []string{"模擬戦開始", fmt.Sprintf("%s vs %s", a.Name, d.Name)}
     // 武器テーブル（共有/フォールバック）
-    wt := weaponTable()
-    if wt == nil {
-        if wtf, err := model.LoadWeaponsJSON("db/master/mst_weapons.json"); err == nil { wtShared = wtf; wt = wtShared }
-    }
+    wt := scenes.WeaponTable()
     if wt == nil { return a, d, append(logs, "[エラー] 武器定義を読み込めませんでした") }
     ga := adapter.UIToGame(wt, a)
     gd := adapter.UIToGame(wt, d)

@@ -1,42 +1,17 @@
-package scenes
+package sim
 
 import (
     "fmt"
+    "image/color"
     "github.com/hajimehoshi/ebiten/v2"
     "github.com/hajimehoshi/ebiten/v2/vector"
     "golang.org/x/image/font"
-    "image/color"
     "ui_sample/internal/adapter"
-    "ui_sample/internal/model"
     uicore "ui_sample/internal/game/service/ui"
+    scenes "ui_sample/internal/game/scenes"
+    "ui_sample/internal/model"
     gcore "ui_sample/pkg/game"
 )
-
-// 共有武器テーブル（Repo注入で設定）。未設定時は初回アクセスで読み込みキャッシュ。
-var wtShared *model.WeaponTable
-
-// SetWeaponTable は内部で共有する武器テーブルを設定します。
-func SetWeaponTable(wt *model.WeaponTable) { wtShared = wt }
-
-// BattleStartButtonRect はバトル開始ボタンの矩形を返します。
-func BattleStartButtonRect(sw, sh int) (x, y, w, h int) {
-    w, h = uicore.S(240), uicore.S(60)
-    x = (sw - w) / 2
-    y = sh - uicore.ListMarginPx() - h
-    return
-}
-
-// AutoRunButtonRect は開始ボタンの右隣（同サイズ/間隔S(20)）の矩形を返します。
-func AutoRunButtonRect(sw, sh int) (int, int, int, int) {
-    bx, by, bw, bh := BattleStartButtonRect(sw, sh)
-    gap := uicore.S(20)
-    return bx + bw + gap, by, bw, bh
-}
-
-// DrawBattle は後方互換（平地扱い）。
-func DrawBattle(dst *ebiten.Image, attacker, defender uicore.Unit) {
-    DrawBattleWithTerrain(dst, attacker, defender, gcore.Terrain{}, gcore.Terrain{}, true)
-}
 
 // DrawBattleWithTerrain は左右の地形を指定してプレビューを描画します。
 // startEnabled が false の場合、開始ボタンはグレーアウト表示になります。
@@ -69,13 +44,11 @@ func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, at
     uicore.TextDraw(dst, "[地形切替] 攻: 1=平地 2=森 3=砦 / 防: Shift+1/2/3", uicore.FaceSmall, leftX, sh-uicore.ListMarginPx()-uicore.S(190), color.RGBA{190,200,210,255})
 }
 
-// ヘッダとパネル
 func drawBattleHeader(dst *ebiten.Image, sw, sh, lm int) {
     uicore.DrawPanel(dst, float32(lm), float32(lm), float32(sw-2*lm), float32(sh-2*lm))
     uicore.TextDraw(dst, "戦闘プレビュー", uicore.FaceTitle, sw/2-uicore.S(120), uicore.ListMarginPx()+uicore.S(56), uicore.ColAccent)
 }
 
-// 開始ボタン
 func drawStartButton(dst *ebiten.Image, sw, sh int, enabled bool) {
     bx, by, bw, bh := BattleStartButtonRect(sw, sh)
     uicore.DrawFramedRect(dst, float32(bx), float32(by), float32(bw), float32(bh))
@@ -93,7 +66,7 @@ func drawStartButton(dst *ebiten.Image, sw, sh int, enabled bool) {
 func drawForecastLeft(dst *ebiten.Image, x, y int, atk, def uicore.Unit, fr gcore.ForecastResult, bk gcore.ForecastBreakdown) {
     baseLine := fmt.Sprintf("命中 %d%%  与ダメ %d  必殺 %d%%", fr.HitDisp, fr.Dmg, fr.Crit)
     uicore.TextDraw(dst, baseLine, uicore.FaceMain, x, y, uicore.ColText)
-    if wt := weaponTable(); wt != nil {
+    if wt := scenes.WeaponTable(); wt != nil {
         aType := weaponTypeOf(wt, atk)
         dType := weaponTypeOf(wt, def)
         lbl, col := triangleRelationLabelColor(gcore.TriangleRelationOf(aType, dType))
@@ -106,24 +79,28 @@ func drawForecastLeft(dst *ebiten.Image, x, y int, atk, def uicore.Unit, fr gcor
     wrap := dynamicWrap(dst.Bounds().Dx(), uicore.ListMarginPx(), true)
     leftHitLine := fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
         bk.WeapHit, bk.Skl2, bk.LckHalf, bk.AttTileHit, bk.DefSpd2, bk.DefLck, bk.DefTileAvoid, bk.TriangleHit, bk.HitDisp)
-    y2 := uicore.DrawWrapped(dst, uicore.FaceSmall, leftHitLine, x, y+uicore.S(50), color.RGBA{210,230,255,255}, wrap, uicore.LineHSmallPx())
-    leftDmgLine := fmt.Sprintf("[与ダメ内訳] 力:%d + 威力:%d + 相性:%+d - 守備合計:%d = %d", bk.AtkStr, bk.WpnMt, bk.TriangleMt, bk.DefTotal, bk.Dmg)
-    _ = uicore.DrawWrapped(dst, uicore.FaceSmall, leftDmgLine, x, y2, color.RGBA{210,230,255,255}, wrap, uicore.LineHSmallPx())
+    y2 := uicore.DrawWrapped(dst, uicore.FaceSmall, leftHitLine, x, y+uicore.S(26), uicore.ColText, wrap, uicore.LineHSmallPx())
+    _ = y2
+    dmgLine := fmt.Sprintf("[与ダメ内訳] 力:%d + 武器D%d + 相性:%+d - 守備合計:%d = %d",
+        bk.AtkStr, bk.WpnMt, bk.TriangleMt, bk.DefTotal, bk.Dmg)
+    _ = uicore.DrawWrapped(dst, uicore.FaceSmall, dmgLine, x, y+uicore.S(26)+uicore.LineHSmallPx(), uicore.ColText, wrap, uicore.LineHSmallPx())
 }
 
-// 右側の予測（反撃側）: 反撃可否に応じた表示 + 内訳
+// 右側の予測（防御側）
 func drawForecastRight(dst *ebiten.Image, x, y, sw, lm int, canCounter bool, fr gcore.ForecastResult, bk gcore.ForecastBreakdown) {
-    wrapRight := dynamicWrap(sw, lm, false)
+    label := "反撃不可"
     if canCounter {
-        base := fmt.Sprintf("(反撃) 命中 %d%%  与ダメ %d  必殺 %d%%", fr.HitDisp, fr.Dmg, fr.Crit)
-        _ = uicore.DrawWrapped(dst, uicore.FaceMain, base, x, y, uicore.ColText, wrapRight, uicore.LineHMainPx())
-        rightHit := fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
+        label = fmt.Sprintf("命中 %d%%  与ダメ %d  必殺 %d%%", fr.HitDisp, fr.Dmg, fr.Crit)
+    }
+    wrap := dynamicWrap(sw, lm, false)
+    uicore.TextDraw(dst, label, uicore.FaceMain, x, y, uicore.ColText)
+    if canCounter {
+        rightHitLine := fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
             bk.WeapHit, bk.Skl2, bk.LckHalf, bk.AttTileHit, bk.DefSpd2, bk.DefLck, bk.DefTileAvoid, bk.TriangleHit, bk.HitDisp)
-        y2 := uicore.DrawWrapped(dst, uicore.FaceSmall, rightHit, x, y+uicore.S(50), color.RGBA{210,230,255,255}, wrapRight, uicore.LineHSmallPx())
-        rightDmg := fmt.Sprintf("[与ダメ内訳] 力:%d + 威力:%d + 相性:%+d - 守備合計:%d = %d", bk.AtkStr, bk.WpnMt, bk.TriangleMt, bk.DefTotal, bk.Dmg)
-        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, rightDmg, x, y2, color.RGBA{210,230,255,255}, wrapRight, uicore.LineHSmallPx())
-    } else {
-        _ = uicore.DrawWrapped(dst, uicore.FaceMain, "(反撃不可) 命中 -  与ダメ -  必殺 -", x, y, color.RGBA{180,180,180,255}, wrapRight, uicore.LineHMainPx())
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, rightHitLine, x, y+uicore.S(26), uicore.ColText, wrap, uicore.LineHSmallPx())
+        dmgLine := fmt.Sprintf("[与ダメ内訳] 力:%d + 武器D%d + 相性:%+d - 守備合計:%d = %d",
+            bk.AtkStr, bk.WpnMt, bk.TriangleMt, bk.DefTotal, bk.Dmg)
+        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, dmgLine, x, y+uicore.S(26)+uicore.LineHSmallPx(), uicore.ColText, wrap, uicore.LineHSmallPx())
     }
 }
 
@@ -148,7 +125,7 @@ func drawBattleSide(dst *ebiten.Image, u uicore.Unit, x, y int) {
     wep := "-"
     if len(u.Equip) > 0 { wep = u.Equip[0].Name }
     // 攻撃速度
-    as := adapter.AttackSpeedOf(weaponTable(), u)
+    as := adapter.AttackSpeedOf(scenes.WeaponTable(), u)
     lineY := y + uicore.S(410)
     uicore.TextDraw(dst, fmt.Sprintf("攻撃速度 %d", as), uicore.FaceSmall, x, lineY, uicore.ColText)
     lineY += uicore.LineHSmallPx()
@@ -168,7 +145,7 @@ func dynamicWrap(sw, lm int, left bool) int {
 
 // explain 版
 func forecastBothWithTerrainExplain(atk, def uicore.Unit, attT, defT gcore.Terrain) (gcore.ForecastResult, gcore.ForecastBreakdown, gcore.ForecastResult, gcore.ForecastBreakdown, bool, bool) {
-    wt := weaponTable()
+    wt := scenes.WeaponTable()
     if wt == nil {
         return gcore.ForecastResult{}, gcore.ForecastBreakdown{}, gcore.ForecastResult{}, gcore.ForecastBreakdown{}, false, false
     }
@@ -194,15 +171,6 @@ func weaponTypeOf(wt *model.WeaponTable, u uicore.Unit) string {
     if len(u.Equip) == 0 { return "" }
     if w, ok := wt.Find(u.Equip[0].Name); ok { return w.Type }
     return ""
-}
-
-func weaponTable() *model.WeaponTable {
-    if wtShared != nil { return wtShared }
-    if wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json"); err == nil {
-        wtShared = wt
-        return wtShared
-    }
-    return nil
 }
 
 func triangleRelationLabelColor(rel gcore.TriangleRelation) (string, color.Color) {
@@ -238,54 +206,5 @@ func DrawBattleLogOverlay(dst *ebiten.Image, logs []string) {
     hint := "クリック または Z/Enter で閉じる"
     tw := int(font.MeasureString(uicore.FaceSmall, hint) >> 6)
     uicore.TextDraw(dst, hint, uicore.FaceSmall, px+(pw-tw)/2, py+ph-16, color.RGBA{210, 220, 240, 255})
-}
-
-// DrawBattleLogOverlayScroll はオフセット指定でスクロール表示します。
-func DrawBattleLogOverlayScroll(dst *ebiten.Image, logs []string, offset int) {
-    if len(logs) == 0 { return }
-    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
-    vector.DrawFilledRect(dst, 0, 0, float32(sw), float32(sh), color.RGBA{0, 0, 0, 140}, false)
-    pw, ph := int(float32(sw)*0.7), 300
-    px := (sw - pw) / 2
-    py := (sh - ph) / 2
-    uicore.DrawFramedRect(dst, float32(px), float32(py), float32(pw), float32(ph))
-    vector.DrawFilledRect(dst, float32(px), float32(py), float32(pw), float32(ph), color.RGBA{25, 30, 50, 230}, false)
-    uicore.TextDraw(dst, "戦闘ログ", uicore.FaceMain, px+16, py+24, uicore.ColAccent)
-    maxLines := (ph - uicore.S(64)) / uicore.LineHSmallPx()
-    if maxLines < 1 { maxLines = 1 }
-    if offset < 0 { offset = 0 }
-    if offset > len(logs)-1 { offset = len(logs)-1 }
-    start := len(logs) - maxLines - offset
-    if start < 0 { start = 0 }
-    end := start + maxLines
-    if end > len(logs) { end = len(logs) }
-    y := py + 48
-    for i := start; i < end; i++ {
-        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, logs[i], px+uicore.S(16), y, uicore.ColText, pw-uicore.S(32), uicore.LineHSmallPx())
-        y += uicore.LineHSmallPx()
-    }
-    hint := "上下/ホイールでスクロール・停止で閉じる"
-    tw := int(font.MeasureString(uicore.FaceSmall, hint) >> 6)
-    uicore.TextDraw(dst, hint, uicore.FaceSmall, px+(pw-tw)/2, py+ph-12, color.RGBA{210, 220, 240, 255})
-}
-
-// DrawBattleLogs は画面下部に戦闘ログを表示します。
-func DrawBattleLogs(dst *ebiten.Image, logs []string) {
-    if len(logs) == 0 { return }
-    sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()
-    w, h := sw-2*uicore.ListMargin-80, 160
-    x := uicore.ListMargin + 40
-    y := sh - uicore.ListMargin - h - 10
-    uicore.DrawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
-    vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), color.RGBA{25, 30, 50, 220}, false)
-    uicore.TextDraw(dst, "戦闘ログ", uicore.FaceMain, x+12, y+24, uicore.ColAccent)
-    maxLines := (h - uicore.S(40)) / uicore.LineHSmallPx()
-    lineY := y + 40
-    start := 0
-    if len(logs) > maxLines { start = len(logs) - maxLines }
-    for i := start; i < len(logs); i++ {
-        _ = uicore.DrawWrapped(dst, uicore.FaceSmall, logs[i], x+uicore.S(12), lineY, uicore.ColText, w-uicore.S(24), uicore.LineHSmallPx())
-        lineY += uicore.LineHSmallPx()
-    }
 }
 
