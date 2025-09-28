@@ -5,7 +5,6 @@ import (
 
     "github.com/hajimehoshi/ebiten/v2"
     "github.com/hajimehoshi/ebiten/v2/ebitenutil"
-    "github.com/hajimehoshi/ebiten/v2/inpututil"
     "ui_sample/internal/game"
     gamesvc "ui_sample/internal/game/service"
     uicore "ui_sample/internal/game/service/ui"
@@ -14,7 +13,7 @@ import (
     gcore "ui_sample/pkg/game"
 )
 
-// Sim シーン（模擬戦）
+// Sim シーン（模擬戦）: character_list 準拠の更新フロー
 type Sim struct{
     E *scenes.Env
     simAtk uicore.Unit
@@ -30,47 +29,45 @@ type Sim struct{
     defSel int
     pop bool
     sw, sh int
+    // ホバー状態
+    backHovered bool
+    startHovered bool
+    autoHovered bool
+    attHover int // -1/0..2
+    defHover int // -1/0..2
 }
 
-func NewSim(e *scenes.Env, atk, def uicore.Unit) *Sim { return &Sim{E:e, simAtk:atk, simDef:def, turn:1} }
+func NewSim(e *scenes.Env, atk, def uicore.Unit) *Sim { return &Sim{E:e, simAtk:atk, simDef:def, turn:1, attHover:-1, defHover:-1} }
 func (s *Sim) ShouldPop() bool { return s.pop }
+
+// Intent 種別
+type IntentKind int
+
+const (
+    intentNone IntentKind = iota
+    intentBack
+    intentCloseLog
+    intentRunOne
+    intentToggleAuto
+    intentSetTerrainAtt // Index: 0..2
+    intentSetTerrainDef // Index: 0..2
+)
+type Intent struct{ Kind IntentKind; Index int }
+func (Intent) IsSceneIntent() {}
+
+type smContract interface{
+    smHandleInput(ctx *game.Ctx) []scenes.Intent
+    smAdvance([]scenes.Intent)
+    smFlush(ctx *game.Ctx)
+}
+var _ smContract = (*Sim)(nil)
 
 func (s *Sim) Update(ctx *game.Ctx) (game.Scene, error) {
     s.sw, s.sh = ctx.ScreenW, ctx.ScreenH
-    // ログポップアップ中は閉じるのみ
-    if s.logPopup {
-        if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { s.logPopup=false; return nil,nil }
-        if ctx!=nil && ctx.Input!=nil && ctx.Input.Press(gamesvc.Confirm) { s.logPopup=false; return nil,nil }
-        return nil,nil
-    }
-    // 戻る
-    bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
-    mx, my := ebiten.CursorPosition()
-    if scenes.PointIn(mx,my,bx,by,bw,bh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { s.pop=true; return nil,nil }
-    if ctx!=nil && ctx.Input!=nil && ctx.Input.Press(gamesvc.Cancel) { s.pop=true; return nil,nil }
-    // 実行
-    canStart := s.simAtk.HP > 0 && s.simDef.HP > 0
-    bx2, by2, bw2, bh2 := scenes.BattleStartButtonRect(s.sw, s.sh)
-    leftFirst := (s.turn%2==1)
-    if canStart && scenes.PointIn(mx,my,bx2,by2,bw2,bh2) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-        s.runOne(leftFirst)
-    }
-    if canStart && ctx!=nil && ctx.Input!=nil && ctx.Input.Press(gamesvc.Confirm) { s.runOne(leftFirst) }
-    // 自動実行
-    if s.auto && canStart && !s.logPopup {
-        if s.autoCD>0 { s.autoCD-- } else { s.runOne(leftFirst); s.autoCD=10 }
-    }
-    // 自動実行トグル
-    ax, ay, aw, ah := scenes.AutoRunButtonRect(s.sw, s.sh)
-    if scenes.PointIn(mx,my,ax,ay,aw,ah) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { s.auto=!s.auto; if s.auto { s.logPopup=false } }
-    // 地形ボタン
-    for i:=0;i<3;i++{
-        ax,ay,aw,ah := uiwidgets.TerrainButtonRect(s.sw, s.sh, true, i)
-        if scenes.PointIn(mx,my,ax,ay,aw,ah) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { s.attSel=i; switch i{case 0:s.attTerrain=gcore.Terrain{}; case 1:s.attTerrain=gcore.Terrain{Avoid:20,Def:1}; case 2:s.attTerrain=gcore.Terrain{Avoid:15,Def:2}} }
-        dx,dy,dw,dh := uiwidgets.TerrainButtonRect(s.sw, s.sh, false, i)
-        if scenes.PointIn(mx,my,dx,dy,dw,dh) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) { s.defSel=i; switch i{case 0:s.defTerrain=gcore.Terrain{}; case 1:s.defTerrain=gcore.Terrain{Avoid:20,Def:1}; case 2:s.defTerrain=gcore.Terrain{Avoid:15,Def:2}} }
-    }
-    return nil,nil
+    intents := s.smHandleInput(ctx)
+    s.smAdvance(intents)
+    s.smFlush(ctx)
+    return nil, nil
 }
 
 func (s *Sim) runOne(leftFirst bool){
@@ -88,11 +85,90 @@ func (s *Sim) Draw(dst *ebiten.Image){
     canStart := s.simAtk.HP>0 && s.simDef.HP>0 && !s.logPopup
     scenes.DrawBattleWithTerrain(dst, s.simAtk, s.simDef, s.attTerrain, s.defTerrain, canStart)
     uiwidgets.DrawTerrainButtons(dst, s.attSel, s.defSel)
-    mx,my := ebiten.CursorPosition(); ax,ay,aw,ah := scenes.AutoRunButtonRect(s.sw, s.sh)
-    uiwidgets.DrawAutoRunButton(dst, scenes.PointIn(mx,my,ax,ay,aw,ah), s.auto)
+    mx,my := ebiten.CursorPosition()
+    ax,ay,aw,ah := scenes.AutoRunButtonRect(s.sw, s.sh)
+    s.autoHovered = scenes.PointIn(mx,my,ax,ay,aw,ah)
+    uiwidgets.DrawAutoRunButton(dst, s.autoHovered, s.auto)
     if s.logPopup { scenes.DrawBattleLogOverlay(dst, s.logs) }
     if s.turn<=0 { s.turn=1 }
     leftFirst := (s.turn%2==1); label := "先攻: "; if leftFirst { label+=s.simAtk.Name } else { label+=s.simDef.Name }
     ebitenutil.DebugPrintAt(dst, label, uicore.ListMarginPx()+uicore.S(40), uicore.ListMarginPx()+uicore.S(56))
-    bx,by,bw,bh := uiwidgets.BackButtonRect(s.sw, s.sh); uiwidgets.DrawBackButton(dst, scenes.PointIn(mx,my,bx,by,bw,bh))
+    bx,by,bw,bh := uiwidgets.BackButtonRect(s.sw, s.sh)
+    s.backHovered = scenes.PointIn(mx,my,bx,by,bw,bh)
+    uiwidgets.DrawBackButton(dst, s.backHovered)
 }
+
+// --- 内部: handle → advance → flush -------------------------------------------------
+
+func (s *Sim) smHandleInput(ctx *game.Ctx) []scenes.Intent {
+    intents := make([]scenes.Intent, 0, 6)
+    mx, my := ebiten.CursorPosition()
+    // ホバー更新
+    bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
+    s.backHovered = scenes.PointIn(mx,my,bx,by,bw,bh)
+    sx, sy, sw2, sh2 := scenes.BattleStartButtonRect(s.sw, s.sh)
+    s.startHovered = scenes.PointIn(mx,my,sx,sy,sw2,sh2)
+    ax, ay, aw, ah := scenes.AutoRunButtonRect(s.sw, s.sh)
+    s.autoHovered = scenes.PointIn(mx,my,ax,ay,aw,ah)
+    s.attHover, s.defHover = -1, -1
+    for i:=0; i<3; i++ {
+        tx,ty,tw,th := uiwidgets.TerrainButtonRect(s.sw, s.sh, true, i)
+        if scenes.PointIn(mx,my,tx,ty,tw,th) { s.attHover = i }
+        dx,dy,dw,dh := uiwidgets.TerrainButtonRect(s.sw, s.sh, false, i)
+        if scenes.PointIn(mx,my,dx,dy,dw,dh) { s.defHover = i }
+    }
+
+    if ctx != nil && ctx.Input != nil {
+        if s.logPopup {
+            if ctx.Input.Press(gamesvc.Confirm) { intents = append(intents, Intent{Kind: intentCloseLog}) }
+            return intents
+        }
+        if ctx.Input.Press(gamesvc.Cancel) { intents = append(intents, Intent{Kind: intentBack}) }
+        if s.startHovered && (s.simAtk.HP>0 && s.simDef.HP>0) && ctx.Input.Press(gamesvc.Confirm) {
+            intents = append(intents, Intent{Kind: intentRunOne})
+        }
+        if s.autoHovered && ctx.Input.Press(gamesvc.Confirm) { intents = append(intents, Intent{Kind: intentToggleAuto}) }
+        if s.attHover >= 0 && ctx.Input.Press(gamesvc.Confirm) { intents = append(intents, Intent{Kind: intentSetTerrainAtt, Index: s.attHover}) }
+        if s.defHover >= 0 && ctx.Input.Press(gamesvc.Confirm) { intents = append(intents, Intent{Kind: intentSetTerrainDef, Index: s.defHover}) }
+        // キーショートカット（1/2/3, Shift+1/2/3）
+        if ctx.Input.Press(gamesvc.TerrainAtt1) { intents = append(intents, Intent{Kind: intentSetTerrainAtt, Index: 0}) }
+        if ctx.Input.Press(gamesvc.TerrainAtt2) { intents = append(intents, Intent{Kind: intentSetTerrainAtt, Index: 1}) }
+        if ctx.Input.Press(gamesvc.TerrainAtt3) { intents = append(intents, Intent{Kind: intentSetTerrainAtt, Index: 2}) }
+        if ctx.Input.Press(gamesvc.TerrainDef1) { intents = append(intents, Intent{Kind: intentSetTerrainDef, Index: 0}) }
+        if ctx.Input.Press(gamesvc.TerrainDef2) { intents = append(intents, Intent{Kind: intentSetTerrainDef, Index: 1}) }
+        if ctx.Input.Press(gamesvc.TerrainDef3) { intents = append(intents, Intent{Kind: intentSetTerrainDef, Index: 2}) }
+    }
+    return intents
+}
+
+func (s *Sim) smAdvance(intents []scenes.Intent) {
+    for _, any := range intents {
+        it, ok := any.(Intent); if !ok { continue }
+        switch it.Kind {
+        case intentCloseLog:
+            s.logPopup = false
+        case intentBack:
+            s.pop = true
+        case intentRunOne:
+            leftFirst := (s.turn%2==1)
+            s.runOne(leftFirst)
+        case intentToggleAuto:
+            s.auto = !s.auto
+            if s.auto { s.logPopup = false }
+        case intentSetTerrainAtt:
+            s.attSel = it.Index
+            switch it.Index { case 0: s.attTerrain = gcore.Terrain{}; case 1: s.attTerrain = gcore.Terrain{Avoid:20,Def:1}; case 2: s.attTerrain = gcore.Terrain{Avoid:15,Def:2} }
+        case intentSetTerrainDef:
+            s.defSel = it.Index
+            switch it.Index { case 0: s.defTerrain = gcore.Terrain{}; case 1: s.defTerrain = gcore.Terrain{Avoid:20,Def:1}; case 2: s.defTerrain = gcore.Terrain{Avoid:15,Def:2} }
+        }
+    }
+    // 自動実行
+    canStart := s.simAtk.HP>0 && s.simDef.HP>0
+    leftFirst := (s.turn%2==1)
+    if s.auto && canStart && !s.logPopup {
+        if s.autoCD>0 { s.autoCD-- } else { s.runOne(leftFirst); s.autoCD=10 }
+    }
+}
+
+func (s *Sim) smFlush(_ *game.Ctx) { /* 今はなし */ }
