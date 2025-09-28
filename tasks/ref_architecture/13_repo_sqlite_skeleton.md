@@ -29,9 +29,8 @@
 - 追加ディレクトリを削除。
 
 ## Progress / Notes
-- YYYY-MM-DD: 着手
-- YYYY-MM-DD: 追加・mcp通過
+- 2025-09-28: 着手
+- 2025-09-28: 追加・mcp通過（sqlite/{user,weapons,inventory}.go を追加）
 
 ## 関連
 - `docs/ARCHITECTURE.md` 9章
-
