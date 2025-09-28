@@ -1,5 +1,5 @@
-// Package app はユースケース層（アプリケーションサービス）を提供します。
-package app
+// Package usecase はユースケース層（アプリケーションサービス）を提供します。
+package usecase
 
 import (
     "fmt"
@@ -9,7 +9,6 @@ import (
     "ui_sample/internal/repo"
     uicore "ui_sample/internal/game/service/ui"
     "ui_sample/internal/user"
-    "ui_sample/internal/assets"
     gcore "ui_sample/pkg/game"
 )
 
@@ -60,8 +59,6 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
         ga2, gd2 = ga3, gd3
     }
     // 追撃（AS差>=3）
-    asAtk := gcore.AttackSpeed(ga)
-    asDef := gcore.AttackSpeed(gd)
     if gd2.S.HP > 0 && gcore.DoubleAdvantage(ga, gd) {
         logs = append(logs, atk.Name+" の追撃")
         ga4, gd4, line3 := gcore.ResolveRoundAt(ga2, gd2, attT, defT, a.RNG)
@@ -69,7 +66,6 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
         if line3 != "" { logs = append(logs, line3) }
         ga2, gd2 = ga4, gd4
     } else if ga2.S.HP > 0 && canCounter && gcore.DoubleAdvantage(gd, ga) {
-        _ = asAtk; _ = asDef // for symmetry / readability
         logs = append(logs, def.Name+" の追撃")
         gd4, ga4, line4 := gcore.ResolveRoundAt(gd2, ga2, defT, attT, a.RNG)
         defCount++
@@ -126,17 +122,15 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
     return units, logs, true, nil
 }
 
-// ReloadData は JSON バックエンドのキャッシュを再読み込みします。
+// ReloadData は JSON バックエンドのキャッシュを再読み込みします（UI資産のクリアは呼び出し側で実施）。
 func (a *App) ReloadData() error {
     if a == nil { return nil }
     if a.Weapons != nil { if err := a.Weapons.Reload(); err != nil { return err } }
-    // 画像キャッシュもここでクリア（UI層の依存を薄く保ちつつ、利便性を優先）
-    assets.Clear()
+    if a.Inv != nil { if err := a.Inv.Reload(); err != nil { return err } }
     return nil
 }
 
-// WeaponsTable は共有用の武器テーブル参照を返します。
-// UIはこれを `ui.SetWeaponTable` に渡して利用します。
+// WeaponsTable は共有用の武器テーブル参照を返します（gdata.Provider 用）。
 func (a *App) WeaponsTable() *model.WeaponTable {
     if a == nil || a.Weapons == nil { return nil }
     return a.Weapons.Table()
@@ -157,3 +151,54 @@ func (a *App) PersistUnit(u uicore.Unit) error {
 
 // Inventory は在庫リポジトリへのアクセサです（Scene層からの参照用）。
 func (a *App) Inventory() repo.InventoryRepo { return a.Inv }
+
+// EquipWeapon は指定のユーザ武器をスロットに装備し、既オーナーの装備を巻き戻します。
+func (a *App) EquipWeapon(unitID string, slot int, userWeaponID string) error {
+    if a == nil || a.Users == nil { return nil }
+    t := a.Users.Table(); if t == nil { return nil }
+    c, ok := t.Find(unitID); if !ok { return nil }
+    var prev user.EquipRef
+    if slot < len(c.Equip) { prev = c.Equip[slot] }
+    // 既オーナーから外し、巻き戻す
+    ownerID := ""; ownerSlot := -1
+    for _, oc := range t.Slice() {
+        for idx, er := range oc.Equip { if er.UserWeaponsID == userWeaponID { ownerID = oc.ID; ownerSlot = idx; break } }
+        if ownerID != "" { break }
+    }
+    if ownerID != "" { if oc, ok2 := t.Find(ownerID); ok2 {
+        for len(oc.Equip) <= ownerSlot { oc.Equip = append(oc.Equip, user.EquipRef{}) }
+        oc.Equip[ownerSlot] = prev
+        t.UpdateCharacter(oc)
+    }}
+    // 装備確定
+    for len(c.Equip) <= slot { c.Equip = append(c.Equip, user.EquipRef{}) }
+    c.Equip[slot] = user.EquipRef{UserWeaponsID: userWeaponID}
+    t.UpdateCharacter(c)
+    return a.Users.Save()
+}
+
+// EquipItem は指定のユーザアイテムをスロットに装備し、既オーナーの装備を巻き戻します。
+func (a *App) EquipItem(unitID string, slot int, userItemID string) error {
+    if a == nil || a.Users == nil { return nil }
+    t := a.Users.Table(); if t == nil { return nil }
+    c, ok := t.Find(unitID); if !ok { return nil }
+    var prev user.EquipRef
+    if slot < len(c.Equip) { prev = c.Equip[slot] }
+    // 既オーナーから外し、巻き戻す
+    ownerID := ""; ownerSlot := -1
+    for _, oc := range t.Slice() {
+        for idx, er := range oc.Equip { if er.UserItemsID == userItemID { ownerID = oc.ID; ownerSlot = idx; break } }
+        if ownerID != "" { break }
+    }
+    if ownerID != "" { if oc, ok2 := t.Find(ownerID); ok2 {
+        for len(oc.Equip) <= ownerSlot { oc.Equip = append(oc.Equip, user.EquipRef{}) }
+        oc.Equip[ownerSlot] = prev
+        t.UpdateCharacter(oc)
+    }}
+    // 装備確定
+    for len(c.Equip) <= slot { c.Equip = append(c.Equip, user.EquipRef{}) }
+    c.Equip[slot] = user.EquipRef{UserItemsID: userItemID}
+    t.UpdateCharacter(c)
+    return a.Users.Save()
+}
+

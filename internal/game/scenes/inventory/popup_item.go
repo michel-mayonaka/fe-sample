@@ -84,36 +84,16 @@ func (v *ItemView) scAdvance(intents []scenes.Intent) {
         switch it.Kind {
         case ivChooseRow:
             owns := v.E.App.Inventory().Items()
-            if it.Index >= 0 && it.Index < len(owns) { v.equipItem(owns[it.Index].ID); v.Host.pop = true }
+            if it.Index >= 0 && it.Index < len(owns) {
+                _ = v.E.App.EquipItem(v.E.Selected().ID, v.E.CurrentSlot, owns[it.Index].ID)
+                v.Host.refreshUnitByID(v.E.Selected().ID)
+                v.Host.pop = true
+            }
         }
     }
 }
 
 func (v *ItemView) scFlush(_ *game.Ctx) { /* 今はなし */ }
-
-// equipItem は指定のユーザアイテムを現在スロットへ装備し、既装備のオーナーを巻き戻します。
-func (v *ItemView) equipItem(userItemID string) {
-    if v.E.UserTable == nil { return }
-    unit := v.E.Selected()
-    if c, ok := v.E.UserTable.Find(unit.ID); ok {
-        var prev user.EquipRef
-        if v.E.CurrentSlot < len(c.Equip) { prev = c.Equip[v.E.CurrentSlot] }
-        ownerID := ""; ownerSlot := -1
-        for _, oc := range v.E.UserTable.Slice() {
-            for idx, er := range oc.Equip { if er.UserItemsID == userItemID { ownerID = oc.ID; ownerSlot = idx; break } }
-            if ownerID != "" { break }
-        }
-        if ownerID != "" { if oc, ok2 := v.E.UserTable.Find(ownerID); ok2 {
-            for len(oc.Equip) <= ownerSlot { oc.Equip = append(oc.Equip, user.EquipRef{}) }
-            oc.Equip[ownerSlot] = prev
-            v.E.UserTable.UpdateCharacter(oc)
-        }}
-        for len(c.Equip) <= v.E.CurrentSlot { c.Equip = append(c.Equip, user.EquipRef{}) }
-        c.Equip[v.E.CurrentSlot] = user.EquipRef{UserItemsID: userItemID}
-        v.E.UserTable.UpdateCharacter(c); _ = v.E.UserTable.Save(v.E.UserPath)
-        v.Host.refreshUnitByID(c.ID)
-    }
-}
 
 // BuildItemRowsFromSnapshots は所持アイテムと定義から行を構築します。
 func BuildItemRowsFromSnapshots(owns []user.OwnItem, it *model.ItemDefTable) []ItemRow {

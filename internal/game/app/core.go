@@ -12,8 +12,8 @@ import (
     gamesvc "ui_sample/internal/game/service"
     "ui_sample/internal/repo"
     uicore "ui_sample/internal/game/service/ui"
-    "ui_sample/internal/user"
     gdata "ui_sample/internal/game/data"
+    "ui_sample/internal/usecase"
 )
 
 // NewUIAppGame は UI サンプル用にポートを注入し SceneStack を構築した ebiten.Game を返します。
@@ -25,8 +25,6 @@ func NewUIAppGame() *Game {
 
     // ユーザパス/テーブル
     userPath := config.DefaultUserPath
-    var ut *user.Table
-    if t, err := user.LoadFromJSON(userPath); err == nil { ut = t }
     // 一覧
     units, _ := uicore.LoadUnitsFromUser(userPath)
     if len(units) == 0 { units = []uicore.Unit{uicore.SampleUnit()} }
@@ -35,7 +33,7 @@ func NewUIAppGame() *Game {
     urepo, _ := repo.NewJSONUserRepo(userPath)
     wrepo, _ := repo.NewJSONWeaponsRepo(config.DefaultWeaponsPath)
     inv, _ := repo.NewJSONInventoryRepo(config.DefaultUserWeaponsPath, config.DefaultUserItemsPath, config.DefaultWeaponsPath, "db/master/mst_items.json")
-    a := New(urepo, wrepo, inv, rng)
+    a := usecase.New(urepo, wrepo, inv, rng)
     // 推奨: プロバイダ経由でテーブルをDI
     gdata.SetProvider(a)
     // 互換呼び出しは不要になったため省略（Provider経由で参照）
@@ -44,7 +42,7 @@ func NewUIAppGame() *Game {
     uicore.SetBaseResolution(screenW, screenH)
 
     // Env（共有状態）
-    env := &scenes.Env{App: a, UserTable: ut, UserPath: userPath, RNG: rng, Units: units, SelIndex: 0}
+    env := &scenes.Env{App: a, UserTable: urepo.Table(), UserPath: userPath, RNG: rng, Session: &scenes.Session{Units: units, SelIndex: 0}}
 
     // Game（Runner + AfterUpdate）
     g := &Game{Runner: Runner{}, Input: in, Env: env, prevTime: time.Now()}

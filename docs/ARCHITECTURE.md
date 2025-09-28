@@ -1,33 +1,263 @@
-# アーキテクチャ指針 v1（Scene/Actor/Service）
+# UI サンプル理想アーキテクチャ（合意版）
 
-最終更新: 2025-09-28
+本ドキュメントは、UI サンプル（Ebiten）プロジェクトにおける「現時点の理想アーキテクチャ」を示します。目的は、役割分担の明確化、依存方向の固定、肥大化の抑止（特に Env）、および拡張・移行の手順を共有することです。
 
-## 原則
-- Scene / Actor / Service の3層。ECS は必要箇所に限定して後付け可能。
-- Update 順序を契約として固定し、デバッグ容易性を最優先。
-- データ駆動（TSV/JSON）＋開発時ホットリロードで調整コストを削減。
-- 描画は固定レイヤ＋アトラス化。純ロジックは純関数化し `go test` 可能に。
-- 「使う側が定義する小さな interface」を基本とし疎結合化。
+最終更新: 2025-09-29
 
-## ディレクトリ構成（あるべき姿）
+## 1. レイヤと役割
 
-`/internal/game/`
-- `app/`            ebiten.Game の心臓。フレーム駆動、SceneStack 管理。
-- `ctx.go`          フレームコンテキスト（DT/Frame/Screen/Input/Services）。
-- `scene.go`        `Scene` インタフェースと `SceneStack` 実装。
-- `scenes/`         画面群（character_list/status/inventory/sim など）。
-- `actor/`          `IActor` と具体 Actor（unit/cursor/fx）。
-- `service/`        入出力・資産・音・カメラ・UI・ホットリロード。
-- `data/`           Sceneへ渡す読み取り専用テーブル群のDIプロバイダ（`TableProvider`）。
-- `domain/`         UI 非依存のゲームルール（model/rules/port）。
-- `repository/`     port 実装（tsv/embed/save_file/save_web/migrate）。
-- `world/`          表示側の盤面制御（タイル/ハイライト/アダプタ）。
-- `render/`         レイヤ描画（背景/世界/影/FX/UI）。
-- `data/`           `tables/` `maps/`（CSV/TSV/JSON）。
-- `assets/`         アトラス/フォント/音源。
-- `util/`           RNG/幾何/IO/プラットフォーム分岐。
+- UI（Scenes）
+  - 画面遷移・入力解釈・描画。UI 一時状態（選択・ポップアップ等）は `Session` に保持。
+  - ルール: Repo/Assets/Model を直接操作しない。ユースケース（Port）を介してコマンド、`gdata.Provider` を介してクエリ。
 
-## コア API（最小）
+- Usecase（アプリケーションサービス）
+  - ビジネスルールの調停・副作用の集約（保存・巻き戻し・整合）。
+  - Repo を介して永続化へアクセス。UI 資産（画像キャッシュ等）には直接触れない。
+
+- Repo（インフラ層）
+  - 抽象化されたリポジトリインターフェースと実装（JSON/将来 SQLite）。
+  - 例: `UserRepo`, `WeaponsRepo`, `InventoryRepo`。
+
+- Model / User / Adapter
+  - Model: マスタ定義（武器・アイテム等）。
+  - User: ユーザセーブのスキーマとテーブル（ID 索引）。
+  - Adapter: UI と Game/Core の相互変換、表示値の計算補助。
+
+- Game Runtime（Runner/Game）
+  - Ebiten の `Game` 実装、SceneStack 管理、グローバルトグル（データ再読み込み、ヘルプ表示など）。
+  - UI レイヤに属する副作用（例: 画像キャッシュクリア）を受け持つ。
+
+- Data Provider（`internal/game/data`）
+  - 読み取り専用テーブル群のプロバイダ。UI からの「参照」を一本化。
+
+## 2. 依存原則（CQRS っぽい分離）
+
+- コマンド（更新）: Scenes → Usecase（Ports）→ Repo
+- クエリ（参照）  : Scenes → `gdata.Provider` → テーブル（例: `WeaponTable`）
+- Scenes は Repo/Assets/Model を直接インポートしない（Adapter/Provider 経由のみ）。
+- Usecase は UI 資産に触れない（画像キャッシュクリアは UI 側で実施）。
+
+## 3. Port（ユースケース境界）の分割方針
+
+env.go に全ユースケースを集約しない。ドメイン単位で Port を分割し、Scene は必要最小の Port のみを前提にする。
+
+推奨ポート（例）:
+```go
+// DataPort: データ再読み込み/保存など横断的操作
+type DataPort interface {
+    ReloadData() error
+    PersistUnit(u uicore.Unit) error
+}
+
+// BattlePort: 戦闘解決（本番）
+type BattlePort interface {
+    RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore.Terrain) ([]uicore.Unit, []string, bool, error)
+}
+
+// InventoryPort: 在庫と装備操作
+type InventoryPort interface {
+    Inventory() repo.InventoryRepo
+    EquipWeapon(unitID string, slot int, userWeaponID string) error
+    EquipItem(unitID string, slot int, userItemID string) error
+}
+
+// UseCases（任意）: 上記の合成（段階移行用のファサード）。
+type UseCases interface {
+    DataPort
+    BattlePort
+    InventoryPort
+}
+```
+
+導入手順:
+- `scenes/ports_*.go` に Port を定義（UI 側の最小依存）
+- `usecase/*.go` で実装（`App` が各ポートを満たす）
+- Scene は自分が使う Port だけを `Env` から受け取る（または Scene コンストラクタ引数で個別 DI）
+
+## 4. ディレクトリ構成（理想）
+
+```
+cmd/
+  ui_sample/
+    main.go
+
+internal/
+  game/
+    app/                  # Ebiten Runner/Window/入力の束ね（ユースケースは含めない）
+      core.go             # Game 構築（Ports/Provider注入・Env/Session生成）
+      game.go             # ebiten.Game 実装（Update/Draw/グローバル操作）
+      runner.go           # SceneStack の更新/描画
+
+    data/                 # 読み取り専用テーブルの Provider（UI 参照用）
+      provider.go         # SetProvider/Provider, TableProvider（WeaponsTable など）
+
+    scenes/               # UI シーン群（UI の状態遷移と描画）
+      ports.go            # UseCases（合成）※任意
+      ports_data.go       # DataPort
+      ports_battle.go     # BattlePort
+      ports_inventory.go  # InventoryPort
+      env.go              # Env（最小: Port/メタ情報/Session）
+      session.go          # Session（UI一時状態: 選択・ポップアップ等）
+      common/...          # 共有UI（popup等）
+      character_list/...  # 一覧
+      status/...          # ステータス
+      inventory/...       # 在庫
+      sim/...             # 模擬戦
+
+    service/              # 入力・UI描画ユーティリティ
+      ui/...              # テキスト/レイアウト/描画/フォント
+      ...
+
+  usecase/                # アプリケーションサービス（Ports 実装）
+    facade.go             # struct App, New(), 依存注入・共通メソッド
+    data.go               # DataPort 実装（ReloadData/PersistUnit）
+    battle.go             # BattlePort 実装（RunBattleRound）
+    inventory.go          # InventoryPort 実装（Inventory/EquipWeapon/EquipItem）
+
+  repo/                   # リポジトリIFと実装（JSON→将来SQLite）
+    user.go
+    weapons.go
+    inventory.go
+
+  model/                  # マスタ定義（武器・アイテム等）
+  user/                   # ユーザセーブ定義とテーブル
+  adapter/                # UI↔Game の変換/補助
+  assets/                 # 画像/音声ローダとキャッシュ
+  config/                 # パス/ビルドタグ等
+
+assets/                   # 画像・フォント・音源
+db/                       # JSON DB（将来 SQLite へ移行）
+docs/                     # ドキュメント
+```
+
+命名規約（抜粋）
+- Port 定義: `internal/game/scenes/ports_*.go`
+- Usecase 実装: `internal/usecase/*.go`（ドメイン単位）
+- テーブル参照は `gdata.Provider().XxxTable()` に統一（Port には載せない）
+
+## 5. Env/Session の責務分離
+
+Env（最小）:
+- ポート（または合成 UseCases）の参照
+- `UserTable`（読み書きテーブル参照を 1 箇所に集約）
+- `UserPath` `RNG` 等、アプリ起動時に決定されるメタ情報
+- `Session`（UI 一時状態）への委譲
+
+Session（UI 状態）:
+- `Units` `SelIndex` `CurrentSlot` などの UI 表示用の一時的値
+- ポップアップの開閉・直後状態・在庫タブなど
+- ドメイン保存/巻き戻しは行わない（Usecase 経由でのみ変更確定）
+
+この分離により、`env.go` 自体の肥大化を防ぎます。
+
+## 6. シーケンス例
+
+### 6.1 武器装備の確定（選択スロットへ割当）
+1) ユーザ操作（在庫ポップアップで候補行を Confirm）
+2) Scene → `InventoryPort.EquipWeapon(unitID, slot, userWeaponID)` を呼ぶ
+3) Usecase:
+   - 既オーナーのスロットから外す→元の装備を巻き戻し
+   - 対象ユニットの `slot` に `userWeaponID` を設定
+   - `UserRepo.Save()` で永続化
+4) Scene: 表示同期（`refreshUnitByID` 等）
+
+ポイント:
+- UI は Repo を直接書き換えない
+- 複数テーブル更新（巻き戻し）をユースケースに集約
+
+### 6.2 データ再読み込み（ホットリロード）
+1) グローバルトグル（Backspace 長押し等）で発火
+2) `DataPort.ReloadData()` → Repo 側のキャッシュ再読込
+3) UI で `assets.Clear()`（画像キャッシュ等の UI 資産クリア）
+4) `uicore.LoadUnitsFromUser` で UI 用ユニットを再構築
+5) `gdata.SetProvider(usecaseApp)` により参照テーブルを最新化
+
+### 6.3 戦闘解決（本番）
+1) 戦闘開始 → Scene から `BattlePort.RunBattleRound(...)`
+2) Usecase 内で `adapter.UIToGame` して解決→HP/耐久を反映→`UserRepo/InventoryRepo.Save()`
+3) Scene がログを受け取りオーバレイ表示
+
+## 7. クエリ/コマンドの分離（Why Provider?）
+
+- クエリは参照専用・副作用なし。`gdata.Provider()` を用いることで UI からの参照経路を 1 本化できる。
+- コマンドは副作用を伴う。Usecase に集約することで UI 直書きのリスク（半更新・整合崩れ）を回避。
+
+## 8. テスト方針
+
+- Usecase 単体テスト
+  - Repo のフェイク（インメモリ実装）で巻き戻し/装備移譲の整合を検証
+  - 例: EquipWeapon の「所有者移動＋巻き戻し＋保存」の一貫性
+
+- Scene の軽量結合テスト
+  - 入力→Intent→状態遷移（選択/ポップアップ）を中心に
+  - テーブル参照は Provider をフェイク化（DI）して検証
+
+## 9. マイグレーション（JSON → SQLite）
+
+- Port/Usecase から見える境界は不変（Repo 実装差し替え）
+- テーブル参照（Provider）はバックエンド差し替えによる影響を受けない
+- 手順（例）:
+  1) `repo/sqlite/*` 実装を追加
+  2) `NewUIAppGame()` の注入先を JSON→SQLite に切替
+  3) 回帰テスト（Usecase テストが後方互換を担保）
+
+## 10. 命名・スタイル（補足）
+
+- ファイル名
+  - Port 定義: `ports_data.go`, `ports_battle.go`, `ports_inventory.go`
+  - Usecase 実装: `data.go`, `battle.go`, `inventory.go`（`facade.go` に `App` 本体と DI）
+  - 画面: `character_list.go`, `status.go`, `inventory.go` など機能名ベース
+
+- GoDoc
+  - エクスポート識別子には役割を一行で（例: `// BattlePort は戦闘解決のユースケース境界です。`）
+
+## 11. 導入ステップ（現在実装との差分を埋める）
+
+1) `scenes/ports_*.go` を追加し、env.go から境界定義を移動
+2) Scene 側の依存を必要最小 Port に変更
+3) `usecase/*` をドメイン別ファイルに分割（`facade.go` + 各ドメイン）
+4) Provider の拡張（必要なら Items 等を追加）
+5) Usecase のユニットテスト追加
+
+## 12. 直近の議論要約（設計方針の確認）
+
+### 12.1 env.go の肥大化懸念について
+- Env に全ユースケースを積み増すのは避ける。
+- 共有 UI 状態は `Session` に集約し、Env は「Port 参照＋メタ情報＋Session」の最小構成に留める。
+- 依存の原則を固定：
+  - コマンド（更新）は Port（Usecase）経由。
+  - クエリ（参照）は `gdata.Provider` 経由。
+- ファイル名と責務の整合を明確化：
+  - `env.go` = 環境コンテナ、`session.go` = UI 一時状態、`ports_*.go` = 境界定義、`usecase/*.go` = 実装。
+
+### 12.2 Port（境界）に関する合意
+- Port は「機能単位のユースケース契約」を小さく分割したもの（例：Data/Battle/Inventory）。
+- 「インターフェースは使う側に置く」原則に従い、Port 定義は `scenes` 配下に配置する。
+  - 利点：循環依存の回避、UI 要件の近接管理、Discoverability の向上。
+- 将来、CLI/サーバなど別フロントエンドでも共通化する必要が出たら、`internal/ports` 等へ昇格を検討。
+
+### 12.3 Scene と Port の関係
+- 各 Scene は自分が必要とする Port だけを利用（最小依存）。
+- 依存の持ち方は 2 案：
+  - A) Scene のコンストラクタに必要 Port を個別 DI（より厳密に最小化）。
+  - B) Env に複数 Port を載せ、Scene は必要なものだけ参照（導入容易・段階移行向け）。
+- 具体例：
+  - Status → `DataPort`（`PersistUnit`）
+  - Inventory → `InventoryPort`（`Inventory/EquipWeapon/EquipItem`）
+  - Battle 本番 → `BattlePort`（`RunBattleRound`）
+  - グローバル再読み込み（Game 側）→ `DataPort`（`ReloadData`）
+- クエリは常に Provider（例：`WeaponsTable`）で統一。Port は原則コマンド専用。
+
+### 12.4 今後のアクション（実装に移す際の順序）
+1) `scenes/ports_*.go` を追加し、Env から境界定義を切り出す。
+2) Scene ごとの依存を必要最小 Port へ縮小（A または B を選択）。
+3) `usecase` をドメイン別ファイル（`data.go`/`battle.go`/`inventory.go`）に整理。
+4) Provider の拡張（必要なら Items 等を追加）。
+5) Usecase のユニットテスト（装備移譲の巻き戻し、保存の一貫性）を追加。
+
+## 13. 旧 ARCHITECTURE.md から引き継ぐ指針
+
+### 13.1 コア API（最小）
 ```go
 // game.Scene
 Update(ctx *game.Ctx) (next game.Scene, err error)
@@ -37,13 +267,13 @@ Draw(screen *ebiten.Image)
 Current() Scene; Push(Scene); Pop() Scene; Replace(Scene); Size() int
 
 // game.Ctx
-DT/Frame/ScreenW/ScreenH と Input/Assets/Audio/Camera/UI/Rand/Debug
+// DT/Frame/ScreenW/ScreenH と Input/Assets/Audio/Camera/UI/Rand/Debug を保持
 
 // actor.IActor
 Update(*game.Ctx) bool; Draw(*ebiten.Image); Layer() int
 ```
 
-## Update 順序契約
+### 13.2 Update 順序契約（全 Scene で遵守）
 1) Input（Snapshot 固定）
 2) Script/AI（重い処理は分割）
 3) Physics/Board（座標・ZOC・当たり）
@@ -52,37 +282,18 @@ Update(*game.Ctx) bool; Draw(*ebiten.Image); Layer() int
 6) GC/Spawn（死活整理）
 7) Draw（レイヤ順）
 
-すべての Scene はこの順序を遵守します。
+### 13.3 入力（抽象アクション）と運用
+- アクション: `Up/Down/Left/Right/Confirm/Cancel/Menu/Next/Prev` に加え、便宜上 `OpenWeapons/OpenItems/EquipToggle/Slot1..5/Unassign` を定義。
+- Press/Down の使い分け:
+  - Press: UI トグル/決定/戻る等の瞬間操作（例: Confirm で決定、Cancel で戻る）。
+  - Down : 押下継続に意味がある操作（例: Menu=Backspace 長押しでデータリロード）。
 
-## データ提供（DI）: TableProvider
-- 目的: Scene をデータ取得実装（JSON/SQLite/メモリ）から切り離す。
-- 仕組み: `internal/game/data.TableProvider` を App が実装し、`data.SetProvider(app)` で注入。
-- 利用: Scene は `data.Provider().WeaponsTable()` など読み取り用メソッドのみを参照する。
-- 移行: 旧 `scenes.WeaponTable` は削除済み。ツール実行時の直読みは Provider 不在時の開発用途に限定。
+### 13.4 データ提供（DI）: TableProvider の原則
+- 目的: UI を取得実装（JSON/SQLite/メモリ）から切り離すための読み取り経路統一。
+- 実装: `internal/game/data.TableProvider` を App/Usecase が実装し、`data.SetProvider(app)` で注入。
+- 利用: Scene は `data.Provider().WeaponsTable()` など参照専用メソッドを用いる（コマンドは Port）。
 
-## Scene 設計（例: sim）
-- 司令塔: `sim/sim.go`（`Sim`/`NewSim`/`Update`/`Draw`）。
-- 入力: `sim/input.go`（入力→Intent）。
-- 遷移: `sim/logic.go`（状態機械・自動実行・runOne）。
-- 描画: `sim/view_rects.go`（Rect）、`sim/view_battle.go`（プレビュー/内訳/ログOverlay）。
-- ポップアップ: `sim/popup_*.go`（例: `popup_log.go`）。
-- ロジック: `sim/engine.go`（簡易戦闘；将来 `service/battle` へ抽出予定）。
+## 14. 運用・適用
 
-## データ駆動とホットリロード
-- マスタは `mst_*`、ユーザは `usr_*` の接頭辞で管理。
-- テーブルは CSV/TSV/JSON を許容。開発時は `tables/*.tsv` と `maps/*.json` をホットリロード。
-- マスタ→ユーザの上書きモデルを維持し、一貫した読取 API を提供。
-
-## 入力（抽象アクション）
-- `service.Input` を追加（Up/Down/Left/Right/Confirm/Cancel/Menu/Next/Prev）
-  に加え、実運用便宜のため `OpenWeapons/OpenItems/EquipToggle/Slot1..5/Unassign` を定義。
-- Snapshot/Press/Down を提供。キーボード→アクションへの投影で UI/パッド差分を吸収。
-
-Press/Down の運用ルール（暫定）
-- Press: UIトグル/決定/戻るなど「瞬間」操作（例: Confirm で戦闘開始、Cancel で戻る）。
-- Down: 押下継続の意味がある操作（例: Menu=Backspace 長押しでデータリロード）。
-
-## テスト戦略
-- `pkg/game` の純関数をユニットテストで担保。
-- Adapter/Repo/レイアウト計算など UI 非依存の純関数をテスト化。
-- 予測数値/A* 経路等はゴールデンファイルで検証。`replay` による再現性確保。
+- 本ドキュメントを唯一の設計指針とする。既存の `docs/architecture.md`（小文字版）は重複のため後続で削除またはリンク集約を検討。
+- 運用: 本アーキテクチャに沿って、複数セッションに分けて段階的に現行コードを整備（Port 分割→依存差し替え→Provider 拡張→テスト強化）。

@@ -10,6 +10,7 @@ import (
     gamesvc "ui_sample/internal/game/service"
     "ui_sample/internal/game/scenes"
     uicore "ui_sample/internal/game/service/ui"
+    "ui_sample/internal/assets"
 )
 
 const (
@@ -65,6 +66,8 @@ func (g *Game) updateGlobalToggles() {
         if g.reloadHold == 30 { // 約0.5秒（60FPS時）
             if g.Env != nil && g.Env.App != nil {
                 _ = g.Env.App.ReloadData()
+                // 画像キャッシュはUI側の責務としてここでクリア
+                assets.Clear()
             }
             // UIユニット再構築
             if g.Env != nil && g.Env.UserPath != "" {

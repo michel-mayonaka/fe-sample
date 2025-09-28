@@ -12,6 +12,7 @@ import (
     "ui_sample/internal/model"
     "ui_sample/internal/user"
     scenes "ui_sample/internal/game/scenes"
+    gdata "ui_sample/internal/game/data"
 )
 
 // WeaponRow はユーザ所持武器（耐久含む）+マスタ情報の結合行です（武器ビュー用）。
@@ -46,7 +47,9 @@ func (v *WeaponView) Update(ctx *game.Ctx) (game.Scene, error) {
 
 // Draw は武器一覧の描画を行います。
 func (v *WeaponView) Draw(dst *ebiten.Image) {
-    rows := BuildWeaponRowsWithOwners(v.E.App.Inventory().Weapons(), v.E.App.WeaponsTable(), v.E.UserTable)
+    var wt *model.WeaponTable
+    if p := gdata.Provider(); p != nil { wt = p.WeaponsTable() }
+    rows := BuildWeaponRowsWithOwners(v.E.App.Inventory().Weapons(), wt, v.E.UserTable)
     DrawWeaponListView(dst, rows, v.hover)
 }
 
@@ -84,37 +87,16 @@ func (v *WeaponView) scAdvance(intents []scenes.Intent) {
         switch it.Kind {
         case wvChooseRow:
             owns := v.E.App.Inventory().Weapons()
-            if it.Index >= 0 && it.Index < len(owns) { v.equipWeapon(owns[it.Index].ID); v.Host.pop = true }
+            if it.Index >= 0 && it.Index < len(owns) {
+                _ = v.E.App.EquipWeapon(v.E.Selected().ID, v.E.CurrentSlot, owns[it.Index].ID)
+                v.Host.refreshUnitByID(v.E.Selected().ID)
+                v.Host.pop = true
+            }
         }
     }
 }
 
 func (v *WeaponView) scFlush(_ *game.Ctx) { /* 今はなし */ }
-
-// equipWeapon は指定のユーザ武器を現在スロットへ装備し、既装備のオーナーを巻き戻します。
-func (v *WeaponView) equipWeapon(userWeaponID string) {
-    if v.E.UserTable == nil { return }
-    unit := v.E.Selected()
-    if c, ok := v.E.UserTable.Find(unit.ID); ok {
-        var prev user.EquipRef
-        if v.E.CurrentSlot < len(c.Equip) { prev = c.Equip[v.E.CurrentSlot] }
-        // 既装備のオーナーから外す
-        ownerID := ""; ownerSlot := -1
-        for _, oc := range v.E.UserTable.Slice() {
-            for idx, er := range oc.Equip { if er.UserWeaponsID == userWeaponID { ownerID = oc.ID; ownerSlot = idx; break } }
-            if ownerID != "" { break }
-        }
-        if ownerID != "" { if oc, ok2 := v.E.UserTable.Find(ownerID); ok2 {
-            for len(oc.Equip) <= ownerSlot { oc.Equip = append(oc.Equip, user.EquipRef{}) }
-            oc.Equip[ownerSlot] = prev
-            v.E.UserTable.UpdateCharacter(oc)
-        }}
-        for len(c.Equip) <= v.E.CurrentSlot { c.Equip = append(c.Equip, user.EquipRef{}) }
-        c.Equip[v.E.CurrentSlot] = user.EquipRef{UserWeaponsID: userWeaponID}
-        v.E.UserTable.UpdateCharacter(c); _ = v.E.UserTable.Save(v.E.UserPath)
-        v.Host.refreshUnitByID(c.ID)
-    }
-}
 
 // BuildWeaponRowsFromSnapshots は所持武器スナップショットと武器定義から行を構築します。
 func BuildWeaponRowsFromSnapshots(owns []user.OwnWeapon, wt *model.WeaponTable) []WeaponRow {
