@@ -92,3 +92,8 @@ MCP_LINT_TARGET := lint-ci
 endif
 
 mcp: check-all $(MCP_LINT_TARGET)
+
+# --- Stories ---
+.PHONY: new-story
+new-story:
+	@./scripts/new_story.sh "$(SLUG)"
