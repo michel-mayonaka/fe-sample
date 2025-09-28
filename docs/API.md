@@ -58,12 +58,12 @@
 - `func AttackSpeedOf(wt *model.WeaponTable, u ui.Unit) int`: 攻撃速度（武器重量考慮、未設定時は速さ）。
 
 ## internal/game/data（テーブルDIプロバイダ）
-- `type TableProvider interface { WeaponsTable() *model.WeaponTable }`
+- `type TableProvider interface { WeaponsTable() *model.WeaponTable; ItemsTable() *model.ItemDefTable }`
 - `func SetProvider(p TableProvider)`: アプリ側実装を注入（推奨ルート）。
 - `func Provider() TableProvider`: 現在のプロバイダ取得。
 
 利用指針:
-- Scene は `data.Provider().WeaponsTable()`（または `Env.App.WeaponsTable()`）経由でテーブル参照。
+- Scene は `data.Provider().WeaponsTable()/ItemsTable()` 経由でテーブル参照。
 - 旧 `scenes.SetWeaponTable/WeaponTable` は廃止。JSON直読みフォールバックは開発ツール用途のみ。
 
 ## internal/game/scenes/sim（模擬戦シーン）

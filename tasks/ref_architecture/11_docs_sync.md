@@ -28,9 +28,8 @@
 - md差分を戻す。
 
 ## Progress / Notes
-- YYYY-MM-DD: 着手
-- YYYY-MM-DD: 完了
+- 2025-09-28: 着手
+- 2025-09-28: 完了（ARCHITECTURE/API 同期、Env.App撤去の注記、ProviderにItemsTable追記）
 
 ## 関連
 - `docs/ARCHITECTURE.md`
-

@@ -61,12 +61,8 @@ type InventoryPort interface {
     EquipItem(unitID string, slot int, userItemID string) error
 }
 
-// UseCases（任意）: 上記の合成（段階移行用のファサード）。
-type UseCases interface {
-    DataPort
-    BattlePort
-    InventoryPort
-}
+// 注: 以前は上記を合成する `UseCases` を段階移行用に併用していましたが、
+// 工程10（2025-09-28）で撤去し、現在は各 Port 参照のみに統一しています。
 ```
 
 導入手順:
@@ -89,10 +85,10 @@ internal/
       runner.go           # SceneStack の更新/描画
 
     data/                 # 読み取り専用テーブルの Provider（UI 参照用）
-      provider.go         # SetProvider/Provider, TableProvider（WeaponsTable など）
+      provider.go         # SetProvider/Provider, TableProvider（WeaponsTable/ItemsTable など）
 
     scenes/               # UI シーン群（UI の状態遷移と描画）
-      ports.go            # UseCases（合成）※任意
+      # ports.go         # （廃止）合成 UseCases。現在は各 Port のみ使用。
       ports_data.go       # DataPort
       ports_battle.go     # BattlePort
       ports_inventory.go  # InventoryPort
@@ -138,7 +134,7 @@ docs/                     # ドキュメント
 ## 5. Env/Session の責務分離
 
 Env（最小）:
-- ポート（または合成 UseCases）の参照
+- ポートの参照
 - `UserTable`（読み書きテーブル参照を 1 箇所に集約）
 - `UserPath` `RNG` 等、アプリ起動時に決定されるメタ情報
 - `Session`（UI 一時状態）への委譲
