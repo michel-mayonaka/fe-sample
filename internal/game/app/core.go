@@ -42,7 +42,16 @@ func NewUIAppGame() *Game {
     uicore.SetBaseResolution(screenW, screenH)
 
     // Env（共有状態）
-    env := &scenes.Env{App: a, UserTable: urepo.Table(), UserPath: userPath, RNG: rng, Session: &scenes.Session{Units: units, SelIndex: 0}}
+    env := &scenes.Env{
+        App: a,
+        Data: a,
+        Battle: a,
+        Inv: a,
+        UserTable: urepo.Table(),
+        UserPath: userPath,
+        RNG: rng,
+        Session: &scenes.Session{Units: units, SelIndex: 0},
+    }
 
     // Game（Runner + AfterUpdate）
     g := &Game{Runner: Runner{}, Input: in, Env: env, prevTime: time.Now()}

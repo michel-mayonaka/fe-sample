@@ -22,7 +22,12 @@ type UseCases interface {
 
 // Env は UI シーン間で共有する状態とユースケースを束ねます。
 type Env struct {
+    // App は合成UseCases（段階移行用の後方互換）。
     App       UseCases
+    // Data/Battle/Inv は分割Port（最小依存での参照）。
+    Data      DataPort
+    Battle    BattlePort
+    Inv       InventoryPort
     UserTable *user.Table
     UserPath  string
     RNG       *rand.Rand
