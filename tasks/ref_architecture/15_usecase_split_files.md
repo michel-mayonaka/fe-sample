@@ -38,9 +38,8 @@
 
 ## Progress / Notes
 - 2025-09-28: タスク追加
-- YYYY-MM-DD: 実施・確認
+- 2025-09-28: 分割実施・mcp通過（facade/data/battle/inventoryへ分離）
 
 ## 関連
 - `docs/ARCHITECTURE.md` 4章（Usecase実装の分割方針）
 - `tasks/ref_architecture/index.md`
-
