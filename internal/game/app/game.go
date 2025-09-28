@@ -65,7 +65,6 @@ func (g *Game) updateGlobalToggles() {
         if g.reloadHold == 30 { // 約0.5秒（60FPS時）
             if g.Env != nil && g.Env.App != nil {
                 _ = g.Env.App.ReloadData()
-                scenes.SetWeaponTable(g.Env.App.WeaponsTable())
             }
             // UIユニット再構築
             if g.Env != nil && g.Env.UserPath != "" {

@@ -38,8 +38,7 @@ func NewUIAppGame() *Game {
     a := New(urepo, wrepo, inv, rng)
     // 推奨: プロバイダ経由でテーブルをDI
     gdata.SetProvider(a)
-    // 互換: 既存の共有参照も設定（暫定併存）
-    scenes.SetWeaponTable(wrepo.Table())
+    // 互換呼び出しは不要になったため省略（Provider経由で参照）
 
     // 画面メトリクス初期化
     uicore.SetBaseResolution(screenW, screenH)
