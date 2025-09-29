@@ -7,7 +7,8 @@ import (
     "strconv"
     "ui_sample/internal/assets"
     "ui_sample/internal/model"
-    "ui_sample/internal/user"
+    usr "ui_sample/internal/model/user"
+    "ui_sample/internal/infra/userfs"
 )
 
 // Itoa は整数を10進文字列に変換します。
@@ -17,8 +18,8 @@ var (
     cachedMaster *model.Table
     cachedWeapons *model.WeaponTable
     cachedItems *model.ItemDefTable
-    cachedUsrWeapons []user.OwnWeapon
-    cachedUsrItems []user.OwnItem
+    cachedUsrWeapons []usr.OwnWeapon
+    cachedUsrItems []usr.OwnItem
     cacheLoaded bool
 )
 
@@ -27,13 +28,13 @@ func ensureCaches() {
     if t, err := model.LoadFromJSON("db/master/mst_characters.json"); err == nil { cachedMaster = t }
     if wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json"); err == nil { cachedWeapons = wt }
     if it, err := model.LoadItemsJSON("db/master/mst_items.json"); err == nil { cachedItems = it }
-    if uw, err := user.LoadUserWeaponsJSON("db/user/usr_weapons.json"); err == nil { cachedUsrWeapons = uw }
-    if ui, err := user.LoadUserItemsJSON("db/user/usr_items.json"); err == nil { cachedUsrItems = ui }
+    if uw, err := userfs.LoadUserWeaponsJSON("db/user/usr_weapons.json"); err == nil { cachedUsrWeapons = uw }
+    if ui, err := userfs.LoadUserItemsJSON("db/user/usr_items.json"); err == nil { cachedUsrItems = ui }
     cacheLoaded = true
 }
 
 // UnitFromUser はユーザのキャラクターレコードから表示用の Unit を構築します。
-func UnitFromUser(c user.Character) Unit {
+func UnitFromUser(c usr.Character) Unit {
     ensureCaches()
     u := Unit{
         ID: c.ID, Name: c.Name, Class: c.Class, Level: c.Level, Exp: c.Exp,
@@ -107,7 +108,7 @@ func UnitFromUser(c user.Character) Unit {
 
 // LoadUnitsFromUser はユーザテーブルJSONから Unit の配列を構築します。
 func LoadUnitsFromUser(path string) ([]Unit, error) {
-	ut, err := user.LoadFromJSON(path)
+	ut, err := userfs.LoadTableJSON(path)
 	if err != nil {
 		return nil, err
 	}

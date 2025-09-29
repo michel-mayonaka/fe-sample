@@ -5,43 +5,44 @@ import (
     "os"
     "path/filepath"
     "testing"
-    "ui_sample/internal/user"
+    usr "ui_sample/internal/model/user"
+    "ui_sample/internal/infra/userfs"
 )
 
 // --- fakes ---------------------------------------------------------------
 
-type fakeUserRepo struct{ t *user.Table; saved int }
+type fakeUserRepo struct{ t *usr.Table; saved int }
 
-func (r *fakeUserRepo) Find(id string) (user.Character, bool) { return r.t.Find(id) }
-func (r *fakeUserRepo) Update(c user.Character)               { r.t.UpdateCharacter(c) }
+func (r *fakeUserRepo) Find(id string) (usr.Character, bool) { return r.t.Find(id) }
+func (r *fakeUserRepo) Update(c usr.Character)               { r.t.UpdateCharacter(c) }
 func (r *fakeUserRepo) Save() error                           { r.saved++; return nil }
-func (r *fakeUserRepo) Table() *user.Table                    { return r.t }
+func (r *fakeUserRepo) Table() *usr.Table                    { return r.t }
 
 type fakeInvRepo struct{}
 func (f fakeInvRepo) Consume(string, int) error { return nil }
 func (f fakeInvRepo) Save() error               { return nil }
 func (f fakeInvRepo) Reload() error             { return nil }
-func (f fakeInvRepo) Weapons() []user.OwnWeapon { return nil }
-func (f fakeInvRepo) Items() []user.OwnItem     { return nil }
+func (f fakeInvRepo) Weapons() []usr.OwnWeapon { return nil }
+func (f fakeInvRepo) Items() []usr.OwnItem     { return nil }
 
 // helper: create temporary user table JSON and load it
-func newUserTableForTest(t *testing.T, rows []user.Character) *user.Table {
+func newUserTableForTest(t *testing.T, rows []usr.Character) *usr.Table {
     t.Helper()
     dir := t.TempDir()
     p := filepath.Join(dir, "usr_characters.json")
     b, err := json.Marshal(rows)
     if err != nil { t.Fatal(err) }
     if err := os.WriteFile(p, b, 0644); err != nil { t.Fatal(err) }
-    ut, err := user.LoadFromJSON(p)
+    ut, err := userfs.LoadTableJSON(p)
     if err != nil { t.Fatal(err) }
     return ut
 }
 
 // TestEquipWeapon_TransfersOwnership は武器の所有者移譲と巻き戻しを検証します。
 func TestEquipWeapon_TransfersOwnership(t *testing.T) {
-    ut := newUserTableForTest(t, []user.Character{
-        {ID: "u1", Name: "A", Equip: []user.EquipRef{{UserWeaponsID: "uw_2"}}},
-        {ID: "u2", Name: "B", Equip: []user.EquipRef{{UserWeaponsID: "uw_1"}}},
+    ut := newUserTableForTest(t, []usr.Character{
+        {ID: "u1", Name: "A", Equip: []usr.EquipRef{{UserWeaponsID: "uw_2"}}},
+        {ID: "u2", Name: "B", Equip: []usr.EquipRef{{UserWeaponsID: "uw_1"}}},
     })
     ur := &fakeUserRepo{t: ut}
     a := New(ur, nil, fakeInvRepo{}, nil)
@@ -56,9 +57,9 @@ func TestEquipWeapon_TransfersOwnership(t *testing.T) {
 
 // TestEquipItem_TransfersOwnership はアイテムの所有者移譲と巻き戻しを検証します。
 func TestEquipItem_TransfersOwnership(t *testing.T) {
-    ut := newUserTableForTest(t, []user.Character{
-        {ID: "u1", Name: "A", Equip: []user.EquipRef{{}, {UserItemsID: "ui_2"}}},
-        {ID: "u2", Name: "B", Equip: []user.EquipRef{{}, {UserItemsID: "ui_1"}}},
+    ut := newUserTableForTest(t, []usr.Character{
+        {ID: "u1", Name: "A", Equip: []usr.EquipRef{{}, {UserItemsID: "ui_2"}}},
+        {ID: "u2", Name: "B", Equip: []usr.EquipRef{{}, {UserItemsID: "ui_1"}}},
     })
     ur := &fakeUserRepo{t: ut}
     a := New(ur, nil, fakeInvRepo{}, nil)

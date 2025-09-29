@@ -3,7 +3,7 @@ package usecase
 import (
     uicore "ui_sample/internal/game/service/ui"
     "ui_sample/internal/model"
-    "ui_sample/internal/user"
+    usr "ui_sample/internal/model/user"
     "ui_sample/internal/config"
 )
 
@@ -36,8 +36,7 @@ func (a *App) PersistUnit(u uicore.Unit) error {
     c.Level = u.Level
     c.HP = u.HP
     c.HPMax = u.HPMax
-    c.Stats = user.Stats{Str: u.Stats.Str, Mag: u.Stats.Mag, Skl: u.Stats.Skl, Spd: u.Stats.Spd, Lck: u.Stats.Lck, Def: u.Stats.Def, Res: u.Stats.Res, Mov: u.Stats.Mov, Bld: u.Stats.Bld}
+    c.Stats = usr.Stats{Str: u.Stats.Str, Mag: u.Stats.Mag, Skl: u.Stats.Skl, Spd: u.Stats.Spd, Lck: u.Stats.Lck, Def: u.Stats.Def, Res: u.Stats.Res, Mov: u.Stats.Mov, Bld: u.Stats.Bld}
     a.Users.Update(c)
     return a.Users.Save()
 }
-

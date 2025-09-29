@@ -10,7 +10,7 @@ import (
     "ui_sample/internal/assets"
     uicore "ui_sample/internal/game/service/ui"
     "ui_sample/internal/model"
-    "ui_sample/internal/user"
+    usr "ui_sample/internal/model/user"
     scenes "ui_sample/internal/game/scenes"
     gdata "ui_sample/internal/game/data"
 )
@@ -97,7 +97,7 @@ func (v *ItemView) scAdvance(intents []scenes.Intent) {
 func (v *ItemView) scFlush(_ *game.Ctx) { /* 今はなし */ }
 
 // BuildItemRowsFromSnapshots は所持アイテムと定義から行を構築します。
-func BuildItemRowsFromSnapshots(owns []user.OwnItem, it *model.ItemDefTable) []ItemRow {
+func BuildItemRowsFromSnapshots(owns []usr.OwnItem, it *model.ItemDefTable) []ItemRow {
     rows := make([]ItemRow, 0, len(owns))
     for _, oi := range owns {
         name := oi.MstItemsID
@@ -114,7 +114,7 @@ func BuildItemRowsFromSnapshots(owns []user.OwnItem, it *model.ItemDefTable) []I
 }
 
 // BuildItemRowsWithOwners は所有者バッジ情報付きのアイテム行を構築します。
-func BuildItemRowsWithOwners(owns []user.OwnItem, it *model.ItemDefTable, ut *user.Table) []ItemRow {
+func BuildItemRowsWithOwners(owns []usr.OwnItem, it *model.ItemDefTable, ut *usr.Table) []ItemRow {
     rows := BuildItemRowsFromSnapshots(owns, it)
     if ut == nil { return rows }
     own := map[string][]OwnerBadge{}

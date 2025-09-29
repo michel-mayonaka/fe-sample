@@ -63,7 +63,8 @@ CI（GitHub Actions）
 - `db/master/mst_class_caps.json`: クラスごとの能力上限
 - `db/master/mst_weapons.json`: 武器の基本性能
 - `db/master/mst_items.json`: アイテムの基本性能
-- `internal/user/`: ユーザ（セーブ）データのモデルとJSONローダー
+- `internal/model/user/`: ユーザ（セーブ）データのモデル（純粋型）
+- `internal/infra/userfs/`: ユーザデータのJSON入出力（バックエンド）
 - `db/user/usr_characters.json`: 現在のユーザ状態（usr_プレフィックス）
 
 ## トラブルシューティング

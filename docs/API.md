@@ -25,12 +25,20 @@
 - `type Weapon`, `LoadWeaponsJSON`: 武器性能（`mst_weapons.json`）
 - `type Item`, `LoadItemsJSON`: アイテム性能（`mst_items.json`）
 
-## internal/user（ユーザデータ / usr_）
-- `type Character`
-  - 現在値を保持（`Level`, `Exp`, `HP`, `HPMax`, `Stats`, `Growth`, `Weapon`, `Magic`, `Equip(uses/max)` など）。
-- `func LoadFromJSON(path string) (*Table, error)`: JSON 読込。
+## internal/model/user（ユーザデータ / usr_ モデル）
+- `type Character`/`type Table`
+  - 現在値を保持する純粋型とインメモリ索引（入出力なし）。
+- `func NewTable(rows []Character) *Table`: 行から索引を構築。
 - `func (*Table) Find(id string) (Character, bool)`: 取得。
-備考: ファイル名は `usr_*.json`。パスは `db/user/`。
+備考: ファイル名は `usr_*.json`。パスは `db/user/`（入出力は次節）。
+
+## internal/infra/userfs（ユーザJSON I/O）
+- `func LoadTableJSON(path string) (*user.Table, error)`
+- `func SaveTableJSON(path string, t *user.Table) error`
+- `func LoadUserWeaponsJSON(path string) ([]user.OwnWeapon, error)`
+- `func SaveUserWeaponsJSON(path string, rows []user.OwnWeapon) error`
+- `func LoadUserItemsJSON(path string) ([]user.OwnItem, error)`
+- `func SaveUserItemsJSON(path string, rows []user.OwnItem) error`
 
 ## internal/game/service/ui（UI描画ユーティリティ）
 - `type Unit`

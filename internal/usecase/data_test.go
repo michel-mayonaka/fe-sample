@@ -8,7 +8,8 @@ import (
     "testing"
     uicore "ui_sample/internal/game/service/ui"
     "ui_sample/internal/model"
-    "ui_sample/internal/user"
+    usr "ui_sample/internal/model/user"
+    "ui_sample/internal/infra/userfs"
 )
 
 // ---- fakes -----------------------------------------------------------------
@@ -24,25 +25,25 @@ type fakeInvRepo2 struct{ reloaded int }
 func (f *fakeInvRepo2) Consume(string, int) error { return nil }
 func (f *fakeInvRepo2) Save() error               { return nil }
 func (f *fakeInvRepo2) Reload() error             { f.reloaded++; return nil }
-func (f *fakeInvRepo2) Weapons() []user.OwnWeapon { return nil }
-func (f *fakeInvRepo2) Items() []user.OwnItem     { return nil }
+func (f *fakeInvRepo2) Weapons() []usr.OwnWeapon { return nil }
+func (f *fakeInvRepo2) Items() []usr.OwnItem     { return nil }
 
-type fakeUserRepo2 struct{ t *user.Table; saved int }
+type fakeUserRepo2 struct{ t *usr.Table; saved int }
 
-func (r *fakeUserRepo2) Find(id string) (user.Character, bool) { return r.t.Find(id) }
-func (r *fakeUserRepo2) Update(c user.Character)               { r.t.UpdateCharacter(c) }
+func (r *fakeUserRepo2) Find(id string) (usr.Character, bool) { return r.t.Find(id) }
+func (r *fakeUserRepo2) Update(c usr.Character)               { r.t.UpdateCharacter(c) }
 func (r *fakeUserRepo2) Save() error                           { r.saved++; return nil }
-func (r *fakeUserRepo2) Table() *user.Table                    { return r.t }
+func (r *fakeUserRepo2) Table() *usr.Table                    { return r.t }
 
 // helper: create temporary user table JSON and load it
-func newUserTableForTest2(t *testing.T, rows []user.Character) *user.Table {
+func newUserTableForTest2(t *testing.T, rows []usr.Character) *usr.Table {
     t.Helper()
     dir := t.TempDir()
     p := filepath.Join(dir, "usr_characters.json")
     b, err := json.Marshal(rows)
     if err != nil { t.Fatal(err) }
     if err := os.WriteFile(p, b, 0644); err != nil { t.Fatal(err) }
-    ut, err := user.LoadFromJSON(p)
+    ut, err := userfs.LoadTableJSON(p)
     if err != nil { t.Fatal(err) }
     return ut
 }
@@ -67,8 +68,8 @@ type okInvRepo struct{}
 func (okInvRepo) Consume(string, int) error { return nil }
 func (okInvRepo) Save() error { return nil }
 func (okInvRepo) Reload() error { return nil }
-func (okInvRepo) Weapons() []user.OwnWeapon { return nil }
-func (okInvRepo) Items() []user.OwnItem { return nil }
+func (okInvRepo) Weapons() []usr.OwnWeapon { return nil }
+func (okInvRepo) Items() []usr.OwnItem { return nil }
 
 func TestReloadData_PropagatesError(t *testing.T) {
     a := &App{Weapons: errWeaponsRepo{}, Inv: okInvRepo{}}
@@ -78,7 +79,7 @@ func TestReloadData_PropagatesError(t *testing.T) {
 }
 
 func TestPersistUnit_UpdatesUserAndSaves(t *testing.T) {
-    ut := newUserTableForTest2(t, []user.Character{{ID: "u1", Name: "A", Level: 1, HP: 10, HPMax: 10, Stats: user.Stats{Str: 1, Mag: 2, Skl: 3, Spd: 4, Lck: 5, Def: 6, Res: 7, Mov: 8, Bld: 9}}})
+    ut := newUserTableForTest2(t, []usr.Character{{ID: "u1", Name: "A", Level: 1, HP: 10, HPMax: 10, Stats: usr.Stats{Str: 1, Mag: 2, Skl: 3, Spd: 4, Lck: 5, Def: 6, Res: 7, Mov: 8, Bld: 9}}})
     ur := &fakeUserRepo2{t: ut}
     a := &App{Users: ur}
     // 変更を含む UI ユニット

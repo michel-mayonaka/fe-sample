@@ -8,7 +8,7 @@ import (
     "time"
     uicore "ui_sample/internal/game/service/ui"
     "ui_sample/internal/model"
-    "ui_sample/internal/user"
+    usr "ui_sample/internal/model/user"
     gcore "ui_sample/pkg/game"
 )
 
@@ -19,18 +19,18 @@ func (f *fakeWeapons) Find(string) (model.Weapon, bool) { return model.Weapon{},
 func (f *fakeWeapons) Table() *model.WeaponTable         { return f.t }
 func (f *fakeWeapons) Reload() error                     { return nil }
 
-type fakeUsers struct{ t *user.Table; saved int }
-func (f *fakeUsers) Find(id string) (user.Character, bool) { return f.t.Find(id) }
-func (f *fakeUsers) Update(c user.Character)               { f.t.UpdateCharacter(c) }
+type fakeUsers struct{ t *usr.Table; saved int }
+func (f *fakeUsers) Find(id string) (usr.Character, bool) { return f.t.Find(id) }
+func (f *fakeUsers) Update(c usr.Character)               { f.t.UpdateCharacter(c) }
 func (f *fakeUsers) Save() error                           { f.saved++; return nil }
-func (f *fakeUsers) Table() *user.Table                    { return f.t }
+func (f *fakeUsers) Table() *usr.Table                    { return f.t }
 
 type fakeInv struct{ consumed map[string]int; saved int }
 func (f *fakeInv) Consume(id string, n int) error { if f.consumed==nil { f.consumed = map[string]int{} }; f.consumed[id]+=n; return nil }
 func (f *fakeInv) Save() error { f.saved++; return nil }
 func (f *fakeInv) Reload() error { return nil }
-func (f *fakeInv) Weapons() []user.OwnWeapon { return nil }
-func (f *fakeInv) Items() []user.OwnItem { return nil }
+func (f *fakeInv) Weapons() []usr.OwnWeapon { return nil }
+func (f *fakeInv) Items() []usr.OwnItem { return nil }
 
 func weaponsTableForTest() *model.WeaponTable {
     rows := []model.Weapon{
@@ -66,7 +66,7 @@ func TestRunBattleRound_UpdatesHP_Uses_Saves(t *testing.T) {
     rng := rand.New(rand.NewSource(1))
     wt := weaponsTableForTest()
     // user table: two chars with equipment refs
-    ut := newUserTableForTest2(t, []user.Character{{ID:"u1", Name:"A", HP:20, HPMax:20}, {ID:"u2", Name:"B", HP:20, HPMax:20}})
+    ut := newUserTableForTest2(t, []usr.Character{{ID:"u1", Name:"A", HP:20, HPMax:20}, {ID:"u2", Name:"B", HP:20, HPMax:20}})
     ar := &fakeUsers{t: ut}
     ir := &fakeInv{}
     a := &App{Weapons: &fakeWeapons{t: wt}, Users: ar, Inv: ir, RNG: rng}
@@ -91,7 +91,7 @@ func TestRunBattleRound_UpdatesHP_Uses_Saves(t *testing.T) {
 func TestRunBattleRound_AttackerDouble_ConsumesTwo(t *testing.T) {
     rng := rand.New(rand.NewSource(time.Now().UnixNano()))
     wt := weaponsTableForTest()
-    ut := newUserTableForTest2(t, []user.Character{{ID:"u1"}, {ID:"u2"}})
+    ut := newUserTableForTest2(t, []usr.Character{{ID:"u1"}, {ID:"u2"}})
     a := &App{Weapons: &fakeWeapons{t: wt}, Users: &fakeUsers{t: ut}, Inv: &fakeInv{}, RNG: rng}
     // 追撃条件: AS差>=3 を満たすように a(Spd=12,Bld=8, Wt5)=AS11, d(Spd=8,Bld=5, Wt8)=AS5
     units := []uicore.Unit{

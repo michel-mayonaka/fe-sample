@@ -2,7 +2,7 @@ package usecase
 
 import (
     "ui_sample/internal/repo"
-    "ui_sample/internal/user"
+    usr "ui_sample/internal/model/user"
 )
 
 // Inventory は在庫リポジトリへのアクセサです（Scene層からの参照用）。
@@ -13,7 +13,7 @@ func (a *App) EquipWeapon(unitID string, slot int, userWeaponID string) error {
     if a == nil || a.Users == nil { return nil }
     t := a.Users.Table(); if t == nil { return nil }
     c, ok := t.Find(unitID); if !ok { return nil }
-    var prev user.EquipRef
+    var prev usr.EquipRef
     if slot < len(c.Equip) { prev = c.Equip[slot] }
     // 既オーナーから外し、巻き戻す
     ownerID := ""; ownerSlot := -1
@@ -22,13 +22,13 @@ func (a *App) EquipWeapon(unitID string, slot int, userWeaponID string) error {
         if ownerID != "" { break }
     }
     if ownerID != "" { if oc, ok2 := t.Find(ownerID); ok2 {
-        for len(oc.Equip) <= ownerSlot { oc.Equip = append(oc.Equip, user.EquipRef{}) }
+        for len(oc.Equip) <= ownerSlot { oc.Equip = append(oc.Equip, usr.EquipRef{}) }
         oc.Equip[ownerSlot] = prev
         t.UpdateCharacter(oc)
     }}
     // 装備確定
-    for len(c.Equip) <= slot { c.Equip = append(c.Equip, user.EquipRef{}) }
-    c.Equip[slot] = user.EquipRef{UserWeaponsID: userWeaponID}
+    for len(c.Equip) <= slot { c.Equip = append(c.Equip, usr.EquipRef{}) }
+    c.Equip[slot] = usr.EquipRef{UserWeaponsID: userWeaponID}
     t.UpdateCharacter(c)
     return a.Users.Save()
 }
@@ -38,7 +38,7 @@ func (a *App) EquipItem(unitID string, slot int, userItemID string) error {
     if a == nil || a.Users == nil { return nil }
     t := a.Users.Table(); if t == nil { return nil }
     c, ok := t.Find(unitID); if !ok { return nil }
-    var prev user.EquipRef
+    var prev usr.EquipRef
     if slot < len(c.Equip) { prev = c.Equip[slot] }
     // 既オーナーから外し、巻き戻す
     ownerID := ""; ownerSlot := -1
@@ -47,14 +47,13 @@ func (a *App) EquipItem(unitID string, slot int, userItemID string) error {
         if ownerID != "" { break }
     }
     if ownerID != "" { if oc, ok2 := t.Find(ownerID); ok2 {
-        for len(oc.Equip) <= ownerSlot { oc.Equip = append(oc.Equip, user.EquipRef{}) }
+        for len(oc.Equip) <= ownerSlot { oc.Equip = append(oc.Equip, usr.EquipRef{}) }
         oc.Equip[ownerSlot] = prev
         t.UpdateCharacter(oc)
     }}
     // 装備確定
-    for len(c.Equip) <= slot { c.Equip = append(c.Equip, user.EquipRef{}) }
-    c.Equip[slot] = user.EquipRef{UserItemsID: userItemID}
+    for len(c.Equip) <= slot { c.Equip = append(c.Equip, usr.EquipRef{}) }
+    c.Equip[slot] = usr.EquipRef{UserItemsID: userItemID}
     t.UpdateCharacter(c)
     return a.Users.Save()
 }
-

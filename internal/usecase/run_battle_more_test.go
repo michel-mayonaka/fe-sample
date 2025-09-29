@@ -4,7 +4,7 @@ import (
     "testing"
     uicore "ui_sample/internal/game/service/ui"
     "ui_sample/internal/model"
-    "ui_sample/internal/user"
+    usr "ui_sample/internal/model/user"
     gcore "ui_sample/pkg/game"
 )
 
@@ -15,7 +15,7 @@ func TestRunBattleRound_NoCounter_OutOfRange(t *testing.T) {
         {ID: "w_bow",   Name: "Iron Bow",   Type: "Bow",   Rank: "E", Might: 4, Hit: 90, Weight: 5, RangeMin: 2, RangeMax: 2},
     }
     wt := mustLoadWeapons(rows)
-    ut := newUserTableForTest2(t, []user.Character{{ID: "u1", Name: "A", HP: 20, HPMax: 20}, {ID: "u2", Name: "B", HP: 20, HPMax: 20}})
+    ut := newUserTableForTest2(t, []usr.Character{{ID: "u1", Name: "A", HP: 20, HPMax: 20}, {ID: "u2", Name: "B", HP: 20, HPMax: 20}})
     ar := &fakeUsers{t: ut}
     ir := &fakeInv{}
     a := &App{Weapons: &fakeWeapons{t: wt}, Users: ar, Inv: ir}
@@ -52,4 +52,3 @@ func TestRunBattleRound_InvalidSelIndex(t *testing.T) {
     if err != nil { t.Fatalf("err: %v", err) }
     if ok || len(logs) != 0 || len(got) != 1 { t.Fatalf("should be no-op for invalid index") }
 }
-

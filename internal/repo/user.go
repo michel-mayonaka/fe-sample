@@ -1,26 +1,27 @@
 package repo
 
 import (
-    "ui_sample/internal/user"
+    usr "ui_sample/internal/model/user"
+    "ui_sample/internal/infra/userfs"
 )
 
 // UserRepo はユーザセーブデータへの最小アクセスを抽象化します。
 type UserRepo interface {
-    Find(id string) (user.Character, bool)
-    Update(c user.Character)
+    Find(id string) (usr.Character, bool)
+    Update(c usr.Character)
     Save() error
-    Table() *user.Table
+    Table() *usr.Table
 }
 
 // JSONUserRepo は JSON バックエンドの簡易実装です（ロード/セーブ）。
 type JSONUserRepo struct {
     path string
-    t    *user.Table
+    t    *usr.Table
 }
 
 // NewJSONUserRepo は JSON を読み込み、テーブルをキャッシュします。
 func NewJSONUserRepo(path string) (*JSONUserRepo, error) {
-    ut, err := user.LoadFromJSON(path)
+    ut, err := userfs.LoadTableJSON(path)
     if err != nil {
         return nil, err
     }
@@ -28,13 +29,13 @@ func NewJSONUserRepo(path string) (*JSONUserRepo, error) {
 }
 
 // Find はIDでユーザキャラクターを検索します。
-func (r *JSONUserRepo) Find(id string) (user.Character, bool) {
-    if r == nil || r.t == nil { return user.Character{}, false }
+func (r *JSONUserRepo) Find(id string) (usr.Character, bool) {
+    if r == nil || r.t == nil { return usr.Character{}, false }
     return r.t.Find(id)
 }
 
 // Update はキャラクターを更新します（ID一致時）。
-func (r *JSONUserRepo) Update(c user.Character) {
+func (r *JSONUserRepo) Update(c usr.Character) {
     if r == nil || r.t == nil { return }
     r.t.UpdateCharacter(c)
 }
@@ -42,8 +43,8 @@ func (r *JSONUserRepo) Update(c user.Character) {
 // Save はテーブルを元のJSONへ保存します。
 func (r *JSONUserRepo) Save() error {
     if r == nil || r.t == nil { return nil }
-    return r.t.Save(r.path)
+    return userfs.SaveTableJSON(r.path, r.t)
 }
 
 // Table は内部テーブルへの参照を返します。
-func (r *JSONUserRepo) Table() *user.Table { return r.t }
+func (r *JSONUserRepo) Table() *usr.Table { return r.t }

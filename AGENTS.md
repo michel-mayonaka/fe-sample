@@ -58,7 +58,8 @@
 ### 構成（サマリ）
 - `cmd/ui_sample/`: エントリ・ゲームループ
 - `internal/game/`: Scene/Service/UI/Provider/Usecase 依存の境界
-- `internal/model` / `internal/user`: マスタ/ユーザデータのスキーマとローダ
+- `internal/model` / `internal/model/user`: マスタ/ユーザデータの純粋モデル（I/Oなし）
+- `internal/infra/userfs`: ユーザデータのJSON入出力
 - `db/master` / `db/user`: JSON 置き場（将来 SQLite に移行）
 - `pkg/game`: ドメインロジック（テスト対象）
 - `assets/`: 画像・フォント・音源

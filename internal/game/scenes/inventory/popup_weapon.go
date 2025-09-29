@@ -10,7 +10,7 @@ import (
     "ui_sample/internal/assets"
     uicore "ui_sample/internal/game/service/ui"
     "ui_sample/internal/model"
-    "ui_sample/internal/user"
+    usr "ui_sample/internal/model/user"
     scenes "ui_sample/internal/game/scenes"
     gdata "ui_sample/internal/game/data"
 )
@@ -98,7 +98,7 @@ func (v *WeaponView) scAdvance(intents []scenes.Intent) {
 func (v *WeaponView) scFlush(_ *game.Ctx) { /* 今はなし */ }
 
 // BuildWeaponRowsFromSnapshots は所持武器スナップショットと武器定義から行を構築します。
-func BuildWeaponRowsFromSnapshots(owns []user.OwnWeapon, wt *model.WeaponTable) []WeaponRow {
+func BuildWeaponRowsFromSnapshots(owns []usr.OwnWeapon, wt *model.WeaponTable) []WeaponRow {
     rows := make([]WeaponRow, 0, len(owns))
     for _, ow := range owns {
         name := ow.MstWeaponsID
@@ -117,7 +117,7 @@ func BuildWeaponRowsFromSnapshots(owns []user.OwnWeapon, wt *model.WeaponTable) 
 }
 
 // BuildWeaponRowsWithOwners は所有者バッジ情報付きの武器行を構築します。
-func BuildWeaponRowsWithOwners(owns []user.OwnWeapon, wt *model.WeaponTable, ut *user.Table) []WeaponRow {
+func BuildWeaponRowsWithOwners(owns []usr.OwnWeapon, wt *model.WeaponTable, ut *usr.Table) []WeaponRow {
     rows := BuildWeaponRowsFromSnapshots(owns, wt)
     if ut == nil { return rows }
     own := map[string][]OwnerBadge{}

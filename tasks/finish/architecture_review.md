@@ -7,7 +7,7 @@
 - エントリ: `cmd/ui_sample/main.go` が状態管理（一覧/詳細/戦闘/模擬戦）、入力、永続化を包括。
 - UI層: `internal/ui/{core,widgets,screens,popup}` で描画・レイアウトを分割し、`internal/ui/api.go` で外向けAPI提供。
 - ドメイン層: `pkg/game` に戦闘ロジック（予測/解決/地形/三すくみ）。単体テストあり。
-- データ層: マスタ `internal/model`（mst_）とユーザ `internal/user`（usr_）で明確分離。
+- データ層: マスタ `internal/model`（mst_）とユーザ `internal/model/user`（usr_ モデル）＋ I/O `internal/infra/userfs` に分離。
 - 資産: 画像はキャッシュ（`internal/assets.ImageCache`）経由でファイル読み込み。`embed` 未使用。
 - ツール: Makefile に vet/build/test。`pkg/...` を最小対象にしている。
 
@@ -68,4 +68,3 @@
 - tasks/todo_sqlite_prep.md
 
 ステータス: Closed（2025-09-27）。以後は各 TODO ファイルで進捗を管理します。
-

@@ -3,7 +3,7 @@ package sqlite
 import (
     "database/sql"
     "ui_sample/internal/repo"
-    "ui_sample/internal/user"
+    usr "ui_sample/internal/model/user"
 )
 
 // Ensure implementation
@@ -15,8 +15,8 @@ var _ repo.InventoryRepo = (*InventoryRepo)(nil)
 type InventoryRepo struct {
     DB *sql.DB
     // 暫定互換: スナップショット
-    weapons []user.OwnWeapon
-    items   []user.OwnItem
+    weapons []usr.OwnWeapon
+    items   []usr.OwnItem
 }
 
 // NewInventoryRepo は在庫リポジトリのスケルトン実装を返します（未配線）。
@@ -29,6 +29,6 @@ func (r *InventoryRepo) Save() error { return nil }
 // Reload は在庫を再読み込みします（スケルトン）。
 func (r *InventoryRepo) Reload() error { return nil }
 // Weapons は所持武器のスナップショットを返します（コピー）。
-func (r *InventoryRepo) Weapons() []user.OwnWeapon { return append([]user.OwnWeapon(nil), r.weapons...) }
+func (r *InventoryRepo) Weapons() []usr.OwnWeapon { return append([]usr.OwnWeapon(nil), r.weapons...) }
 // Items は所持アイテムのスナップショットを返します（コピー）。
-func (r *InventoryRepo) Items() []user.OwnItem { return append([]user.OwnItem(nil), r.items...) }
+func (r *InventoryRepo) Items() []usr.OwnItem { return append([]usr.OwnItem(nil), r.items...) }

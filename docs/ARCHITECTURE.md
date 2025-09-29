@@ -121,8 +121,10 @@ internal/
     weapons.go
     inventory.go
 
-  model/                  # マスタ定義（武器・アイテム等）
-  user/                   # ユーザセーブ定義とテーブル
+  model/                  # マスタ定義（武器・アイテム等）+ user モデル（純粋型）
+    user/                 # ユーザセーブ定義（純粋型・入出力なし）
+  infra/
+    userfs/               # ユーザセーブの JSON 入出力（バックエンド）
   adapter/                # UI↔Game の変換/補助
   assets/                 # 画像/音声ローダとキャッシュ
   config/                 # パス/ビルドタグ等

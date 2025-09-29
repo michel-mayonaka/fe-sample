@@ -3,7 +3,8 @@ package repo
 
 import (
     "ui_sample/internal/model"
-    "ui_sample/internal/user"
+    usr "ui_sample/internal/model/user"
+    "ui_sample/internal/infra/userfs"
 )
 
 // InventoryRepo は「在庫」集約への最小アクセスです。
@@ -22,8 +23,8 @@ type InventoryRepo interface {
     // Reload は在庫スナップショットを再読み込みします。
     Reload() error
     // Snapshots
-    Weapons() []user.OwnWeapon
-    Items() []user.OwnItem
+    Weapons() []usr.OwnWeapon
+    Items() []usr.OwnItem
 }
 
 // JSONInventoryRepo は usr_weapons.json / usr_items.json を束ねて扱う軽量実装です。
@@ -32,8 +33,8 @@ type InventoryRepo interface {
 type JSONInventoryRepo struct {
     weaponsPath string
     itemsPath   string
-    weapons     []user.OwnWeapon
-    items       []user.OwnItem
+    weapons     []usr.OwnWeapon
+    items       []usr.OwnItem
     // 参照用（結合時に利用）
     wt *model.WeaponTable
     it *model.ItemDefTable
@@ -41,9 +42,9 @@ type JSONInventoryRepo struct {
 
 // NewJSONInventoryRepo はユーザ在庫（武器/アイテム）とマスタ定義を読み込みます。
 func NewJSONInventoryRepo(usrWeaponsPath, usrItemsPath, mstWeaponsPath, mstItemsPath string) (*JSONInventoryRepo, error) {
-    w, err := user.LoadUserWeaponsJSON(usrWeaponsPath)
+    w, err := userfs.LoadUserWeaponsJSON(usrWeaponsPath)
     if err != nil { return nil, err }
-    i, err := user.LoadUserItemsJSON(usrItemsPath)
+    i, err := userfs.LoadUserItemsJSON(usrItemsPath)
     if err != nil { return nil, err }
     wt, _ := model.LoadWeaponsJSON(mstWeaponsPath)
     it, _ := model.LoadItemsJSON(mstItemsPath)
@@ -51,9 +52,9 @@ func NewJSONInventoryRepo(usrWeaponsPath, usrItemsPath, mstWeaponsPath, mstItems
 }
 
 // Weapons は所持武器のスナップショットを返します（コピー）。
-func (r *JSONInventoryRepo) Weapons() []user.OwnWeapon { return append([]user.OwnWeapon(nil), r.weapons...) }
+func (r *JSONInventoryRepo) Weapons() []usr.OwnWeapon { return append([]usr.OwnWeapon(nil), r.weapons...) }
 // Items は所持アイテムのスナップショットを返します（コピー）。
-func (r *JSONInventoryRepo) Items() []user.OwnItem { return append([]user.OwnItem(nil), r.items...) }
+func (r *JSONInventoryRepo) Items() []usr.OwnItem { return append([]usr.OwnItem(nil), r.items...) }
 
 // Consume は指定IDの耐久を減らします（下限0）。
 func (r *JSONInventoryRepo) Consume(id string, count int) error {
@@ -83,16 +84,16 @@ func (r *JSONInventoryRepo) Consume(id string, count int) error {
 
 // Save は在庫JSONファイルへ保存します。
 func (r *JSONInventoryRepo) Save() error {
-    if err := user.SaveUserWeaponsJSON(r.weaponsPath, r.weapons); err != nil { return err }
-    if err := user.SaveUserItemsJSON(r.itemsPath, r.items); err != nil { return err }
+    if err := userfs.SaveUserWeaponsJSON(r.weaponsPath, r.weapons); err != nil { return err }
+    if err := userfs.SaveUserItemsJSON(r.itemsPath, r.items); err != nil { return err }
     return nil
 }
 
 // Reload は在庫とマスタを再読み込みします。
 func (r *JSONInventoryRepo) Reload() error {
-    w, err := user.LoadUserWeaponsJSON(r.weaponsPath)
+    w, err := userfs.LoadUserWeaponsJSON(r.weaponsPath)
     if err != nil { return err }
-    i, err := user.LoadUserItemsJSON(r.itemsPath)
+    i, err := userfs.LoadUserItemsJSON(r.itemsPath)
     if err != nil { return err }
     r.weapons, r.items = w, i
     wt, _ := model.LoadWeaponsJSON("db/master/mst_weapons.json")
