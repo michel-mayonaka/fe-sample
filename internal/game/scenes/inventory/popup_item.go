@@ -32,7 +32,7 @@ type ItemView struct{
     sw, sh int
     hover int
 }
-
+// NewItemView はアイテム一覧サブビューを生成します。
 func NewItemView(e *scenes.Env, host *Inventory) *ItemView { return &ItemView{E:e, Host:host, hover:-1} }
 
 // Update はサブビュー内の状態更新を行います。
@@ -83,8 +83,7 @@ func (v *ItemView) scHandleInput(ctx *game.Ctx) []scenes.Intent {
 func (v *ItemView) scAdvance(intents []scenes.Intent) {
     for _, any := range intents {
         it, ok := any.(ivIntent); if !ok { continue }
-        switch it.Kind {
-        case ivChooseRow:
+        if it.Kind == ivChooseRow {
             owns := v.E.Inv.Inventory().Items()
             if it.Index >= 0 && it.Index < len(owns) {
                 _ = v.E.Inv.EquipItem(v.E.Selected().ID, v.E.CurrentSlot, owns[it.Index].ID)
@@ -132,7 +131,6 @@ func BuildItemRowsWithOwners(owns []user.OwnItem, it *model.ItemDefTable, ut *us
     return rows
 }
 
-// toWidgetItemRows は描画ウィジェット用のVMへ変換します（最後の所有者のみ表示）。
 // DrawItemListView はアイテム一覧（アイテムビュー）を描画します。
 func DrawItemListView(dst *ebiten.Image, rows []ItemRow, hover int) {
     sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()

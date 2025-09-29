@@ -29,10 +29,12 @@ type Status struct{
     lvHovered bool
 }
 
+// NewStatus はステータス画面の Scene を生成します。
 func NewStatus(e *scenes.Env) *Status { return &Status{E:e} }
+// ShouldPop は本シーンが終了要求（pop）状態かを返します。
 func (s *Status) ShouldPop() bool { return s.pop }
 
-// Intent 種別
+// IntentKind はステータス画面における入力意図の種別です。
 type IntentKind int
 
 const (
@@ -45,7 +47,9 @@ const (
     intentOpenInvItems
 )
 
+// Intent は入力を意味表現に変換したものです。
 type Intent struct{ Kind IntentKind; Index int }
+// IsSceneIntent は scenes.Intent 実装のマーカーです。
 func (Intent) IsSceneIntent() {}
 
 // scContract はパッケージ内コンパイル保証のためのインターフェースです。

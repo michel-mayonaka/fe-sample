@@ -2,6 +2,8 @@ package usecase
 
 import (
     "fmt"
+    "math/rand"
+    "time"
     "ui_sample/internal/adapter"
     uicore "ui_sample/internal/game/service/ui"
     gcore "ui_sample/pkg/game"
@@ -27,7 +29,12 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
     logs := []string{"戦闘開始", atk.Name + " の攻撃"}
     // 攻撃回数（耐久消費用）
     atkCount, defCount := 0, 0
-    ga2, gd2, line1 := gcore.ResolveRoundAt(ga, gd, attT, defT, a.RNG)
+    // RNG フォールバック: 未注入時でもパニックしないように都度生成
+    rng := a.RNG
+    if rng == nil {
+        rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+    }
+    ga2, gd2, line1 := gcore.ResolveRoundAt(ga, gd, attT, defT, rng)
     atkCount++
     if line1 != "" { logs = append(logs, line1) }
     // 反撃
@@ -35,7 +42,7 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
     canCounter := gd2.W.RMin <= dist && dist <= gd2.W.RMax
     if gd2.S.HP > 0 && canCounter {
         logs = append(logs, def.Name+" の反撃")
-        gd3, ga3, line2 := gcore.ResolveRoundAt(gd2, ga2, defT, attT, a.RNG)
+        gd3, ga3, line2 := gcore.ResolveRoundAt(gd2, ga2, defT, attT, rng)
         defCount++
         if line2 != "" { logs = append(logs, line2) }
         ga2, gd2 = ga3, gd3
@@ -43,13 +50,13 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
     // 追撃（AS差>=3）
     if gd2.S.HP > 0 && gcore.DoubleAdvantage(ga, gd) {
         logs = append(logs, atk.Name+" の追撃")
-        ga4, gd4, line3 := gcore.ResolveRoundAt(ga2, gd2, attT, defT, a.RNG)
+        ga4, gd4, line3 := gcore.ResolveRoundAt(ga2, gd2, attT, defT, rng)
         atkCount++
         if line3 != "" { logs = append(logs, line3) }
         ga2, gd2 = ga4, gd4
     } else if ga2.S.HP > 0 && canCounter && gcore.DoubleAdvantage(gd, ga) {
         logs = append(logs, def.Name+" の追撃")
-        gd4, ga4, line4 := gcore.ResolveRoundAt(gd2, ga2, defT, attT, a.RNG)
+        gd4, ga4, line4 := gcore.ResolveRoundAt(gd2, ga2, defT, attT, rng)
         defCount++
         if line4 != "" { logs = append(logs, line4) }
         ga2, gd2 = ga4, gd4
@@ -103,4 +110,3 @@ func (a *App) RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore
     }
     return units, logs, true, nil
 }
-

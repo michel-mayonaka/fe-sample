@@ -14,6 +14,7 @@ type LogView struct{
     sw, sh int
 }
 
+// NewLogView は戦闘ログのポップアップビューを生成します。
 func NewLogView(host *Sim) *LogView { return &LogView{Host: host} }
 
 // Update はポップアップ自身の入力処理を行います。
@@ -49,8 +50,7 @@ func (v *LogView) scHandleInput(ctx *game.Ctx) []scenes.Intent {
 func (v *LogView) scAdvance(intents []scenes.Intent) {
     for _, any := range intents {
         it, ok := any.(lvIntent); if !ok { continue }
-        switch it.Kind {
-        case lvClose:
+        if it.Kind == lvClose {
             if v.Host != nil { v.Host.logPopup = false }
         }
     }

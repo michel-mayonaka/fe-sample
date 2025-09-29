@@ -4,7 +4,7 @@ package game
 
 import (
     "ui_sample/internal/game/service"
-    "ui_sample/internal/game/util"
+    g_rng "ui_sample/internal/game/rng"
 )
 
 // Ctx はフレーム共通の読み取り専用情報＋サービス群です。
@@ -20,7 +20,6 @@ type Ctx struct {
     Audio  *service.Audio
     Camera *service.Camera
     UI     *service.UI
-    Rand   *util.Rand
+    Rand   *g_rng.Rand
     Debug  bool
 }
-

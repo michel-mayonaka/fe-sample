@@ -99,8 +99,8 @@ var _ scContract = (*List)(nil)
 type IntentKind int
 
 const (
-    // intentNone: 意図なし（何もしない）。
-    intentNone IntentKind = iota
+    // 先頭は 0 から開始
+    _ IntentKind = iota
     // intentOpenStatus: 一覧のホバー行を選択してステータス画面を開く。
     intentOpenStatus
     // intentOpenWeapons: 武器在庫一覧を開く（SelectingEquip=false）。

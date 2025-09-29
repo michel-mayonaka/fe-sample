@@ -43,11 +43,13 @@ type Sim struct{
     defHover int // -1/0..2
 }
 
+// NewSim は模擬戦シーンを生成します。
 func NewSim(e *scenes.Env, atk, def uicore.Unit) *Sim {
     s := &Sim{E:e, simAtk:atk, simDef:def, turn:1, attHover:-1, defHover:-1}
     s.lv = NewLogView(s)
     return s
 }
+// ShouldPop は本シーンが終了要求（pop）状態かを返します。
 func (s *Sim) ShouldPop() bool { return s.pop }
 var _ scContract = (*Sim)(nil)
 

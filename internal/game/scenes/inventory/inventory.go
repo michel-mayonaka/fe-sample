@@ -30,16 +30,17 @@ type Inventory struct{
     wv *WeaponView
     iv *ItemView
 }
-
+// NewInventory は在庫画面の Scene を生成します。
 func NewInventory(e *scenes.Env) *Inventory {
     s := &Inventory{E:e, tabHover: -1}
     s.wv = NewWeaponView(e, s)
     s.iv = NewItemView(e, s)
     return s
 }
+// ShouldPop は本シーンが終了要求（pop）状態かを返します。
 func (s *Inventory) ShouldPop() bool { return s.pop }
 
-// Intent 種別
+// IntentKind は在庫画面における入力意図の種別です。
 type IntentKind int
 
 const (
@@ -50,11 +51,12 @@ const (
     intentChooseRow // Index に行番号
 )
 
-// Intent は入力の意味表現です。
+// Intent は入力を意味表現に変換したものです。
 type Intent struct{
     Kind IntentKind
     Index int
 }
+// IsSceneIntent は scenes.Intent 実装のマーカーです。
 func (Intent) IsSceneIntent() {}
 
 // scContract はパッケージ内コンパイル保証のためのインターフェースです。
@@ -115,7 +117,11 @@ func (s *Inventory) refreshUnitByID(id string) {
     if s.E == nil || s.E.UserTable == nil { return }
     c, ok := s.E.UserTable.Find(id); if !ok { return }
     u := uicore.UnitFromUser(c)
-    for i := range s.E.Units { if s.E.Units[i].ID == id { s.E.Units[i] = u; if s.E.SelIndex==i { /* keep selected */ } } }
+    for i := range s.E.Units {
+        if s.E.Units[i].ID == id {
+            s.E.Units[i] = u
+        }
+    }
 }
 
 // --- 内部: scHandleInput → scAdvance → scFlush --------------------------------------

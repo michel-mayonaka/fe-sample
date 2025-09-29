@@ -33,7 +33,7 @@ type WeaponView struct{
     sw, sh int
     hover int
 }
-
+// NewWeaponView は武器一覧サブビューを生成します。
 func NewWeaponView(e *scenes.Env, host *Inventory) *WeaponView { return &WeaponView{E:e, Host:host, hover:-1} }
 
 // Update はサブビュー内の状態更新を行います。
@@ -84,8 +84,7 @@ func (v *WeaponView) scHandleInput(ctx *game.Ctx) []scenes.Intent {
 func (v *WeaponView) scAdvance(intents []scenes.Intent) {
     for _, any := range intents {
         it, ok := any.(wvIntent); if !ok { continue }
-        switch it.Kind {
-        case wvChooseRow:
+        if it.Kind == wvChooseRow {
             owns := v.E.Inv.Inventory().Weapons()
             if it.Index >= 0 && it.Index < len(owns) {
                 _ = v.E.Inv.EquipWeapon(v.E.Selected().ID, v.E.CurrentSlot, owns[it.Index].ID)
@@ -135,7 +134,6 @@ func BuildWeaponRowsWithOwners(owns []user.OwnWeapon, wt *model.WeaponTable, ut 
     return rows
 }
 
-// toWidgetWeaponRows は描画ウィジェット用のVMへ変換します（最後の所有者のみ表示）。
 // DrawWeaponListView は武器一覧（武器ビュー）を描画します。
 func DrawWeaponListView(dst *ebiten.Image, rows []WeaponRow, hover int) {
     sw, sh := dst.Bounds().Dx(), dst.Bounds().Dy()

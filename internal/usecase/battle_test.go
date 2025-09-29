@@ -32,7 +32,7 @@ func (f *fakeInv) Reload() error { return nil }
 func (f *fakeInv) Weapons() []user.OwnWeapon { return nil }
 func (f *fakeInv) Items() []user.OwnItem { return nil }
 
-func wtForTest() *model.WeaponTable {
+func weaponsTableForTest() *model.WeaponTable {
     rows := []model.Weapon{
         {ID:"w_sword", Name:"Iron Sword", Type:"Sword", Rank:"E", Might:5, Hit:95, Crit:0, Weight:5, RangeMin:1, RangeMax:1},
         {ID:"w_axe",   Name:"Iron Axe",   Type:"Axe",   Rank:"E", Might:6, Hit:80, Crit:0, Weight:8, RangeMin:1, RangeMax:1},
@@ -55,7 +55,7 @@ func jsonMarshal(v any) ([]byte, error) { return json.Marshal(v) }
 
 func writeTempFile(b []byte) string {
     f, _ := os.CreateTemp("", "wt-*.json")
-    defer f.Close()
+    defer func() { _ = f.Close() }()
     _, _ = f.Write(b)
     return f.Name()
 }
@@ -64,7 +64,7 @@ func writeTempFile(b []byte) string {
 
 func TestRunBattleRound_UpdatesHP_Uses_Saves(t *testing.T) {
     rng := rand.New(rand.NewSource(1))
-    wt := wtForTest()
+    wt := weaponsTableForTest()
     // user table: two chars with equipment refs
     ut := newUserTableForTest2(t, []user.Character{{ID:"u1", Name:"A", HP:20, HPMax:20}, {ID:"u2", Name:"B", HP:20, HPMax:20}})
     ar := &fakeUsers{t: ut}
@@ -90,7 +90,7 @@ func TestRunBattleRound_UpdatesHP_Uses_Saves(t *testing.T) {
 
 func TestRunBattleRound_AttackerDouble_ConsumesTwo(t *testing.T) {
     rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-    wt := wtForTest()
+    wt := weaponsTableForTest()
     ut := newUserTableForTest2(t, []user.Character{{ID:"u1"}, {ID:"u2"}})
     a := &App{Weapons: &fakeWeapons{t: wt}, Users: &fakeUsers{t: ut}, Inv: &fakeInv{}, RNG: rng}
     // 追撃条件: AS差>=3 を満たすように a(Spd=12,Bld=8, Wt5)=AS11, d(Spd=8,Bld=5, Wt8)=AS5

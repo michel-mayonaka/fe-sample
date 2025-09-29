@@ -1,4 +1,4 @@
-package util
+package rng
 
 import "math/rand"
 
@@ -13,4 +13,3 @@ func (x *Rand) Intn(n int) int { return x.r.Intn(n) }
 
 // Float64 は [0,1) を返します。
 func (x *Rand) Float64() float64 { return x.r.Float64() }
-

@@ -5,7 +5,7 @@ import (
     scenes "ui_sample/internal/game/scenes"
 )
 
-// Intent 種別
+// IntentKind は模擬戦シーンで扱う入力意図の種別です。
 type IntentKind int
 
 const (
@@ -17,8 +17,9 @@ const (
     intentSetTerrainDef // Index: 0..2
 )
 
-// Intent は入力の意味を表します。
+// Intent は入力を意味表現に変換したものです。
 type Intent struct{ Kind IntentKind; Index int }
+// IsSceneIntent は scenes.Intent 実装のマーカーです。
 func (Intent) IsSceneIntent() {}
 
 // scContract はパッケージ内コンパイル保証のためのインターフェースです。
@@ -28,4 +29,3 @@ type scContract interface{
     scAdvance([]scenes.Intent)
     scFlush(ctx *game.Ctx)
 }
-
