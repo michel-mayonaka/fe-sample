@@ -124,6 +124,23 @@ Provider と Repository の役割の違い:
 - `func (*Game) Update() error`: 入力処理（`H`/`Esc`/`Backspace`）。
 - `func (*Game) Draw(*ebiten.Image)`: 画面描画（UI呼び出し）。
 - `func (*Game) Layout(int,int) (int,int)`: 論理解像度を返す。
+
+## UI メトリクス（uicore）
+- 読込: `internal/config/uimetrics` にて JSON をロード（ユーザ→マスタ→既定）。
+- 適用: `internal/game/service/ui.ApplyMetrics` で `uicore` の変数へ反映。
+- 代表キー（list.*）例:
+  - `margin`, `itemH`, `itemGap`, `titleOffset`, `portraitSize`
+  - 固定オフセット: `headerTopGap`, `itemsTopGap`, `panelInnerPaddingX`, `titleXOffset`, `headerBaseX`,
+    `rowTextOffsetX`, `rowTextOffsetY`, `rowBorderPad`, `rowRightIconSize`, `rowRightIconGap`
+  - 列配列: `headerColumnsItems`, `headerColumnsWeapons`, `rowColumnsItems`, `rowColumnsWeapons`
+ - 代表キー（status.*）例:
+   - `panelPad`, `portraitSize`, `textGapX`, `nameOffsetY`
+   - `classGapFromName`, `levelGapFromName`, `hpGapFromName`, `hpBarGapFromName`, `hpBarW`, `hpBarH`
+   - `statsTopGap`, `statsLineH`, `statsColGap`, `weaponRanksXExtra`, `rankLineH`, `magicRanksTopExtra`
+   - `equipTitleGapY`, `equipLineH`, `equipRect{W,H,YOffset}`, `equipLabelGapX`, `equipUsesX`
+ - 代表キー（sim.*）例:
+   - `startBtnW`, `startBtnH`, `autoRunGap`, `titleYOffset`, `titleXOffsetFromCenter`
+   - `terrain.*`: `buttonW/H`, `baseYFromBottom`, `leftBaseXOffset`, `rightBaseXInset`, `buttonGap`, `labelLeftXOffset`, `labelYOffsetFromBottom`
 - `func main()`: ウィンドウ作成とゲームループ開始。
 
 ## 参考

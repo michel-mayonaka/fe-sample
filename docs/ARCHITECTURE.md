@@ -366,3 +366,13 @@ Update(*game.Ctx) bool; Draw(*ebiten.Image); Layer() int
 
 - 本ドキュメントを唯一の設計指針とする。既存の `docs/architecture.md`（小文字版）は重複のため後続で削除またはリンク集約を検討。
 - 運用: 本アーキテクチャに沿って、複数セッションに分けて段階的に現行コードを整備（Port 分割→依存差し替え→Provider 拡張→テスト強化）。
+### UI メトリクスの外部化
+- 目的: 解像度差/画面改修をデータドリブンに調整可能にする。
+- 構成:
+  - ローダ: `internal/config/uimetrics/metrics.go`（JSON 読み込み、`Default`/`LoadOrDefault`）
+  - 適用: `internal/game/service/ui/apply.go`（`ApplyMetrics` で `uicore` 変数へ反映）
+  - 既定: `db/master/mst_ui_metrics.json`（ユーザ上書きは `db/user/usr_ui_metrics.json`）
+  - 反映タイミング: アプリ起動時（`internal/game/app/core.go`）、再読込（Backspace 長押し、`internal/game/app/game.go`）
+- スケール: 論理解像度（`SetBaseResolution`）と実ウィンドウサイズから算出（`UpdateMetricsFromWindow`）。
+- 対象（初期）:
+  - 一覧系: マージン、行高、行間、タイトルオフセット、ヘッダ/行の固定オフセット、列位置配列、行内テキスト/ボーダ/アイコン余白 等。

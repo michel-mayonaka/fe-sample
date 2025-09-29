@@ -2,24 +2,24 @@
 package sqlite
 
 import (
-    "context"
-    "database/sql"
-    "ui_sample/internal/repo"
-    usr "ui_sample/internal/model/user"
+	"context"
+	"database/sql"
+	usr "ui_sample/internal/model/user"
+	"ui_sample/internal/repo"
 )
 
 // Ensure implementations
 var (
-    _ repo.UserRepo = (*UserRepo)(nil)
+	_ repo.UserRepo = (*UserRepo)(nil)
 )
 
 // UserRepo は SQLite 版のユーザリポジトリ（スケルトン）です。
 // Find/Update/Save/Table は既存 IF を満たす最小のダミー動作を提供します。
 type UserRepo struct {
-    DB  *sql.DB
-    Ctx context.Context
-    // cache は最小限の互換用テーブル（暫定）。将来はSELECTに置換。
-    cache *usr.Table
+	DB  *sql.DB
+	Ctx context.Context
+	// cache は最小限の互換用テーブル（暫定）。将来はSELECTに置換。
+	cache *usr.Table
 }
 
 // NewUserRepo は接続を受け取り、スケルトンを返します（未実装）。
@@ -27,14 +27,18 @@ func NewUserRepo(ctx context.Context, db *sql.DB) *UserRepo { return &UserRepo{D
 
 // Find は ID でユーザキャラクタを検索します（スケルトン）。
 func (r *UserRepo) Find(id string) (usr.Character, bool) {
-    if r.cache == nil { return usr.Character{}, false }
-    return r.cache.Find(id)
+	if r.cache == nil {
+		return usr.Character{}, false
+	}
+	return r.cache.Find(id)
 }
 
 // Update はユーザキャラクタを更新します（スケルトン）。
 func (r *UserRepo) Update(c usr.Character) {
-    if r.cache == nil { return }
-    r.cache.UpdateCharacter(c)
+	if r.cache == nil {
+		return
+	}
+	r.cache.UpdateCharacter(c)
 }
 
 // Save は変更を保存します（スケルトン）。

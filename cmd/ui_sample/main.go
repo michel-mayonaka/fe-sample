@@ -3,14 +3,13 @@
 package main
 
 import (
-    "github.com/hajimehoshi/ebiten/v2"
-    gameapp "ui_sample/internal/game/app"
+	"github.com/hajimehoshi/ebiten/v2"
+	gameapp "ui_sample/internal/game/app"
 )
 
 // main はウィンドウを作成しゲームループを開始します。
 func main() {
-    if err := ebiten.RunGame(gameapp.NewUIAppGame()); err != nil {
-        panic(err)
-    }
+	if err := ebiten.RunGame(gameapp.NewUIAppGame()); err != nil {
+		panic(err)
+	}
 }
-

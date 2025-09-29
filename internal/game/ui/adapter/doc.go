@@ -6,4 +6,3 @@
 // - adapter → ui/view（表示用構造体）
 // - adapter は scenes や draw/layout に依存しません。
 package adapter
-
