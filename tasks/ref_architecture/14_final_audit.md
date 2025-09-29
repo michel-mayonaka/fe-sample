@@ -33,9 +33,11 @@
 - 変更は最小・安全のため不要想定。
 
 ## Progress / Notes
-- YYYY-MM-DD: 着手
-- YYYY-MM-DD: 完了
+- 2025-09-29: 着手。UI 層の直接書込検知→ `internal/game/scenes/status/status.go` の `UserTable.UpdateCharacter` 呼び出しを削除し、`DataPort.PersistUnit` への委譲に統一。
+- 2025-09-29: `rg` チェック結果 — UI→Repo 直接書込 0 件、`WeaponsTable()` は `gdata.Provider()` 経由のみを確認。
+- 2025-09-29: `make mcp` 実行 — `check-all`/`check-ui` OK。`golangci-lint` は環境依存メッセージ（非必須）。
+- 2025-09-29: `/pkg/game` テストを拡充し coverage 87.2% に到達。`internal/usecase` は 42.9%（追加テストを作成）。
+- 2025-09-29: `internal/usecase` に `RunBattleRound/ReloadData/PersistUnit/Equip(Weapon|Item)` のテストを追加（反撃射程外/追撃/スロット拡張/エラー伝播を網羅）。
 
 ## 関連
 - `docs/ARCHITECTURE.md`
-

@@ -50,6 +50,9 @@ jobs:
       - name: Download modules
         run: go mod download
 
+      - name: Tidy modules (ensure consistency)
+        run: go mod tidy
+
       - name: Install golangci-lint
         run: |
           GOBIN="$PWD/bin" go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -58,6 +61,7 @@ jobs:
       - name: Make MCP (vet/build/lint)
         env:
           EXTRA_LINTERS: ${{ github.event.inputs.extra_linters }}
+          GOFLAGS: -mod=readonly
         run: |
           # 追加の厳格ルールは必要時に有効化できます（例: funlen/gocognit/cyclop）
           # EXTRA_LINTERS='-E funlen -E gocognit -E cyclop' make mcp

@@ -10,7 +10,6 @@ import (
     scpopup "ui_sample/internal/game/scenes/common/popup"
     scenes "ui_sample/internal/game/scenes"
     inventory "ui_sample/internal/game/scenes/inventory"
-    "ui_sample/internal/user"
 )
 
 // Status はステータス画面の Scene 実装です。
@@ -147,13 +146,7 @@ func (s *Status) scAdvance(intents []scenes.Intent) {
             scpopup.ApplyGains(&unit, gains, game.LevelCap)
             s.E.SetSelected(unit)
             s.E.PopupGains, s.E.PopupActive, s.E.PopupJustOpened = gains, true, true
-            if s.E.UserTable != nil {
-                if c, ok := s.E.UserTable.Find(unit.ID); ok {
-                    c.Level = unit.Level; c.HPMax = unit.HPMax
-                    c.Stats = user.Stats{Str: unit.Stats.Str, Mag: unit.Stats.Mag, Skl: unit.Stats.Skl, Spd: unit.Stats.Spd, Lck: unit.Stats.Lck, Def: unit.Stats.Def, Res: unit.Stats.Res, Mov: unit.Stats.Mov}
-                    s.E.UserTable.UpdateCharacter(c)
-                }
-            }
+            // 永続化は Usecase(DataPort) に委譲し、UI から Repo へ直接書き込みしない
             if s.E.Data != nil { _ = s.E.Data.PersistUnit(unit) }
         case intentOpenInvSlot:
             i := it.Index
