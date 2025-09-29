@@ -55,17 +55,22 @@ CI（GitHub Actions）
 - `Backspace`: サンプル値を再読み込み
 
 ## 構成
-- `cmd/ui_sample/main.go`: エントリ・ゲームループ
-- `internal/ui/ui.go`: パネル/テキスト/HPバー/能力値の描画、ポートレート画像の表示
+- `cmd/ui_sample/`: エントリ・ゲームループ
+- `internal/game/scenes/`: 画面（一覧/ステータス/在庫/模擬戦）とポート定義
+- `internal/game/ui/`
+  - `layout/`: レイアウト計算（矩形/サイズ）
+  - `draw/`: 描画関数（見た目）
+  - `view/`: 表示用データ型（行モデルなど）
+  - `adapter/`: view-model 生成（テーブル/ユーザ→view、`PortraitLoader` 抽象）
+- `internal/game/service/ui/`: テキスト/パネル等のUIユーティリティ、`SampleUnit()` など
+- `internal/game/service/levelup/`: レベルアップの抽選/反映ロジック
+- `pkg/game/geom/`: 幾何の純ロジック（`RectContains` など、テスト付き）
 - `assets/`: 画像等を追加する場合に利用（例: `assets/01_iris.png`）
-- `internal/model/`: キャラクターマスタのモデルとJSONローダー
-- `db/master/mst_characters.json`: キャラクターのマスタデータ（ID索引, mst_プレフィックス）
-- `db/master/mst_class_caps.json`: クラスごとの能力上限
-- `db/master/mst_weapons.json`: 武器の基本性能
-- `db/master/mst_items.json`: アイテムの基本性能
-- `internal/model/user/`: ユーザ（セーブ）データのモデル（純粋型）
+- `internal/model/`: マスタ定義とJSONローダー
+- `internal/model/user/`: ユーザ（セーブ）データの純粋モデル
 - `internal/infra/userfs/`: ユーザデータのJSON入出力（バックエンド）
-- `db/user/usr_characters.json`: 現在のユーザ状態（usr_プレフィックス）
+- `db/master/*.json`: 各種マスタ（`mst_`）
+- `db/user/*.json`: ユーザ状態（`usr_`）
 
 ## トラブルシューティング
 - go.mod の Go 版エラー（例:「go 1.22 だが最大 1.17」）
@@ -80,7 +85,7 @@ CI（GitHub Actions）
 
 ## 画像の追加（ポートレート表示）
 - `assets/01_iris.png` を配置すると、左上のポートレート枠に表示されます。
-- 別名で使う場合は `internal/ui/ui.go` の `SampleUnit()` で読み込みパスを変更してください。
+- 別名で使う場合は `internal/game/service/ui/load.go` の `SampleUnit()` の読み込みパスを変更してください。
 
 ## データ構成（mst_/usr_）
 - マスタ: `db/master/mst_characters.json`
@@ -104,4 +109,4 @@ CI（GitHub Actions）
 - 「戦闘開始」で1ラウンド（攻撃→反撃）を解決し、HP/耐久を `db/user/usr_characters.json` に保存
 - ダメージ計算: `攻撃 = 力 + 武器威力 - 相手守備`（命中は簡易式）
 
-デザイン調整は `internal/ui/ui.go` の色・座標・フォントサイズを編集してください。必要に応じて画像/TTF を `assets/` に追加し、`embed` で組み込み可能です。
+デザイン調整は `internal/game/service/ui` と `internal/game/ui/{layout,draw}` の色・座標・フォントサイズを編集してください。必要に応じて画像/TTF を `assets/` に追加し、`embed` で組み込み可能です。
