@@ -1,6 +1,6 @@
 # [story] `ui/input` サブパッケージ導入の検討
 
-- ステータス: 提案中
+- ステータス: [完了]
 - 日付: 2025-09-29
 - 参照: docs/ARCHITECTURE.md, docs/NAMING.md, stories/BACKLOG.md
 
@@ -29,12 +29,12 @@
 - `make mcp` グリーン、lint 0 を目標。
 
 ## 工程（サブタスク）
-- [ ] tasks/01_discovery_current_usage.md — 現状の入力参照箇所の棚卸し
-- [ ] tasks/02_design_options.md — 案比較（A: 現状維持、B: ui/input へ移行、C: `pkg/game/input` + アダプタ）
-- [ ] tasks/03_define_min_api.md — `Action`/`Reader` の最小API定義と命名確定
-- [ ] tasks/04_spike_adapter.md — 既存 `service.Input` → `ui/input.Reader` アダプタのスパイク
-- [ ] tasks/05_pilot_integration.md — 代表1画面での切替と検証
-- [ ] tasks/06_docs_update.md — ARCHITECTURE/API の更新と決定事項の反映
+- [x] tasks/01_discovery_current_usage.md — 現状の入力参照箇所の棚卸し
+- [x] tasks/02_design_options.md — 案比較（A: 現状維持、B: ui/input へ移行、C: `pkg/game/input` + アダプタ）
+- [x] tasks/03_define_min_api.md — `Action`/`Reader` の最小API定義と命名確定
+- [x] tasks/04_spike_adapter.md — 既存 `service.Input` → `ui/input.Reader` アダプタのスパイク
+- [x] tasks/05_pilot_integration.md — 代表1画面での切替と検証（全シーンへ段階適用）
+- [x] tasks/06_docs_update.md — ARCHITECTURE/API の更新と決定事項の反映
 
 ## 影響範囲
 - `internal/game/service/input.go`（参照側のimport変更/アダプタ追加）
@@ -57,3 +57,17 @@
 - 2025-09-29: `game.Ctx.Input` を `ui/input.Reader` に変更（実装は従来の `service.Input` を供給）。
 - 2025-09-29: `ServiceAdapter`（`service.Input` を包む）を追加し、単体テストを作成・通過。
 - 2025-09-29: docs(API/ARCHITECTURE) 追記を反映。
+
+## 採用判断（結論）
+- 採用: 案B（`internal/game/ui/input` に `Action`/`Reader` を定義、`service.Input` はアダプタで適合）。
+- 理由（Pros）:
+  - UI 層が「入力の意味」だけを参照し、取得実装を隠蔽できる。
+  - 既存 `service.Input` を活かしつつ段階移行できる（破壊的変更なし）。
+  - 将来の拡張（ゲームパッド/タッチ/リマップ保存）が `ui/input` 起点で容易。
+- 留意点（Cons）:
+  - 当面は `service`/`ui` に入力関連が分散（アダプタで吸収）。
+  - 列挙の重複を保守する必要あり（当面は `ui/input` を正とし、`service` は内部実装と位置付け）。
+
+## 今後の運用（DoD後のフォロー）
+- 新しいアクション追加時は `ui/input` を原本とし、`service.Input` のマッピングを追随。
+- 必要になれば、案C（`pkg/game/input` で完全にUI非依存化）を別ストーリーで検討。
