@@ -91,6 +91,13 @@ CI（GitHub Actions）
 
 将来: SQLite へ移行予定（`docs/DB_NOTES.md` 参照）
 
+## ドキュメント
+- 命名規約: `docs/NAMING.md`
+- コメント記法: `docs/COMMENT_STYLE.md`
+- アーキテクチャ: `docs/ARCHITECTURE.md`
+- ストーリー運用: `docs/REF_STORIES.md`
+- DB メモ: `docs/DB_NOTES.md`
+
 ## 戦闘画面（簡易）
 - ステータス画面右下の「戦闘へ」→ 戦闘プレビュー
 - 「戦闘開始」で1ラウンド（攻撃→反撃）を解決し、HP/耐久を `db/user/usr_characters.json` に保存

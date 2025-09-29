@@ -213,6 +213,8 @@ Provider と Repository の違い（明確化）:
 
 ## 10. 命名・スタイル（補足）
 
+詳細な命名規約は `docs/NAMING.md` を参照してください。本節は抜粋と背景説明のみを記載します。
+
 - ファイル名
   - Port 定義: `ports_data.go`, `ports_battle.go`, `ports_inventory.go`
   - Usecase 実装: `data.go`, `battle.go`, `inventory.go`（`facade.go` に `App` 本体と DI）
