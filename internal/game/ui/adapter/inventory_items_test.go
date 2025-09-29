@@ -2,6 +2,7 @@ package adapter
 
 import (
     "testing"
+    gdata "ui_sample/internal/game/data"
     usr "ui_sample/internal/model/user"
     "ui_sample/internal/model"
 )
@@ -19,14 +20,28 @@ func (m *mockPL) Load(name string) (*ebiten.Image, error) {
 // ebiten import needs to be after func to avoid unused during formatting
 import "github.com/hajimehoshi/ebiten/v2"
 
+// fakeProv はテスト用の簡易 TableProvider 実装です（必要メソッドのみ）。
+type fakeProv struct{ ut *usr.Table }
+func (f fakeProv) WeaponsTable() *model.WeaponTable                 { return nil }
+func (f fakeProv) ItemsTable() *model.ItemDefTable                  { return nil }
+func (f fakeProv) UserWeapons() []usr.OwnWeapon                     { return nil }
+func (f fakeProv) UserItems() []usr.OwnItem                         { return nil }
+func (f fakeProv) UserTable() *usr.Table                            { return f.ut }
+func (f fakeProv) UserUnitByID(string) (ui.Unit, bool)              { return ui.Unit{}, false }
+func (f fakeProv) EquipKindAt(string, int) (bool, bool)             { return false, false }
+
+// import 循環回避のため ui は後段で別名import
+import ui "ui_sample/internal/game/service/ui"
+
 func TestBuildItemRows_OwnersAndPortraits(t *testing.T) {
     owns := []usr.OwnItem{{ID:"u_item_1", MstItemsID:"mst_potion", Uses:3, Max:10}}
     ut := usr.NewTable([]usr.Character{{
         ID:"char_1", Name:"Alice", Portrait:"alice.png",
         Equip: []usr.EquipRef{{UserItemsID: "u_item_1"}},
     }})
+    gdata.SetProvider(fakeProv{ut: ut})
     pl := &mockPL{withImage:true}
-    rows := BuildItemRows(owns, nil, ut, pl)
+    rows := BuildItemRows(owns, nil, pl)
     if len(rows) != 1 { t.Fatalf("rows len=%d", len(rows)) }
     r := rows[0]
     if r.Name != "mst_potion" { t.Errorf("want name passthrough, got %s", r.Name) }
@@ -41,7 +56,8 @@ func TestBuildItemRows_WithDefinitions(t *testing.T) {
     owns := []usr.OwnItem{{ID:"u_item_1", MstItemsID:"it_vulnerary", Uses:2, Max:10}}
     it, err := model.LoadItemsJSON("db/master/mst_items.json")
     if err != nil { t.Skipf("items table not available: %v", err) }
-    rows := BuildItemRows(owns, it, nil, nil)
+    gdata.SetProvider(fakeProv{})
+    rows := BuildItemRows(owns, it, nil)
     if len(rows) != 1 { t.Fatalf("rows len=%d", len(rows)) }
     r := rows[0]
     if r.Name == "it_vulnerary" { t.Errorf("expected name resolved, got id: %s", r.Name) }

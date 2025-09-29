@@ -2,7 +2,6 @@ package scenes
 
 import (
     "math/rand"
-    usr "ui_sample/internal/model/user"
 )
 
 // Env は UI シーン間で共有する状態とユースケースを束ねます。
@@ -11,7 +10,6 @@ type Env struct {
     Data      DataPort
     Battle    BattlePort
     Inv       InventoryPort
-    UserTable *usr.Table
     UserPath  string
     RNG       *rand.Rand
 

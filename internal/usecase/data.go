@@ -52,3 +52,27 @@ func (a *App) UserItems() []usr.OwnItem {
     if a == nil || a.Inv == nil { return nil }
     return a.Inv.Items()
 }
+
+// UserTable はユーザテーブル（読み取り用）を返します。
+func (a *App) UserTable() *usr.Table {
+    if a == nil || a.Users == nil { return nil }
+    return a.Users.Table()
+}
+
+// UserUnitByID はユーザキャラクタIDから UI 用ユニットを生成して返します。
+func (a *App) UserUnitByID(id string) (uicore.Unit, bool) {
+    if a == nil || a.Users == nil { return uicore.Unit{}, false }
+    c, ok := a.Users.Find(id)
+    if !ok { return uicore.Unit{}, false }
+    return uicore.UnitFromUser(c), true
+}
+
+// EquipKindAt は指定スロットに武器/アイテムのどちらが入っているかを返します。
+func (a *App) EquipKindAt(unitID string, slot int) (bool, bool) {
+    if a == nil || a.Users == nil { return false, false }
+    c, ok := a.Users.Find(unitID)
+    if !ok { return false, false }
+    if slot < 0 || slot >= len(c.Equip) { return false, false }
+    er := c.Equip[slot]
+    return er.UserWeaponsID != "", er.UserItemsID != ""
+}

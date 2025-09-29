@@ -46,7 +46,6 @@ func NewUIAppGame() *Game {
         Data: a,
         Battle: a,
         Inv: a,
-        UserTable: urepo.Table(),
         UserPath: userPath,
         RNG: rng,
         Session: &scenes.Session{Units: units, SelIndex: 0},

@@ -37,7 +37,7 @@ func (v *ItemView) Update(ctx *game.Ctx) (game.Scene, error) {
 // Draw はアイテム一覧の描画を行います。
 func (v *ItemView) Draw(dst *ebiten.Image) {
     if p := gdata.Provider(); p != nil {
-        rows := uiadapter.BuildItemRows(p.UserItems(), p.ItemsTable(), v.E.UserTable, uiadapter.AssetsPortraitLoader{})
+        rows := uiadapter.BuildItemRows(p.UserItems(), p.ItemsTable(), uiadapter.AssetsPortraitLoader{})
         uidraw.DrawItemListView(dst, rows, v.hover)
     }
 }

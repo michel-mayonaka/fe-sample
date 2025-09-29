@@ -9,6 +9,7 @@ import (
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     scenes "ui_sample/internal/game/scenes"
     inventory "ui_sample/internal/game/scenes/inventory"
+    gdata "ui_sample/internal/game/data"
     uidraw "ui_sample/internal/game/ui/draw"
     uilayout "ui_sample/internal/game/ui/layout"
     lvl "ui_sample/internal/game/service/levelup"
@@ -163,15 +164,11 @@ func (s *Status) scAdvance(intents []scenes.Intent) {
             // 既装備の種別からタブを初期選択（なければ武器）
             s.E.SelectingIsWeapon = true
             s.E.InvTab = 0
-            if s.E.UserTable != nil {
+            if p := gdata.Provider(); p != nil {
                 unit := s.E.Selected()
-                if c, ok := s.E.UserTable.Find(unit.ID); ok {
-                    if i < len(c.Equip) {
-                        er := c.Equip[i]
-                        if er.UserItemsID != "" { s.E.SelectingIsWeapon = false; s.E.InvTab = 1 }
-                        if er.UserWeaponsID != "" { s.E.SelectingIsWeapon = true;  s.E.InvTab = 0 }
-                    }
-                }
+                hasW, hasI := p.EquipKindAt(unit.ID, i)
+                if hasI { s.E.SelectingIsWeapon = false; s.E.InvTab = 1 }
+                if hasW { s.E.SelectingIsWeapon = true;  s.E.InvTab = 0 }
             }
             s.next = inventory.NewInventory(s.E)
         case intentOpenInvWeapons:

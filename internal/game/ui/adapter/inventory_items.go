@@ -2,6 +2,7 @@ package adapter
 
 import (
     "github.com/hajimehoshi/ebiten/v2"
+    gdata "ui_sample/internal/game/data"
     "ui_sample/internal/model"
     usr "ui_sample/internal/model/user"
     uiview "ui_sample/internal/game/ui/view"
@@ -9,7 +10,7 @@ import (
 
 // BuildItemRows はユーザ所持アイテムと定義テーブル/ユーザテーブルから
 // 表示用の行データを構築します。
-func BuildItemRows(owns []usr.OwnItem, it *model.ItemDefTable, ut *usr.Table, pl PortraitLoader) []uiview.ItemRow {
+func BuildItemRows(owns []usr.OwnItem, it *model.ItemDefTable, pl PortraitLoader) []uiview.ItemRow {
     rows := make([]uiview.ItemRow, 0, len(owns))
     for _, oi := range owns {
         name := oi.MstItemsID
@@ -22,6 +23,8 @@ func BuildItemRows(owns []usr.OwnItem, it *model.ItemDefTable, ut *usr.Table, pl
         }
         rows = append(rows, uiview.ItemRow{ID: oi.ID, Name: name, Type: typ, Effect: eff, Power: pow, Uses: oi.Uses, Max: oi.Max})
     }
+    var ut *usr.Table
+    if p := gdata.Provider(); p != nil { ut = p.UserTable() }
     if ut == nil { return rows }
     own := map[string][]uiview.OwnerBadge{}
     for _, c := range ut.Slice() {
@@ -37,4 +40,3 @@ func BuildItemRows(owns []usr.OwnItem, it *model.ItemDefTable, ut *usr.Table, pl
     for i := range rows { rows[i].Owners = own[rows[i].ID] }
     return rows
 }
-

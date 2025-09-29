@@ -38,7 +38,7 @@ func (v *WeaponView) Update(ctx *game.Ctx) (game.Scene, error) {
 func (v *WeaponView) Draw(dst *ebiten.Image) {
     // 参照は Provider 経由へ統一（未設定時は描画スキップ）
     if p := gdata.Provider(); p != nil {
-        rows := uiadapter.BuildWeaponRows(p.UserWeapons(), p.WeaponsTable(), v.E.UserTable, uiadapter.AssetsPortraitLoader{})
+        rows := uiadapter.BuildWeaponRows(p.UserWeapons(), p.WeaponsTable(), uiadapter.AssetsPortraitLoader{})
         uidraw.DrawWeaponListView(dst, rows, v.hover)
     }
 }

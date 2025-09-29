@@ -66,7 +66,7 @@
 - `func AttackSpeedOf(wt *model.WeaponTable, u ui.Unit) int`: 攻撃速度（武器重量考慮、未設定時は速さ）。
 
 ## internal/game/data（テーブル/在庫のDIプロバイダ）
-- `type TableProvider interface { WeaponsTable() *model.WeaponTable; ItemsTable() *model.ItemDefTable; UserWeapons() []user.OwnWeapon; UserItems() []user.OwnItem }`
+- `type TableProvider interface { WeaponsTable() *model.WeaponTable; ItemsTable() *model.ItemDefTable; UserWeapons() []user.OwnWeapon; UserItems() []user.OwnItem; UserTable() *user.Table; UserUnitByID(string) (ui.Unit,bool); EquipKindAt(unitID string, slot int) (bool,bool) }`
 - `func SetProvider(p TableProvider)`: アプリ側実装を注入（推奨ルート）。
 - `func Provider() TableProvider`: 現在のプロバイダ取得。
 

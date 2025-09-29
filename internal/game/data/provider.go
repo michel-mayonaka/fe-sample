@@ -2,6 +2,7 @@
 package data
 
 import (
+    uicore "ui_sample/internal/game/service/ui"
     "ui_sample/internal/model"
     usr "ui_sample/internal/model/user"
 )
@@ -14,6 +15,12 @@ type TableProvider interface {
     // UserInventory: ユーザ在庫の参照（スナップショット）。
     UserWeapons() []usr.OwnWeapon
     UserItems() []usr.OwnItem
+    // UserTable: ユーザテーブル参照（読み取り用途）。
+    UserTable() *usr.Table
+    // UserUnitByID: UI 用ユニットへの変換を提供（表示同期などに利用）。
+    UserUnitByID(id string) (uicore.Unit, bool)
+    // EquipKindAt: 指定スロットの種別（武器/アイテムのどちらが入っているか）を返す。
+    EquipKindAt(unitID string, slot int) (hasWeapon bool, hasItem bool)
 }
 
 var provider TableProvider
