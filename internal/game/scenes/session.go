@@ -2,7 +2,7 @@ package scenes
 
 import (
     uicore "ui_sample/internal/game/service/ui"
-    scpopup "ui_sample/internal/game/scenes/common/popup"
+    lvl "ui_sample/internal/game/service/levelup"
 )
 
 // Session は UI シーン間で共有される“表示用の一時状態”をまとめた構造体です。
@@ -15,7 +15,7 @@ type Session struct {
 
     // ステータス/在庫で共有する状態
     PopupActive     bool
-    PopupGains      scpopup.LevelUpGains
+    PopupGains      lvl.Gains
     PopupJustOpened bool
     CurrentSlot     int
     SelectingEquip  bool

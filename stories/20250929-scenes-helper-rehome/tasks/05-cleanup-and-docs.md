@@ -1,6 +1,6 @@
 # [task] 参照掃除・Lint・ドキュメント更新
 
-- ステータス: 進行中
+- ステータス: 完了
 - 目的: 参照の取りこぼしを解消し、Lint/テストを全通過。ドキュメントへ反映する。
 
 ## スコープ
@@ -17,9 +17,9 @@
 - ドキュメントの差分作成・リンク確認。
 
 ## DoD（完了条件）
-- `rg -n "scenes/helper|\bPointIn\b"` が 0 件。
-- `make mcp` グリーン。
-- 上記ドキュメントの該当節が更新済み。
+- `rg -n "scenes/helper|\bPointIn\b"` が 0 件（達成）。
+- `make mcp` グリーン（達成）。
+- README/ARCHITECTURE/NAMING を更新（達成）。
 
 ## コマンド例
 - `rg -n "scenes/helper|\bPointIn\b" || true`
