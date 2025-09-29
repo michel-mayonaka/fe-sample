@@ -18,6 +18,12 @@
 
 初期エントリ
 
+## 2025-09-29: `internal/game/service/ui/apply.go` の分割検討
+- 目的: UI メトリクス適用処理を責務単位で分割し、可読性・変更容易性・テスト容易性を向上する。
+- 背景: 現在の `apply.go` は複数ドメイン（List/Status/Sim/Popup/Widgets）への一括適用を担っており、変更差分の把握や衝突が起きやすい。
+- DoD: 機能等価のまま `apply_list.go`/`apply_status.go`/`apply_sim.go`/`apply_popup.go`/`apply_widgets.go` 等へ分割、外部 API を不変に維持、`make mcp` グリーン。
+- 参考/関連: `internal/game/service/ui/apply.go`, `internal/game/service/ui/*.go`, `docs/NAMING.md`, `docs/ARCHITECTURE.md`
+
 ## 2025-09-29: FE風バトル マップ画面の叩き追加
 - 目的: FE風シミュレーションバトルのマップ画面を試作し、キャラクター一覧からの遷移と配置ロジックの骨組みを固める
 - 背景: 現状は一覧表示のみで戦闘画面が未実装のため、体験の流れが断絶している
