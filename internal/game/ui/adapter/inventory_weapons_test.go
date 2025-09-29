@@ -3,6 +3,7 @@ package adapter
 import (
     "testing"
     usr "ui_sample/internal/model/user"
+    "ui_sample/internal/model"
 )
 
 func TestBuildWeaponRows_OwnersAndPortraits(t *testing.T) {
@@ -22,3 +23,15 @@ func TestBuildWeaponRows_OwnersAndPortraits(t *testing.T) {
     if r.Owners[0].Portrait != nil { t.Errorf("expected nil portrait when loader returns nil") }
 }
 
+func TestBuildWeaponRows_WithDefinitions(t *testing.T) {
+    owns := []usr.OwnWeapon{{ID:"u_w1", MstWeaponsID:"wp_iron_sword", Uses:40, Max:40}}
+    wt, err := model.LoadWeaponsJSON("db/master/mst_weapons.json")
+    if err != nil { t.Skipf("weapons table not available: %v", err) }
+    rows := BuildWeaponRows(owns, wt, nil, nil)
+    if len(rows) != 1 { t.Fatalf("rows len=%d", len(rows)) }
+    r := rows[0]
+    if r.Name == "wp_iron_sword" { t.Errorf("expected name resolved, got id: %s", r.Name) }
+    if r.Type == "" || r.Rank == "" || r.Might <= 0 {
+        t.Errorf("expected fields from definitions, got type=%s rank=%s might=%d", r.Type, r.Rank, r.Might)
+    }
+}

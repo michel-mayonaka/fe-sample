@@ -3,6 +3,7 @@ package adapter
 import (
     "testing"
     usr "ui_sample/internal/model/user"
+    "ui_sample/internal/model"
 )
 
 type mockPL struct{ called []string; withImage bool }
@@ -36,3 +37,15 @@ func TestBuildItemRows_OwnersAndPortraits(t *testing.T) {
     if len(pl.called) == 0 || pl.called[0] != "alice.png" { t.Errorf("portrait loader not called correctly: %+v", pl.called) }
 }
 
+func TestBuildItemRows_WithDefinitions(t *testing.T) {
+    owns := []usr.OwnItem{{ID:"u_item_1", MstItemsID:"it_vulnerary", Uses:2, Max:10}}
+    it, err := model.LoadItemsJSON("db/master/mst_items.json")
+    if err != nil { t.Skipf("items table not available: %v", err) }
+    rows := BuildItemRows(owns, it, nil, nil)
+    if len(rows) != 1 { t.Fatalf("rows len=%d", len(rows)) }
+    r := rows[0]
+    if r.Name == "it_vulnerary" { t.Errorf("expected name resolved, got id: %s", r.Name) }
+    if r.Type == "" || r.Effect == "" || r.Power <= 0 {
+        t.Errorf("expected fields from definitions, got type=%s effect=%s power=%d", r.Type, r.Effect, r.Power)
+    }
+}

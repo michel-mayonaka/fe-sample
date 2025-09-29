@@ -41,6 +41,16 @@
 - ストーリーは“目的と受け入れ基準”を先に固定。途中の仕様変更は「決定事項」に追記。
 - 実装前後で `make mcp`、必要に応じて `go test -race -cover` を実施。
 
+### 事例: UI 責務分割パターン（layout/draw/view/adapter）
+- 動機: `helper` 的な曖昧名を排し、探索性と再利用性を高める。
+- 構成:
+  - `ui/layout`: 副作用のない矩形計算（座標/サイズ）。
+  - `ui/draw`: 見た目の描画（テキスト/パネル/ボタン等）。
+  - `ui/view`: 表示用データ（行モデルなど）。
+  - `ui/adapter`: テーブル/ユーザ→view の変換（`PortraitLoader` で画像読込を抽象化）。
+- 適用例: `scenes/list_layout` → `ui/layout/list.go`、`scenes/view_status_draw` → `ui/draw/status.go`、
+  在庫行の描画/生成 → `ui/draw/inventory_list.go` / `ui/adapter/inventory_*.go`。
+
 ### サブタスク運用（必須）
 - サブタスクは一つ一つを別 MD として、該当ストーリーディレクトリ内に作成し、進捗管理を行うこと。
 - サブタスクMDの作成は README 作成後、制作者レビューが終了し内容が確定してから行うこと。
