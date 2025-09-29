@@ -199,6 +199,30 @@ Session（UI 状態）:
 - クエリは参照専用・副作用なし。`gdata.Provider()` を用いることで UI からの参照経路を 1 本化できる。
 - コマンドは副作用を伴う。Usecase に集約することで UI 直書きのリスク（半更新・整合崩れ）を回避。
 
+### 7.1 図（Provider と Port）
+```
+      +-------------------+            +-------------------+
+      |      Scenes       |            |      Usecase      |
+      |  (UI: input/draw) |            |   (Application)   |
+      +---------+---------+            +----------+--------+
+                |                               |
+      Query --> | gdata.Provider()              | <-- Command (Ports)
+                v                               v
+      +---------+-------------------------------+----------+
+      |                  App (TableProvider, Ports)       |
+      |     - WeaponsTable/ItemsTable                     |
+      |     - UserWeapons/UserItems (snapshot)            |
+      |     - InventoryPort(EquipWeapon/EquipItem)       |
+      |     - DataPort(ReloadData/PersistUnit)           |
+      +---------------------+----------------------------+
+                            |
+                            v
+                  +---------+----------+
+                  |       Repo         |
+                  | (User/Weapons/Inv) |
+                  +--------------------+
+```
+
 Provider と Repository の違い（明確化）:
 - Provider（読み取り専用）
   - 役割: 参照テーブルとユーザ在庫スナップショットの提供（例: `WeaponsTable()`/`ItemsTable()`/`UserWeapons()`/`UserItems()`）。

@@ -31,6 +31,7 @@
 - 2025-09-29: ストーリー作成。サブタスク草案を追加。
 - 2025-09-29: 監査初版を作成（`artifacts/audit_findings.md`）。InventoryPort の Repo 依存を改善候補として提示。
 - 2025-09-29: 方針B（Provider 統一）で PoC 実装。`UserWeapons/UserItems` を Provider に追加、在庫参照を Scenes から切替。Docs/API/ARCHITECTURE を更新。
+- 2025-09-29: リファクタチェックリストを作成（`artifacts/scene_refactor_checklist.md`）。Task 04 を完了。
 
 ## リスク・懸念
 - 例: 依存の変更、CI制約 など

@@ -1,6 +1,6 @@
 # 04_prepare_refactor_checklist_for_scenes — 後続リファクタ用チェックリスト
 
-ステータス: [未着手]
+ステータス: [完了]
 
 ## 目的
 - `inventory` / `status` / `character_list` 画面のリファクタ実施に向けた共通チェックリストを整備する。
@@ -20,6 +20,5 @@
 - `artifacts/scene_refactor_checklist.md`
 
 ## DoD
-- [ ] 1 画面の試験適用でチェックが通る（または差分が残課題として整理）
-- [ ] 後続タスクで再利用できるレベルで具体化
-
+- [x] 1 画面の試験適用でチェックが通る（inventory で Provider 化済み）
+- [x] 後続タスクで再利用できるレベルで具体化
