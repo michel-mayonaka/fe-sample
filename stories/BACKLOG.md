@@ -49,3 +49,9 @@
 - DoD: view-model を `PortraitPath` に寄せる設計案の比較と方針確定（採用/見送りの記録）
 
 <!-- 昇格: stories/20250929-ui-input-subpkg へ移行（2025-09-29） -->
+
+## 2025-09-29: 入力ロジックのUI非依存化（案C）
+- 目的: 入力のマッピング/状態遷移を `pkg/game/input` に抽出し、UI完全非依存のテスタブルなコアにする。
+- 背景: 現状は `ui/input` 列挙と `service.Input`（Ebiten依存）+アダプタで段階移行中。更なる再利用性とテスト容易性のため、純ロジック化の選択肢を評価。
+- DoD: 設計比較（影響/利点/コスト）と採否判断の記録、最小スパイクの検証、`make mcp` グリーン。
+- 参考/関連: `internal/game/ui/input`, `internal/game/service/input.go`, docs/ARCHITECTURE.md, docs/API.md

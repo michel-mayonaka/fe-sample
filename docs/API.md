@@ -133,3 +133,26 @@ Provider と Repository の役割の違い:
 - 新規/変更した公開要素（型/関数/定数/フィールド）は本ファイルを必ず更新。
 - UIレイアウト変更時は、座標・行間・フォントサイズの意図を1行で追記。
 - 画像/フォント追加時は、読み込み先・依存・ライセンス（必要なら）を明記。
+
+---
+
+## internal/game/ui/input（抽象入力API）
+
+- 目的: Scene から「入力の意味」だけを参照するための最小API。
+- 構成:
+  - `type Action int`: 抽象アクション列挙（`Confirm/Cancel/Menu/...` など）。
+  - `type Reader interface { Press(Action) bool; Down(Action) bool }`: フレームスナップショットの読み取り。
+  - `type ServiceAdapter struct{ S *service.Input }` / `func WrapService(*service.Input) Reader`: 既存実装を適合。
+- 列挙（代表）:
+  - 基本: `Up, Down, Left, Right, Confirm, Cancel, Menu, Next, Prev`
+  - 便宜: `OpenWeapons, OpenItems, EquipToggle, Slot1..5, Unassign`
+  - 地形: `TerrainAtt1..3, TerrainDef1..3`
+- 利用例:
+```
+// ctx.Input は uinput.Reader
+if ctx.Input.Press(uinput.Confirm) { /* 決定 */ }
+if ctx.Input.Down(uinput.Menu)     { /* 長押し検出等 */ }
+```
+- 備考:
+  - `game.Ctx.Input` は `uinput.Reader`。アプリ層で `WrapService(gamesvc.NewInput())` を供給。
+  - 取得/マッピング（`Snapshot` 等）はアプリ層で継続実装し、UI からは隠蔽。
