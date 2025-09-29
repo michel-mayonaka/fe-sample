@@ -55,3 +55,5 @@
 - 2025-09-29: `internal/game/ui/input` を追加し、最小API(Action/Reader)を定義。
 - 2025-09-29: `character_list`/`status`/`inventory`/`sim` を `ui/input` 参照に切替。
 - 2025-09-29: `game.Ctx.Input` を `ui/input.Reader` に変更（実装は従来の `service.Input` を供給）。
+- 2025-09-29: `ServiceAdapter`（`service.Input` を包む）を追加し、単体テストを作成・通過。
+- 2025-09-29: docs(API/ARCHITECTURE) 追記を反映。

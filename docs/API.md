@@ -15,8 +15,9 @@
   テスト用の `SnapshotWith(func(ebiten.Key) bool)` を用意。
 
 - `package ui/input`: UI 層向けの最小API。
-  - `type Action`（当面は `service.Action` のエイリアスを再公開）
+  - `type Action`（`ui/input` 独自の列挙）
   - `type Reader interface { Press(Action) bool; Down(Action) bool }`
+  - `type ServiceAdapter struct{ S *service.Input }` / `func WrapService(*service.Input) Reader`
   - 目的: Scenes からは「入力の意味（Action/Press/Down）」のみ参照し、取得実装（Snapshot/マッピング）はアプリ層で隠蔽。
 
 ## internal/model（マスタデータ / mst_）
