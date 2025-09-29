@@ -1,6 +1,6 @@
 # [task] サービス系（遷移/演出/状態連携）の移設
 
-- ステータス: 未着手
+- ステータス: 完了
 - 目的: 画面遷移・アニメーション・状態連携などの横断サービスを `internal/game/service/*` に移し、`scenes` から分離する。
 
 ## 入力
@@ -8,9 +8,9 @@
 - 既存 `internal/game/service/*` の構成
 
 ## スコープ
-- 新設候補: `internal/game/service/transition`, `internal/game/service/easing` など（実体に合わせて決定）。
-- 関数/型の移動と API 整形（必要に応じインタフェース化）。
-- 参照更新（`scenes/*`）。
+- 新設: `internal/game/service/levelup`（成長抽選/反映）。
+- 既存: `scenes/common/popup/levelup.go` のロジック部を移設。
+- 参照更新（`status` シーンから `levelup.Roll/Apply` を利用）。
 
 ## 非スコープ
 - 新規演出の追加。
@@ -21,11 +21,10 @@
 - `make mcp` で逐次確認。
 
 ## DoD（完了条件）
-- サービス系の共通処理が `internal/game/service/*` に移設されている。
+- 成長抽選/反映ロジックが `service/levelup` に移り、描画は `ui/draw` に分離されている。
 - 依存方向の逆転がない（`service` が `scenes` を参照しない）。
 - `make mcp` グリーン。
 
 ## コマンド例
 - `rg -n "transition|fade|anim|ease|state" internal/game/scenes || true`
 - `make mcp`
-

@@ -9,9 +9,9 @@ import (
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     scenes "ui_sample/internal/game/scenes"
     inventory "ui_sample/internal/game/scenes/inventory"
-    scpopup "ui_sample/internal/game/scenes/common/popup"
     uidraw "ui_sample/internal/game/ui/draw"
     uilayout "ui_sample/internal/game/ui/layout"
+    lvl "ui_sample/internal/game/service/levelup"
     "ui_sample/pkg/game/geom"
 )
 
@@ -90,7 +90,7 @@ func (s *Status) Draw(dst *ebiten.Image) {
     lvx, lvy, lvw, lvh := uiwidgets.LevelUpButtonRect(s.sw, s.sh)
     s.lvHovered = geom.RectContains(mx, my, lvx, lvy, lvw, lvh)
     uiwidgets.DrawLevelUpButton(dst, s.lvHovered, unit.Level < game.LevelCap && !s.E.PopupActive)
-    if s.E.PopupActive { scpopup.DrawLevelUpPopup(dst, unit, s.E.PopupGains) }
+    if s.E.PopupActive { uidraw.DrawLevelUpPopup(dst, unit, s.E.PopupGains) }
     ebitenutil.DebugPrintAt(dst, "装備: E/数字/DELETE で操作", uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10))
 }
 
@@ -149,8 +149,8 @@ func (s *Status) scAdvance(intents []scenes.Intent) {
             s.E.PopupActive = false
         case intentLevelUp:
             unit := s.E.Selected()
-            gains := scpopup.RollLevelUp(unit, s.E.RNG.Float64)
-            scpopup.ApplyGains(&unit, gains, game.LevelCap)
+            gains := lvl.Roll(unit, s.E.RNG.Float64)
+            lvl.Apply(&unit, gains, game.LevelCap)
             s.E.SetSelected(unit)
             s.E.PopupGains, s.E.PopupActive, s.E.PopupJustOpened = gains, true, true
             // 永続化は Usecase(DataPort) に委譲し、UI から Repo へ直接書き込みしない
