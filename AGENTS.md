@@ -1,75 +1,67 @@
-# Repository Guidelines
+# AGENTS — 開発者/エージェント向けガイド（最新）
 
-本ドキュメントは、本リポジトリに貢献する際の最小限の実務ガイドです。UI サンプル用途を想定しています（現状の構成に合わせて適宜更新してください）。
+このリポジトリで作業する人間/エージェント向けの最小実務ガイドです。詳細は各ドキュメントへリンクします（クリックで開けます）。
 
-## Project Structure & Module Organization
-- `cmd/ui_sample/main.go`: エントリポイント。
-- `internal/ui`: UI レイアウト・入力イベント処理。
-- `internal/game`: ゲーム定数など共有設定。
-- `internal/model`: キャラクターマスタのスキーマとJSONローダー。
-- `internal/user`: ユーザ（セーブ）データのスキーマとJSONローダー。
-- `assets/`: 画像・フォント・音源等のアセット。
-- `db/master/mst_characters.json`: キャラクターマスタ（ID索引, mst_プレフィックス）。
-- `db/user/usr_characters.json`: ユーザ状態（Lv/Exp/HP/耐久, usr_プレフィックス）。
-- `pkg/`: 複数バイナリ/ツールから再利用するライブラリ（必要時）。
-- `testdata/`: テスト専用アセット。
+## クイックリンク
+- 命名規約: docs/NAMING.md
+- コメント記法: docs/COMMENT_STYLE.md
+- アーキテクチャ: docs/ARCHITECTURE.md
+- ストーリー運用: docs/REF_STORIES.md
+- DB メモ: docs/DB_NOTES.md
+- ルート概要: README.md
 
-## Build, Test, and Development Commands
-- `go run ./cmd/ui_sample`: ローカル実行。
-- `go build -o bin/ui_sample ./cmd/ui_sample`: バイナリ生成。
-- `go test ./...`: ユニットテスト一括実行。
-- `go test ./... -race -cover`: 競合検出＋カバレッジ計測。
-- `go fmt ./...`: 公式フォーマッタで整形。
-- `golangci-lint run`: Lint 実行（導入済みの場合）。
- - `make lint`: golangci-lint 実行。
- - `make fmt`: gofumpt + gofmt で整形。
- - `make check`: `go vet` と `go build` でコンパイル検証（バイナリは `/dev/null` へ破棄）。
+## よく使うコマンド
+- 検証一式: `make mcp`（vet/build/lint/test を実行）
+- コンパイル確認: `make check-all`（UI まで）
+- テスト: `make test-all`（`-race -cover` 既定）
+- 実行: `go run ./cmd/ui_sample`
+- ビルド: `go build -o bin/ui_sample ./cmd/ui_sample`
 
-## Coding Style & Naming Conventions
-- インデント: タブ（Go 標準）。行長は 120 目安。
-- パッケージ名: 小文字単語連結（例: `ui`, `gamecore`）。
-- ファイル名: 小文字スネーク（例: `button_test.go`）。
-- エクスポート識別子: `UpperCamelCase`、GoDoc コメントを付与。
-- エラー: `fmt.Errorf("%w", err)` でラップ、文脈は `errors.Join` 等で付加。
+## ストーリー駆動の運用
+- 新規作成: `make new-story SLUG=<slug>` → `stories/YYYYMMDD-slug/README.md`
+- 作成フロー（要点）:
+  - README を先に作成し、目的/スコープ/DoD を確定（制作者レビュー必須）。
+  - サブタスクは 1 タスク=1 MD をストーリー配下 `tasks/` に作成（連番推奨）。詳細: docs/REF_STORIES.md
+  - 完了/アーカイブ: `make finish-story SLUG=<slug>`（ステータスを自動で [完了] に更新）。
 
-## Comments & Docs（コメント方針）
-- コメントは原則 Markdown で管理します。コード内は最小限（1〜2行）に留め、詳細は `docs/*.md` を更新してください。
-- 追加/変更した「型・関数・フィールド・定数」は `docs/API.md` に説明を必ず追記。
-- 用語は日本語で統一（例: HP/守備/魔防/理/光/闇）。英語表記が必要な場合は併記。
-- UIレイアウトや数値の意図（行間・余白・サイズ）は 1 行で簡潔に。
+## 命名・コーディング（要約）
+- ルール全文: docs/NAMING.md
+- コード: UpperCamel（export）/lowerCamel（internal）、初期ismは `ID/HTTP/URL` などを全大文字維持。
+- データ: `snake_case`、マスタ `mst_*`／ユーザ `usr_*`、JSON キーはタグで対応。
+- アセット: `用途_部位_状態_バリアント@倍率.ext`（例: `status_panel_dark@2x.png`）。
+- 列挙: 型付き `iota`、`XxxUnknown` を 0 に据える。
+- 汎用名は避ける: `util`/`helpers` 等は禁止。例: 乱数→`internal/game/rng`、矩形判定→`rect*_`。
 
-### 将来のデータベース移行
-- JSON は暫定。最終的に SQLite へ移行予定（`docs/DB_NOTES.md` 参照）。
-- 変更時はマスタ→ユーザの上書きモデルを維持してください。
-- テーブル命名規約: マスタは `mst_*`、ユーザは `usr_*` を接頭辞にします。
+## コメント・ドキュメント
+- エクスポート識別子は 1 行 GoDoc 必須（revive の exported を満たす）。
+- 詳述は Markdown に集約（コード内は最小限）。
+- 新規/変更 API は docs/API.md に追記。設計背景は docs/ARCHITECTURE.md、命名/表記は docs/NAMING.md に整合。
 
-## Lint 方針
-- ツール: `golangci-lint`（設定は `.golangci.yml`）。
-- 主要ルール: `govet`, `staticcheck`, `revive`, `gocritic`, `gofumpt`, `unused` など。
-- CI 追加時は同設定を用い、PR で lint を必須化してください。
+## Lint/テスト基準
+- Lint は `.golangci.yml` に準拠。ローカルは非必須扱いだが、可能な限り 0 issue を維持。
+- 変更時は `make mcp` を実施し、`pkg/...` と `internal/usecase` のユニットテストが通ること。
 
-## Testing Guidelines
-- フレームワーク: 標準 `testing`。
-- 命名: テスト `TestXxx`、ベンチ `BenchmarkXxx`、例: `TestButtonHover`。
-- カバレッジ目標: 70% 目安（描画はロジック分離やスナップショットで担保）。
-- 実行: `go test ./...` を基本、描画依存は条件付きスキップを使用。
+## コミット規約（日本語・Conventional Commits）
+- 例: `feat(ui): ステータス画面にHPバーを追加`、`docs(naming): NAMING に詳細規則を追記`。
+- 本文に「目的／影響範囲／検証手順」を簡潔に。ストーリー作業は `[story]` をサマリに含めてもよい。
 
-## Commit & Pull Request Guidelines
-- 言語: 以後、コミットメッセージと PR タイトル/本文は日本語で記述してください。
-- コミット規約: Conventional Commits 準拠（日本語サマリ）。種別例: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`。
-- 形式例:
-  - `feat(ui): ステータス画面にHPバーを追加`
-  - `fix(input): Gamepad 接続時の初期化クラッシュを回避`
-  - `docs(readme): トラブルシューティングを追記`
-- 本文: なぜ必要か、影響範囲、検証手順を簡潔に（72字程度で改行推奨）。
-- PR 要件:
-  - 目的/背景と主要変更点（箇条書き可）。
-  - UI 変更はスクリーンショット/GIF を添付。
-  - 動作確認環境（OS/Go 版/ドライバ等）。
-  - 関連 Issue を `Closes #123` でリンク。
-  - 1 PR は 1 トピック、差分を小さく保つ。
+## 変更の流儀（エージェント向け）
+- 小さく進める: ストーリー→サブタスク→実装→`make mcp`→進捗ログ更新。
+- 命名は docs/NAMING.md を最優先。`util/helpers/common` 等の曖昧名は採らない。
+- 既存規約と衝突する場合はストーリーで先に方針決定→ドキュメントを更新してから変更する。
+- 影響の大きいリネームは試験的に 1〜2 箇所から始め、DoD で運用確認して段階適用。
 
-## Security & Configuration Tips (任意)
-- アセットは `embed` 利用を推奨（例: `//go:embed assets/*`）。
-- 秘密情報は環境変数や `.env` を使用（リポジトリへコミット不可）。
-- 開発時は `-tags=ebitendebug` などのデバッグビルドタグを検討。
+---
+
+以下は参考の詳細（上記リンク先を正とします）。
+
+### 構成（サマリ）
+- `cmd/ui_sample/`: エントリ・ゲームループ
+- `internal/game/`: Scene/Service/UI/Provider/Usecase 依存の境界
+- `internal/model` / `internal/user`: マスタ/ユーザデータのスキーマとローダ
+- `db/master` / `db/user`: JSON 置き場（将来 SQLite に移行）
+- `pkg/game`: ドメインロジック（テスト対象）
+- `assets/`: 画像・フォント・音源
+
+### セキュリティ/設定（任意）
+- アセットは `embed` 検討、秘密情報は `.env`/環境変数で管理。
