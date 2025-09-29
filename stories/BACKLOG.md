@@ -18,6 +18,37 @@
 
 初期エントリ
 
+## 2025-09-29: アーキテクチャドキュメントの再レビュー
+- [採択: stories/20250929-arch-doc-review]
+- 目的: `docs/ARCHITECTURE.md` 等を現状実装と整合させ、境界・依存を明確化
+- 背景: UI/Scene/Usecase/Provider/Model の役割に揺れが見られるため、以降のリファクタ前提を固めたい
+- DoD: 差分の洗い出し→更新/却下の記録、主要図の更新、`make mcp` グリーン
+- 参考/関連: docs/ARCHITECTURE.md, docs/NAMING.md, internal/game, pkg/game, README.md
+
+## 2025-09-29: scenes/inventory・status・character_list の設計準拠リファクタ
+- 目的: Scene 層の責務分離と依存方向の是正
+- 背景: 入力解釈/状態遷移/描画/永続の境界が一部曖昧
+- DoD: 各 Scene の Update を input→intent→advance→render に整理、永続は `Env.Data` 経由に統一、既存機能非退行、関連ユニットテスト通過
+- 参考/関連: internal/game/scenes/{inventory,status,character_list}, internal/usecase, docs/ARCHITECTURE.md
+
+## 2025-09-29: UI 表示位置・サイズのメトリクス外部化
+- 目的: UI レイアウトを外部ファイル(JSON/TOML 等)から読み込み可能にし、解像度差分の調整を容易化
+- 背景: 現状は定数/ハードコードが散在
+- DoD: メトリクス定義スキーマ策定、ローダ実装、代表 1 画面へ適用、フォールバック既定値、`make mcp` グリーン
+- 参考/関連: internal/game/scenes, assets, docs/ARCHITECTURE.md, docs/NAMING.md
+
+## 2025-09-29: マウス座標デバッグ表示
+- 目的: マウスカーソル位置のゲーム座標/スクリーン座標を HUD に表示して調整を容易化
+- 背景: レイアウト調整やクリック判定の検証負荷が高い
+- DoD: トグル可能なデバッグ HUD 実装(例: F2)、座標オーバレイ表示、UI との重なり確認、パフォーマンス影響軽微
+- 参考/関連: internal/game/app/game.go, internal/game/scenes, Ebiten 入力 API
+
+## 2025-09-29: FPS デバッグ表示
+- 目的: フレームパフォーマンスの可視化
+- 背景: 画面増加に伴う描画コストの監視が必要
+- DoD: トグル可能な FPS 表示(HUD)、秒間平均の表示、負荷小、`make mcp` グリーン
+- 参考/関連: internal/game/app/game.go, ebitenutil.DebugPrint など
+
 ## 2025-09-29: CIで UI パッケージのテストも実行する
 - 目的: `ui/adapter` や `service/levelup` のテストを継続的に検証
 - DoD: CI で `make test-all-ui` を追加ジョブとして実行
@@ -31,4 +62,3 @@
 ## 2025-09-29: `ui/input` サブパッケージ導入の検討
 - 目的: 入力→意図(Intent) 変換の共通ユーティリティ化
 - DoD: 代表1画面での試験導入、依存方向の検証
-

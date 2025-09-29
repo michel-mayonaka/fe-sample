@@ -9,7 +9,6 @@ import (
     uidraw "ui_sample/internal/game/ui/draw"
     uilayout "ui_sample/internal/game/ui/layout"
     uiadapter "ui_sample/internal/game/ui/adapter"
-    "ui_sample/internal/model"
     "ui_sample/pkg/game/geom"
 )
 
@@ -37,10 +36,11 @@ func (v *WeaponView) Update(ctx *game.Ctx) (game.Scene, error) {
 
 // Draw は武器一覧の描画を行います。
 func (v *WeaponView) Draw(dst *ebiten.Image) {
-    var wt *model.WeaponTable
-    if p := gdata.Provider(); p != nil { wt = p.WeaponsTable() }
-    rows := uiadapter.BuildWeaponRows(v.E.Inv.Inventory().Weapons(), wt, v.E.UserTable, uiadapter.AssetsPortraitLoader{})
-    uidraw.DrawWeaponListView(dst, rows, v.hover)
+    // 参照は Provider 経由へ統一（未設定時は描画スキップ）
+    if p := gdata.Provider(); p != nil {
+        rows := uiadapter.BuildWeaponRows(p.UserWeapons(), p.WeaponsTable(), v.E.UserTable, uiadapter.AssetsPortraitLoader{})
+        uidraw.DrawWeaponListView(dst, rows, v.hover)
+    }
 }
 
 // --- 内部: scHandleInput → scAdvance → scFlush --------------------------------------
@@ -58,7 +58,8 @@ func (v *WeaponView) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     mx, my := ebiten.CursorPosition()
     // 行ホバー更新
     v.hover = -1
-    count := len(v.E.Inv.Inventory().Weapons())
+    count := 0
+    if p := gdata.Provider(); p != nil { count = len(p.UserWeapons()) }
     for i := 0; i < count; i++ {
         x, y, w, h := uilayout.ListItemRect(v.sw, v.sh, i)
         if geom.RectContains(mx, my, x, y, w, h) { v.hover = i }
@@ -75,12 +76,14 @@ func (v *WeaponView) scAdvance(intents []scenes.Intent) {
     for _, any := range intents {
         it, ok := any.(wvIntent); if !ok { continue }
         if it.Kind == wvChooseRow {
-            owns := v.E.Inv.Inventory().Weapons()
-            if it.Index >= 0 && it.Index < len(owns) {
-                _ = v.E.Inv.EquipWeapon(v.E.Selected().ID, v.E.CurrentSlot, owns[it.Index].ID)
-                v.Host.refreshUnitByID(v.E.Selected().ID)
-                v.Host.pop = true
+            if p := gdata.Provider(); p != nil {
+                owns := p.UserWeapons()
+                if it.Index >= 0 && it.Index < len(owns) {
+                    _ = v.E.Inv.EquipWeapon(v.E.Selected().ID, v.E.CurrentSlot, owns[it.Index].ID)
+                }
             }
+            v.Host.refreshUnitByID(v.E.Selected().ID)
+            v.Host.pop = true
         }
     }
 }

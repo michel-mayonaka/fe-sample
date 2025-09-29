@@ -10,6 +10,7 @@ import (
     uicore "ui_sample/internal/game/service/ui"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     scenes "ui_sample/internal/game/scenes"
+    gdata "ui_sample/internal/game/data"
     "ui_sample/pkg/game/geom"
 )
 
@@ -166,9 +167,10 @@ func (s *Inventory) scAdvance(intents []scenes.Intent) {
         case intentBack:
             s.pop = true
         case intentTabWeapons:
-            if s.E.Inv != nil && s.E.Inv.Inventory() != nil { s.E.InvTab, s.E.HoverInv = 0, -1 }
+            // Provider が設定されていれば切替（在庫参照は Provider 経由）
+            if gdata.Provider() != nil { s.E.InvTab, s.E.HoverInv = 0, -1 }
         case intentTabItems:
-            if s.E.Inv != nil && s.E.Inv.Inventory() != nil { s.E.InvTab, s.E.HoverInv = 1, -1 }
+            if gdata.Provider() != nil { s.E.InvTab, s.E.HoverInv = 1, -1 }
         }
     }
 }

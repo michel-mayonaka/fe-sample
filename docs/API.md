@@ -65,13 +65,13 @@
 - `func UIToGame(wt *model.WeaponTable, u ui.Unit) gcore.Unit`: UIユニットから戦闘用`gcore.Unit`へ変換（先頭装備）。
 - `func AttackSpeedOf(wt *model.WeaponTable, u ui.Unit) int`: 攻撃速度（武器重量考慮、未設定時は速さ）。
 
-## internal/game/data（テーブルDIプロバイダ）
-- `type TableProvider interface { WeaponsTable() *model.WeaponTable; ItemsTable() *model.ItemDefTable }`
+## internal/game/data（テーブル/在庫のDIプロバイダ）
+- `type TableProvider interface { WeaponsTable() *model.WeaponTable; ItemsTable() *model.ItemDefTable; UserWeapons() []user.OwnWeapon; UserItems() []user.OwnItem }`
 - `func SetProvider(p TableProvider)`: アプリ側実装を注入（推奨ルート）。
 - `func Provider() TableProvider`: 現在のプロバイダ取得。
 
 利用指針（Provider=参照専用）:
-- Scene は `data.Provider().WeaponsTable()/ItemsTable()` 経由でテーブル参照。
+- Scene は `data.Provider().WeaponsTable()/ItemsTable()/UserWeapons()/UserItems()` 経由で参照。
 - 旧 `scenes.SetWeaponTable/WeaponTable` は廃止。JSON直読みフォールバックは開発ツール用途のみ。
 
 Provider と Repository の役割の違い:

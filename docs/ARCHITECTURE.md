@@ -46,7 +46,7 @@
 ## 2. 依存原則（CQRS っぽい分離）
 
 - コマンド（更新）: Scenes → Usecase（Ports）→ Repo
-- クエリ（参照）  : Scenes → `gdata.Provider` → テーブル（例: `WeaponTable`）
+- クエリ（参照）  : Scenes → `gdata.Provider` → テーブル/在庫（例: `WeaponsTable`/`ItemsTable`/`UserWeapons`/`UserItems`）
 - Scenes は Repo/Assets/Model を直接インポートしない（Adapter/Provider 経由のみ）。
 - Scenes は必要に応じて `ui/layout|draw|view|adapter` を参照する（UI 内の責務分割）。
 - Usecase は UI 資産に触れない（画像キャッシュクリアは UI 側で実施）。
@@ -68,9 +68,8 @@ type BattlePort interface {
     RunBattleRound(units []uicore.Unit, selIndex int, attT, defT gcore.Terrain) ([]uicore.Unit, []string, bool, error)
 }
 
-// InventoryPort: 在庫と装備操作
+// InventoryPort: 在庫と装備操作（更新系のみ）
 type InventoryPort interface {
-    Inventory() repo.InventoryRepo
     EquipWeapon(unitID string, slot int, userWeaponID string) error
     EquipItem(unitID string, slot int, userItemID string) error
 }
@@ -83,6 +82,7 @@ type InventoryPort interface {
 - `scenes/ports_*.go` に Port を定義（UI 側の最小依存）
 - `usecase/*.go` で実装（`App` が各ポートを満たす）
 - Scene は自分が使う Port だけを `Env` から受け取る（または Scene コンストラクタ引数で個別 DI）
+- 参照（Query）は `gdata.Provider()` に統一（`WeaponsTable/ItemsTable/UserWeapons/UserItems`）。
 
 ## 4. ディレクトリ構成（理想）
 
@@ -98,8 +98,8 @@ internal/
       game.go             # ebiten.Game 実装（Update/Draw/グローバル操作）
       runner.go           # SceneStack の更新/描画
 
-    data/                 # 読み取り専用テーブルの Provider（UI 参照用）
-      provider.go         # SetProvider/Provider, TableProvider（WeaponsTable/ItemsTable など）
+    data/                 # 読み取り専用テーブル/在庫の Provider（UI 参照用）
+      provider.go         # SetProvider/Provider, TableProvider（WeaponsTable/ItemsTable/UserWeapons/UserItems）
 
     scenes/               # UI シーン群（UI の状態遷移と描画）
       # ports.go         # （廃止）合成 UseCases。現在は各 Port のみ使用。
@@ -127,7 +127,7 @@ internal/
     facade.go             # struct App, New(), 依存注入・共通メソッド
     data.go               # DataPort 実装（ReloadData/PersistUnit）
     battle.go             # BattlePort 実装（RunBattleRound）
-    inventory.go          # InventoryPort 実装（Inventory/EquipWeapon/EquipItem）
+    inventory.go          # InventoryPort 実装（EquipWeapon/EquipItem）
 
   repo/                   # リポジトリIFと実装（JSON→将来SQLite）
     user.go
@@ -201,7 +201,7 @@ Session（UI 状態）:
 
 Provider と Repository の違い（明確化）:
 - Provider（読み取り専用）
-  - 役割: 参照テーブルの提供（例: `WeaponsTable()`/`ItemsTable()`）。
+  - 役割: 参照テーブルとユーザ在庫スナップショットの提供（例: `WeaponsTable()`/`ItemsTable()`/`UserWeapons()`/`UserItems()`）。
   - 特性: 追加・更新・保存は行わない（Query に特化）。
 - Repository（更新を含む）
   - 役割: ユーザ状態や在庫などの保存境界を扱う（例: `UserRepo`、`InventoryRepo`）。
@@ -233,10 +233,14 @@ Provider と Repository の違い（明確化）:
 - ファイル名
   - Port 定義: `ports_data.go`, `ports_battle.go`, `ports_inventory.go`
   - Usecase 実装: `data.go`, `battle.go`, `inventory.go`（`facade.go` に `App` 本体と DI）
-  - 画面: `character_list.go`, `status.go`, `inventory.go` など機能名ベース
+- 画面: `character_list.go`, `status.go`, `inventory.go` など機能名ベース
 
 - GoDoc
   - エクスポート識別子には役割を一行で（例: `// BattlePort は戦闘解決のユースケース境界です。`）
+
+### 10.x 型参照の暫定許容
+- `scenes` から `internal/model` 型を参照するケースは副作用が無い範囲で暫定許容。
+- 将来的には DTO 化または Provider 拡張で置換し、`scenes` からの model import を段階削減する。
 
 ## 11. 導入ステップ（現在実装との差分を埋める）
 
@@ -318,7 +322,7 @@ Update(*game.Ctx) bool; Draw(*ebiten.Image); Layer() int
 ### 13.4 データ提供（DI）: TableProvider の原則
 - 目的: UI を取得実装（JSON/SQLite/メモリ）から切り離すための読み取り経路統一。
 - 実装: `internal/game/data.TableProvider` を App/Usecase が実装し、`data.SetProvider(app)` で注入。
-- 利用: Scene は `data.Provider().WeaponsTable()` など参照専用メソッドを用いる（コマンドは Port）。
+- 利用: Scene は `data.Provider().WeaponsTable()/ItemsTable/UserWeapons/UserItems` など参照専用メソッドを用いる（コマンドは Port）。
 
 ## 14. 運用・適用
 

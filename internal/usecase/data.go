@@ -40,3 +40,15 @@ func (a *App) PersistUnit(u uicore.Unit) error {
     a.Users.Update(c)
     return a.Users.Save()
 }
+
+// UserWeapons はユーザ所持武器のスナップショットを返します。
+func (a *App) UserWeapons() []usr.OwnWeapon {
+    if a == nil || a.Inv == nil { return nil }
+    return a.Inv.Weapons()
+}
+
+// UserItems はユーザ所持アイテムのスナップショットを返します。
+func (a *App) UserItems() []usr.OwnItem {
+    if a == nil || a.Inv == nil { return nil }
+    return a.Inv.Items()
+}

@@ -1,12 +1,8 @@
 package usecase
 
 import (
-    "ui_sample/internal/repo"
     usr "ui_sample/internal/model/user"
 )
-
-// Inventory は在庫リポジトリへのアクセサです（Scene層からの参照用）。
-func (a *App) Inventory() repo.InventoryRepo { return a.Inv }
 
 // EquipWeapon は指定のユーザ武器をスロットに装備し、既オーナーの装備を巻き戻します。
 func (a *App) EquipWeapon(unitID string, slot int, userWeaponID string) error {

@@ -9,8 +9,6 @@ import (
     uidraw "ui_sample/internal/game/ui/draw"
     uilayout "ui_sample/internal/game/ui/layout"
     uiadapter "ui_sample/internal/game/ui/adapter"
-    "ui_sample/internal/model"
-    // usr はビルダー移設済みのため未使用
     "ui_sample/pkg/game/geom"
 )
 
@@ -38,10 +36,10 @@ func (v *ItemView) Update(ctx *game.Ctx) (game.Scene, error) {
 
 // Draw はアイテム一覧の描画を行います。
 func (v *ItemView) Draw(dst *ebiten.Image) {
-    var it *model.ItemDefTable
-    if p := gdata.Provider(); p != nil { it = p.ItemsTable() }
-    rows := uiadapter.BuildItemRows(v.E.Inv.Inventory().Items(), it, v.E.UserTable, uiadapter.AssetsPortraitLoader{})
-    uidraw.DrawItemListView(dst, rows, v.hover)
+    if p := gdata.Provider(); p != nil {
+        rows := uiadapter.BuildItemRows(p.UserItems(), p.ItemsTable(), v.E.UserTable, uiadapter.AssetsPortraitLoader{})
+        uidraw.DrawItemListView(dst, rows, v.hover)
+    }
 }
 
 // --- 内部: scHandleInput → scAdvance → scFlush --------------------------------------
@@ -59,7 +57,8 @@ func (v *ItemView) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     mx, my := ebiten.CursorPosition()
     // 行ホバー更新
     v.hover = -1
-    count := len(v.E.Inv.Inventory().Items())
+    count := 0
+    if p := gdata.Provider(); p != nil { count = len(p.UserItems()) }
     for i := 0; i < count; i++ {
         x, y, w, h := uilayout.ListItemRect(v.sw, v.sh, i)
         if geom.RectContains(mx, my, x, y, w, h) { v.hover = i }
@@ -76,12 +75,14 @@ func (v *ItemView) scAdvance(intents []scenes.Intent) {
     for _, any := range intents {
         it, ok := any.(ivIntent); if !ok { continue }
         if it.Kind == ivChooseRow {
-            owns := v.E.Inv.Inventory().Items()
-            if it.Index >= 0 && it.Index < len(owns) {
-                _ = v.E.Inv.EquipItem(v.E.Selected().ID, v.E.CurrentSlot, owns[it.Index].ID)
-                v.Host.refreshUnitByID(v.E.Selected().ID)
-                v.Host.pop = true
+            if p := gdata.Provider(); p != nil {
+                owns := p.UserItems()
+                if it.Index >= 0 && it.Index < len(owns) {
+                    _ = v.E.Inv.EquipItem(v.E.Selected().ID, v.E.CurrentSlot, owns[it.Index].ID)
+                }
             }
+            v.Host.refreshUnitByID(v.E.Selected().ID)
+            v.Host.pop = true
         }
     }
 }
