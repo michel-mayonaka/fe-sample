@@ -39,6 +39,10 @@ make check
 - 実行: `make lint` または `golangci-lint run`
 - 整形: `make fmt`
 
+## テスト
+- 既定（ロジック/ユースケースのみ）: `make test-all`
+- UI 関連含む（adapter/levelup 等）: `make test-all-ui`
+
 CI（GitHub Actions）
 - 本リポジトリは `make mcp`（vet/build/lint）を CI で実行します。
 - Go 1.25.x を固定し、Go のビルドキャッシュ/モジュールキャッシュを保存します。

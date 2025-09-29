@@ -32,6 +32,12 @@
 - 推奨コマンド: `make finish-story SLUG=ref-architecture` または `make finish-story PATH=stories/20250928-ref-architecture`
 - 移動時に `README.md` の先頭ステータスを `[完了]` に自動更新します（スクリプトが置換）。
 
+## Backlog（将来のストーリー候補）運用
+- 置き場所: `stories/BACKLOG.md`（単一ファイル）。作業中に見つけた「別ストーリーにすべき改善/アイデア」を即時メモする。
+- 記法: 1エントリ=1セクションで「目的/背景/DoD/関連」を簡潔に記す。重要度が高いものは上部へ。
+- 昇格フロー: 採択が決まったら `make new-story SLUG=<slug>` で新規ストーリーを作成し、Backlog から当該エントリへリンクを追記。Backlog 側には `[採択:<path>]` などの注記を残す。
+- 見直し: セッション/週次の終わりに古い/不要エントリを整理（削除または採否を明記）。
+
 ## テンプレート
 - 雛形は `stories/_TEMPLATE/README.md` に配置。
 - 直接コピーする場合: `cp -R stories/_TEMPLATE stories/20250928-your-story && vi stories/20250928-your-story/README.md`

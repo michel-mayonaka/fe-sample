@@ -97,6 +97,17 @@ test-all:
 	GOWORK=off \
 	go test $(TEST_FLAGS) $(TEST_PKGS)
 
+# UI 関連パッケージも含めたテスト（CI 追加ジョブ向け）
+.PHONY: test-all-ui
+TEST_PKGS_UI ?= ./pkg/... ./internal/usecase ./internal/game/service/... ./internal/game/ui/...
+test-all-ui:
+	@mkdir -p .gocache .gomodcache
+	GOFLAGS='-mod=readonly' \
+	GOMODCACHE=$(PWD)/.gomodcache \
+	GOCACHE=$(PWD)/.gocache \
+	GOWORK=off \
+	go test $(TEST_FLAGS) $(TEST_PKGS_UI)
+
 # MCP: 変更前チェック（必須）
 # 既定はローカル: lint / CI: lint-ci
 MCP_LINT_TARGET ?= lint
