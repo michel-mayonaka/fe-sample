@@ -18,7 +18,11 @@
 
 初期エントリ
 
-
+## 2025-09-29: FE風バトル マップ画面の叩き追加
+- 目的: FE風シミュレーションバトルのマップ画面を試作し、キャラクター一覧からの遷移と配置ロジックの骨組みを固める
+- 背景: 現状は一覧表示のみで戦闘画面が未実装のため、体験の流れが断絶している
+- DoD: キャラクター一覧右上にマップ画面遷移ボタン追加、平地/森/砦レイヤーを持つマップJSONマスタを新設、`db/user/usr_characters.json` の味方1体・敵2体を所定の位置へ初期配置
+- 参考/関連: cmd/ui_sample, internal/game/scenes, db/master, docs/ARCHITECTURE.md, docs/NAMING.md
 
 <!-- 昇格: stories/20250929-ui-metrics-externalize へ移行（2025-09-29） -->
 
