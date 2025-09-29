@@ -1,6 +1,6 @@
 # [story] scenes/list_layout のUI層への抽出
 
-- ステータス: 提案中
+ステータス: [完了]
 - 日付: 2025-09-29
 - 参照: docs/ARCHITECTURE.md, docs/NAMING.md
 
