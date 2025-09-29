@@ -8,6 +8,9 @@ import (
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     scenes "ui_sample/internal/game/scenes"
     gcore "ui_sample/pkg/game"
+    uidraw "ui_sample/internal/game/ui/draw"
+    uilayout "ui_sample/internal/game/ui/layout"
+    "ui_sample/pkg/game/geom"
 )
 
 // Sim は模擬戦画面の Scene 実装です。
@@ -68,18 +71,18 @@ func (s *Sim) Update(ctx *game.Ctx) (game.Scene, error) {
 // Draw は模擬戦の盤面・UI とログポップアップを描画します。
 func (s *Sim) Draw(dst *ebiten.Image){
     canStart := s.simAtk.HP>0 && s.simDef.HP>0 && !s.logPopup
-    DrawBattleWithTerrain(dst, s.simAtk, s.simDef, s.attTerrain, s.defTerrain, canStart)
+    uidraw.DrawBattleWithTerrain(dst, s.simAtk, s.simDef, s.attTerrain, s.defTerrain, canStart)
     uiwidgets.DrawTerrainButtons(dst, s.attSel, s.defSel)
     mx,my := ebiten.CursorPosition()
-    ax,ay,aw,ah := AutoRunButtonRect(s.sw, s.sh)
-    s.autoHovered = scenes.PointIn(mx,my,ax,ay,aw,ah)
+    ax,ay,aw,ah := uilayout.AutoRunButtonRect(s.sw, s.sh)
+    s.autoHovered = geom.RectContains(mx,my,ax,ay,aw,ah)
     uiwidgets.DrawAutoRunButton(dst, s.autoHovered, s.auto)
     if s.logPopup && s.lv != nil { s.lv.Draw(dst) }
     if s.turn<=0 { s.turn=1 }
     leftFirst := (s.turn%2==1); label := "先攻: "; if leftFirst { label+=s.simAtk.Name } else { label+=s.simDef.Name }
     ebitenutil.DebugPrintAt(dst, label, uicore.ListMarginPx()+uicore.S(40), uicore.ListMarginPx()+uicore.S(56))
     bx,by,bw,bh := uiwidgets.BackButtonRect(s.sw, s.sh)
-    s.backHovered = scenes.PointIn(mx,my,bx,by,bw,bh)
+    s.backHovered = geom.RectContains(mx,my,bx,by,bw,bh)
     uiwidgets.DrawBackButton(dst, s.backHovered)
 }
 

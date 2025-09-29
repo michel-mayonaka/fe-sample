@@ -10,6 +10,7 @@ import (
     uicore "ui_sample/internal/game/service/ui"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     scenes "ui_sample/internal/game/scenes"
+    "ui_sample/pkg/game/geom"
 )
 
 // Inventory は在庫画面の Scene 実装です。
@@ -105,7 +106,7 @@ func (s *Inventory) Draw(dst *ebiten.Image) {
     // 戻る
     bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
     mx, my := ebiten.CursorPosition()
-    s.backHovered = scenes.PointIn(mx, my, bx, by, bw, bh)
+    s.backHovered = geom.RectContains(mx, my, bx, by, bw, bh)
     uiwidgets.DrawBackButton(dst, s.backHovered)
     if s.E.SelectingEquip { ebitenutil.DebugPrintAt(dst, "クリックでスロットに装備", uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10)) }
 }
@@ -136,13 +137,13 @@ func (s *Inventory) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     lm := uicore.ListMarginPx()
     tx := lm + uicore.S(20)
     ty := lm + uicore.S(12)
-    if scenes.PointIn(mx, my, tx, ty, tabW, tabH) { s.tabHover = 0 }
+    if geom.RectContains(mx, my, tx, ty, tabW, tabH) { s.tabHover = 0 }
     tx2 := tx + tabW + uicore.S(10)
-    if scenes.PointIn(mx, my, tx2, ty, tabW, tabH) { s.tabHover = 1 }
+    if geom.RectContains(mx, my, tx2, ty, tabW, tabH) { s.tabHover = 1 }
 
     // ボタンホバー
     bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
-    s.backHovered = scenes.PointIn(mx, my, bx, by, bw, bh)
+    s.backHovered = geom.RectContains(mx, my, bx, by, bw, bh)
 
     if ctx != nil && ctx.Input != nil {
         if ctx.Input.Press(gamesvc.Cancel) { intents = append(intents, Intent{Kind: intentBack}) }

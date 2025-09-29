@@ -16,11 +16,13 @@ import (
     gamesvc "ui_sample/internal/game/service"
     uicore "ui_sample/internal/game/service/ui"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
-    scpopup "ui_sample/internal/game/scenes/common/popup"
     scenes "ui_sample/internal/game/scenes"
     inventory "ui_sample/internal/game/scenes/inventory"
     status "ui_sample/internal/game/scenes/status"
     sim "ui_sample/internal/game/scenes/sim"
+    "ui_sample/pkg/game/geom"
+    uidraw "ui_sample/internal/game/ui/draw"
+    uilayout "ui_sample/internal/game/ui/layout"
 )
 
 // List はユニット一覧画面の Scene 実装です。
@@ -83,7 +85,7 @@ func (s *List) Draw(dst *ebiten.Image) {
         // 選択段階に応じてタイトルを切り替え
         title := "模擬戦: 攻撃側を選択"
         if s.simSelectStep == 1 { title = "模擬戦: 防御側を選択" }
-        scpopup.DrawChooseUnitPopup(dst, title, s.E.Units, s.chooseHover)
+        uidraw.DrawChooseUnitPopup(dst, title, s.E.Units, s.chooseHover)
     }
 }
 
@@ -138,19 +140,19 @@ func (s *List) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     // ホバー更新（一覧）
     s.hoverIndex = -1
     for i := range s.E.Units {
-        x, y, w, h := scenes.ListItemRect(s.sw, s.sh, i)
-        if scenes.PointIn(mx, my, x, y, w, h) { s.hoverIndex = i }
+        x, y, w, h := uilayout.ListItemRect(s.sw, s.sh, i)
+        if geom.RectContains(mx, my, x, y, w, h) { s.hoverIndex = i }
     }
     // 模擬戦ボタンのホバー
     bx, by, bw, bh := uiwidgets.SimBattleButtonRect(s.sw, s.sh)
-    s.simBtnHovered = scenes.PointIn(mx, my, bx, by, bw, bh)
+    s.simBtnHovered = geom.RectContains(mx, my, bx, by, bw, bh)
 
     // 選択ポップアップ中のホバー更新を先に計算（このフレームの確定に反映）
     if s.simSelecting {
         s.chooseHover = -1
         for i := range s.E.Units {
-            x, y, w, h := scpopup.ChooseUnitItemRect(s.sw, s.sh, i, len(s.E.Units))
-            if scenes.PointIn(mx, my, x, y, w, h) { s.chooseHover = i }
+            x, y, w, h := uilayout.ChooseUnitItemRect(s.sw, s.sh, i, len(s.E.Units))
+            if geom.RectContains(mx, my, x, y, w, h) { s.chooseHover = i }
         }
     } else {
         s.chooseHover = -1
@@ -243,7 +245,7 @@ func (s *List) drawCharacterList(dst *ebiten.Image) {
     uicore.DrawPanel(dst, float32(lm), float32(lm), float32(sw-2*lm), float32(sh-2*lm))
     uicore.TextDraw(dst, "ユニット一覧", uicore.FaceTitle, lm+uicore.S(20), lm+uicore.ListTitleOffsetPx(), uicore.ColAccent)
     for i, u := range s.E.Units {
-        x, y, w, h := scenes.ListItemRect(sw, sh, i)
+        x, y, w, h := uilayout.ListItemRect(sw, sh, i)
         bg := color.RGBA{30, 45, 78, 255}
         if i == s.hoverIndex { bg = color.RGBA{40, 60, 100, 255} }
         vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), bg, false)

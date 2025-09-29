@@ -1,4 +1,4 @@
-package sim
+package layout
 
 import (
     uicore "ui_sample/internal/game/service/ui"
@@ -12,7 +12,7 @@ func BattleStartButtonRect(sw, sh int) (x, y, w, h int) {
     return
 }
 
-// AutoRunButtonRect は開始ボタンの右隣（同サイズ/間隔S(20)）の矩形を返します。
+// AutoRunButtonRect は開始ボタンの右隣（同サイズ/間隔S(20)）。
 func AutoRunButtonRect(sw, sh int) (int, int, int, int) {
     bx, by, bw, bh := BattleStartButtonRect(sw, sh)
     gap := uicore.S(20)

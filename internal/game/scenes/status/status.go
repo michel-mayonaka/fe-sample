@@ -7,9 +7,12 @@ import (
     gamesvc "ui_sample/internal/game/service"
     uicore "ui_sample/internal/game/service/ui"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
-    scpopup "ui_sample/internal/game/scenes/common/popup"
     scenes "ui_sample/internal/game/scenes"
     inventory "ui_sample/internal/game/scenes/inventory"
+    scpopup "ui_sample/internal/game/scenes/common/popup"
+    uidraw "ui_sample/internal/game/ui/draw"
+    uilayout "ui_sample/internal/game/ui/layout"
+    "ui_sample/pkg/game/geom"
 )
 
 // Status はステータス画面の Scene 実装です。
@@ -77,15 +80,15 @@ func (s *Status) Update(ctx *game.Ctx) (game.Scene, error) {
 func (s *Status) Draw(dst *ebiten.Image) {
     // 本体（ステータス）
     unit := s.E.Selected()
-    scenes.DrawStatus(dst, unit)
+    uidraw.DrawStatus(dst, unit)
     // 戻るボタン
     mx, my := ebiten.CursorPosition()
     bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
-    s.backHovered = scenes.PointIn(mx, my, bx, by, bw, bh)
+    s.backHovered = geom.RectContains(mx, my, bx, by, bw, bh)
     uiwidgets.DrawBackButton(dst, s.backHovered)
     // レベルアップボタン
     lvx, lvy, lvw, lvh := uiwidgets.LevelUpButtonRect(s.sw, s.sh)
-    s.lvHovered = scenes.PointIn(mx, my, lvx, lvy, lvw, lvh)
+    s.lvHovered = geom.RectContains(mx, my, lvx, lvy, lvw, lvh)
     uiwidgets.DrawLevelUpButton(dst, s.lvHovered, unit.Level < game.LevelCap && !s.E.PopupActive)
     if s.E.PopupActive { scpopup.DrawLevelUpPopup(dst, unit, s.E.PopupGains) }
     ebitenutil.DebugPrintAt(dst, "装備: E/数字/DELETE で操作", uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10))
@@ -100,9 +103,9 @@ func (s *Status) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     wasPopup := s.E != nil && s.E.PopupActive
     // 戻る/レベルアップ ホバー
     bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
-    s.backHovered = scenes.PointIn(mx, my, bx, by, bw, bh)
+    s.backHovered = geom.RectContains(mx, my, bx, by, bw, bh)
     lvx, lvy, lvw, lvh := uiwidgets.LevelUpButtonRect(s.sw, s.sh)
-    s.lvHovered = scenes.PointIn(mx, my, lvx, lvy, lvw, lvh)
+    s.lvHovered = geom.RectContains(mx, my, lvx, lvy, lvw, lvh)
 
     if ctx != nil && ctx.Input != nil {
         if ctx.Input.Press(gamesvc.Cancel) { intents = append(intents, Intent{Kind: intentBack}) }
@@ -122,8 +125,8 @@ func (s *Status) scHandleInput(ctx *game.Ctx) []scenes.Intent {
 
         // スロット選択→在庫
         for i := 0; i < 5; i++ {
-            x, y, w, h := scenes.EquipSlotRect(s.sw, s.sh, i)
-            if scenes.PointIn(mx, my, x, y, w, h) && ctx.Input.Press(gamesvc.Confirm) {
+            x, y, w, h := uilayout.EquipSlotRect(s.sw, s.sh, i)
+            if geom.RectContains(mx, my, x, y, w, h) && ctx.Input.Press(gamesvc.Confirm) {
                 intents = append(intents, Intent{Kind: intentOpenInvSlot, Index: i})
                 break
             }

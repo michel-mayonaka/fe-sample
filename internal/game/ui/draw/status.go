@@ -1,4 +1,4 @@
-package scenes
+package draw
 
 import (
     "fmt"
@@ -10,8 +10,6 @@ import (
     gdata "ui_sample/internal/game/data"
     "ui_sample/internal/model"
 )
-
-const slotCap = 5
 
 // DrawStatus はステータス画面を描画します。
 func DrawStatus(dst *ebiten.Image, u uicore.Unit) {
@@ -93,7 +91,7 @@ func drawMagicRanks(dst *ebiten.Image, u uicore.Unit, x, y int) {
 func drawEquipList(dst *ebiten.Image, u uicore.Unit, px, py, ph int) {
     equipTitleY := py + ph + uicore.S(56)
     uicore.TextDraw(dst, "装備", uicore.FaceMain, px, equipTitleY, uicore.ColAccent)
-    for i := 0; i < slotCap; i++ {
+    for i := 0; i < 5; i++ {
         lineY := equipTitleY + uicore.S(30) + i*uicore.S(30)
         label := "- 空 -"
         uses := "-"
@@ -109,23 +107,6 @@ func drawEquipList(dst *ebiten.Image, u uicore.Unit, px, py, ph int) {
     }
 }
 
-// EquipSlotRect はステータス画面における装備スロット行の矩形を返します。
-// index は 0..slotCap-1。
-func EquipSlotRect(_ , _ int, index int) (x, y, w, h int) {
-    if index < 0 || index >= slotCap { return 0,0,0,0 }
-    lm := float32(uicore.ListMarginPx())
-    panelX, panelY := lm, lm
-    px, py := panelX+float32(uicore.S(24)), panelY+float32(uicore.S(24))
-    ph := float32(uicore.S(320))
-    equipTitleY := int(py + ph + float32(uicore.S(56)))
-    lineY := equipTitleY + uicore.S(30) + index*uicore.S(30)
-    x = int(px)
-    y = lineY - uicore.S(20)
-    w = uicore.S(360)
-    h = uicore.S(26)
-    return
-}
-
 // ローカル描画補助
 func drawStatLineWithGrowth(dst *ebiten.Image, face font.Face, x, y int, label string, v, g int) {
     uicore.TextDraw(dst, label, face, x, y, uicore.ColText)
@@ -134,9 +115,7 @@ func drawStatLineWithGrowth(dst *ebiten.Image, face font.Face, x, y int, label s
 }
 
 func drawRankLine(dst *ebiten.Image, face font.Face, x, y int, label, rank string) {
-    if rank == "" {
-        rank = "-"
-    }
+    if rank == "" { rank = "-" }
     uicore.TextDraw(dst, label, face, x, y, uicore.ColText)
     uicore.TextDraw(dst, rank, face, x+uicore.S(120), y, uicore.ColAccent)
 }
@@ -144,8 +123,8 @@ func drawRankLine(dst *ebiten.Image, face font.Face, x, y int, label, rank strin
 // 成長率のない派生値用の簡易行描画。
 func drawStatLine(dst *ebiten.Image, face font.Face, x, y int, label string, v int) {
     uicore.TextDraw(dst, label, face, x, y, uicore.ColText)
-    // ラベル実幅を測って十分な余白を確保
     lw := int(font.MeasureString(face, label) >> 6)
     gap := uicore.S(20)
     uicore.TextDraw(dst, fmt.Sprintf("%2d", v), face, x+lw+gap, y, uicore.ColAccent)
 }
+

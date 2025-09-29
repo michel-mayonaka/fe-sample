@@ -5,6 +5,7 @@ import (
     gamesvc "ui_sample/internal/game/service"
     "github.com/hajimehoshi/ebiten/v2"
     scenes "ui_sample/internal/game/scenes"
+    uidraw "ui_sample/internal/game/ui/draw"
 )
 
 // LogView は戦闘ログのポップアップビューです。
@@ -27,7 +28,7 @@ func (v *LogView) Update(ctx *game.Ctx) (game.Scene, error) {
 }
 
 // Draw はログポップアップを描画します。
-func (v *LogView) Draw(dst *ebiten.Image) { DrawBattleLogOverlay(dst, v.Host.logs) }
+func (v *LogView) Draw(dst *ebiten.Image) { uidraw.DrawBattleLogOverlay(dst, v.Host.logs) }
 
 // --- 内部: scHandleInput → scAdvance → scFlush --------------------------------------
 

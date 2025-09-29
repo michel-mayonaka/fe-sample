@@ -114,7 +114,7 @@ CREATE TABLE Characters (CharacterId TEXT PRIMARY KEY, CreatedAt TEXT);
   - 幾何矩形判定 → `rect`（例: `rect.go` へ集約。暫定的に複数機能が混在する場合は `rect_helpers.go` とし、後で分割）
   - 画像処理 → `imageproc` / `imaging`
   - 永続化補助 → `loader`, `saver`, `migrator`
-  - UI 補助 → `widgets`, `draw_*`, `*_view`
+  - UI 補助 → `ui/layout`（座標）, `ui/draw`（描画）, `ui/view`（表示用型）, `ui/adapter`（変換）
   - 変換層 → `adapter`（例: `adapter/ui_to_game.go`）
   - 乱用されやすい `Manager`/`Data`/`Info` は具体語に置換（例: `InventoryRepo`, `BattlePort`）。
 - 判断フロー:

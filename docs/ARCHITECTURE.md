@@ -10,6 +10,13 @@
   - 画面遷移・入力解釈・描画。UI 一時状態（選択・ポップアップ等）は `Session` に保持。
   - ルール: Repo/Assets/Model を直接操作しない。ユースケース（Port）を介してコマンド、`gdata.Provider` を介してクエリ。
 
+### 1.1 UI 補助サブパッケージ（責務分割）
+
+- `internal/game/ui/layout`: レイアウト計算（矩形/サイズ）。副作用なし。
+- `internal/game/ui/draw`: 描画関数（見た目）。レイアウトに依存、I/Oはしない。
+- `internal/game/ui/view`: 表示用データ構造（行モデル等）。画像は参照（`*ebiten.Image`）に留める。
+- `internal/game/ui/adapter`: view-model 生成（テーブル/ユーザデータ→view）。`PortraitLoader` 抽象で画像読込を疎結合化。
+
 - Usecase（アプリケーションサービス）
   - ビジネスルールの調停・副作用の集約（保存・巻き戻し・整合）。
   - Repo を介して永続化へアクセス。UI 資産（画像キャッシュ等）には直接触れない。
@@ -41,6 +48,7 @@
 - コマンド（更新）: Scenes → Usecase（Ports）→ Repo
 - クエリ（参照）  : Scenes → `gdata.Provider` → テーブル（例: `WeaponTable`）
 - Scenes は Repo/Assets/Model を直接インポートしない（Adapter/Provider 経由のみ）。
+- Scenes は必要に応じて `ui/layout|draw|view|adapter` を参照する（UI 内の責務分割）。
 - Usecase は UI 資産に触れない（画像キャッシュクリアは UI 側で実施）。
 
 ## 3. Port（ユースケース境界）の分割方針
@@ -109,6 +117,11 @@ internal/
     service/              # 入力・UI描画ユーティリティ
       ui/...              # テキスト/レイアウト/描画/フォント
       ...
+    ui/                   # UI補助サブパッケージ群（責務分割）
+      layout/             # 座標計算（矩形）
+      draw/               # 描画関数（見た目）
+      view/               # 表示用データ（VM）
+      adapter/            # VM 生成（テーブル/ユーザ→view）
 
   usecase/                # アプリケーションサービス（Ports 実装）
     facade.go             # struct App, New(), 依存注入・共通メソッド

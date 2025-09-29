@@ -6,6 +6,8 @@ import (
     gamesvc "ui_sample/internal/game/service"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     scenes "ui_sample/internal/game/scenes"
+    uilayout "ui_sample/internal/game/ui/layout"
+    "ui_sample/pkg/game/geom"
 )
 
 // scHandleInput は“入力→意図(Intent)”へ変換し、描画用のホバー状態を更新します。
@@ -15,17 +17,17 @@ func (s *Sim) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     mx, my := ebiten.CursorPosition()
     // ホバー更新
     bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
-    s.backHovered = scenes.PointIn(mx,my,bx,by,bw,bh)
-    sx, sy, sw2, sh2 := BattleStartButtonRect(s.sw, s.sh)
-    s.startHovered = scenes.PointIn(mx,my,sx,sy,sw2,sh2)
-    ax, ay, aw, ah := AutoRunButtonRect(s.sw, s.sh)
-    s.autoHovered = scenes.PointIn(mx,my,ax,ay,aw,ah)
+    s.backHovered = geom.RectContains(mx,my,bx,by,bw,bh)
+    sx, sy, sw2, sh2 := uilayout.BattleStartButtonRect(s.sw, s.sh)
+    s.startHovered = geom.RectContains(mx,my,sx,sy,sw2,sh2)
+    ax, ay, aw, ah := uilayout.AutoRunButtonRect(s.sw, s.sh)
+    s.autoHovered = geom.RectContains(mx,my,ax,ay,aw,ah)
     s.attHover, s.defHover = -1, -1
     for i:=0; i<3; i++ {
         tx,ty,tw,th := uiwidgets.TerrainButtonRect(s.sw, s.sh, true, i)
-        if scenes.PointIn(mx,my,tx,ty,tw,th) { s.attHover = i }
+        if geom.RectContains(mx,my,tx,ty,tw,th) { s.attHover = i }
         dx,dy,dw,dh := uiwidgets.TerrainButtonRect(s.sw, s.sh, false, i)
-        if scenes.PointIn(mx,my,dx,dy,dw,dh) { s.defHover = i }
+        if geom.RectContains(mx,my,dx,dy,dw,dh) { s.defHover = i }
     }
 
     if ctx != nil && ctx.Input != nil {

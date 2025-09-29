@@ -1,4 +1,4 @@
-package sim
+package draw
 
 import (
     "fmt"
@@ -7,6 +7,7 @@ import (
     "github.com/hajimehoshi/ebiten/v2/vector"
     "golang.org/x/image/font"
     "ui_sample/internal/adapter"
+    uilayout "ui_sample/internal/game/ui/layout"
     uicore "ui_sample/internal/game/service/ui"
     gdata "ui_sample/internal/game/data"
     "ui_sample/internal/model"
@@ -29,11 +30,10 @@ func DrawBattleWithTerrain(dst *ebiten.Image, attacker, defender uicore.Unit, at
     // 開始ボタン
     drawStartButton(dst, sw, sh, startEnabled)
 
-    // 予測値表示（/pkg/game.ForecastAt）
+    // 予測値表示
     if frAtk, frAtkBk, frDef, frDefBk, canCounter, ok := forecastBothWithTerrainExplain(attacker, defender, attT, defT); ok {
         ax, ay := leftX, topY+uicore.S(460)
         dx, dy := rightX, topY+uicore.S(460)
-        // 左右の基本行
         drawForecastLeft(dst, ax, ay, attacker, defender, frAtk, frAtkBk)
         drawForecastRight(dst, dx, dy, sw, lm, canCounter, frDef, frDefBk)
         // 地形ラベル
@@ -50,7 +50,7 @@ func drawBattleHeader(dst *ebiten.Image, sw, sh, lm int) {
 }
 
 func drawStartButton(dst *ebiten.Image, sw, sh int, enabled bool) {
-    bx, by, bw, bh := BattleStartButtonRect(sw, sh)
+    bx, by, bw, bh := uilayout.BattleStartButtonRect(sw, sh)
     uicore.DrawFramedRect(dst, float32(bx), float32(by), float32(bw), float32(bh))
     fill := color.RGBA{110, 90, 40, 255}
     labelCol := uicore.ColText
@@ -62,27 +62,26 @@ func drawStartButton(dst *ebiten.Image, sw, sh int, enabled bool) {
     uicore.TextDraw(dst, "戦闘開始", uicore.FaceMain, bx+uicore.S(70), by+uicore.S(38), labelCol)
 }
 
-// 左側の予測（攻撃側）: 基本行 + 相性 + 内訳
+// 左側の予測（攻撃側）
 func drawForecastLeft(dst *ebiten.Image, x, y int, atk, def uicore.Unit, fr gcore.ForecastResult, bk gcore.ForecastBreakdown) {
     baseLine := fmt.Sprintf("命中 %d%%  与ダメ %d  必殺 %d%%", fr.HitDisp, fr.Dmg, fr.Crit)
     uicore.TextDraw(dst, baseLine, uicore.FaceMain, x, y, uicore.ColText)
     if p := gdata.Provider(); p != nil {
         if wt := p.WeaponsTable(); wt != nil {
-        aType := weaponTypeOf(wt, atk)
-        dType := weaponTypeOf(wt, def)
-        lbl, col := triangleRelationLabelColor(gcore.TriangleRelationOf(aType, dType))
-        w := int(font.MeasureString(uicore.FaceMain, baseLine) >> 6)
-        uicore.TextDraw(dst, "  相性: ", uicore.FaceMain, x+w+8, y, uicore.ColText)
-        w2 := int(font.MeasureString(uicore.FaceMain, "  相性: ") >> 6)
-        uicore.TextDraw(dst, lbl, uicore.FaceMain, x+w+8+w2, y, col)
+            aType := weaponTypeOf(wt, atk)
+            dType := weaponTypeOf(wt, def)
+            lbl, col := triangleRelationLabelColor(gcore.TriangleRelationOf(aType, dType))
+            w := int(font.MeasureString(uicore.FaceMain, baseLine) >> 6)
+            uicore.TextDraw(dst, "  相性: ", uicore.FaceMain, x+w+8, y, uicore.ColText)
+            w2 := int(font.MeasureString(uicore.FaceMain, "  相性: ") >> 6)
+            uicore.TextDraw(dst, lbl, uicore.FaceMain, x+w+8+w2, y, col)
         }
     }
     // 内訳
     wrap := dynamicWrap(dst.Bounds().Dx(), uicore.ListMarginPx(), true)
     leftHitLine := fmt.Sprintf("[命中内訳] 武器H%d + 技×2:%d + 幸/2:%d + 地命中:%d - (速×2:%d + 幸:%d + 地回避:%d) + 相性:%+d = %d",
         bk.WeapHit, bk.Skl2, bk.LckHalf, bk.AttTileHit, bk.DefSpd2, bk.DefLck, bk.DefTileAvoid, bk.TriangleHit, bk.HitDisp)
-    y2 := uicore.DrawWrapped(dst, uicore.FaceSmall, leftHitLine, x, y+uicore.S(26), uicore.ColText, wrap, uicore.LineHSmallPx())
-    _ = y2
+    _ = uicore.DrawWrapped(dst, uicore.FaceSmall, leftHitLine, x, y+uicore.S(26), uicore.ColText, wrap, uicore.LineHSmallPx())
     dmgLine := fmt.Sprintf("[与ダメ内訳] 力:%d + 武器D%d + 相性:%+d - 守備合計:%d = %d",
         bk.AtkStr, bk.WpnMt, bk.TriangleMt, bk.DefTotal, bk.Dmg)
     _ = uicore.DrawWrapped(dst, uicore.FaceSmall, dmgLine, x, y+uicore.S(26)+uicore.LineHSmallPx(), uicore.ColText, wrap, uicore.LineHSmallPx())
@@ -106,26 +105,49 @@ func drawForecastRight(dst *ebiten.Image, x, y, sw, lm int, canCounter bool, fr 
     }
 }
 
-// 地形ラベル（左右）
+func triangleRelationLabelColor(rel gcore.TriangleRelation) (string, color.Color) {
+    switch rel {
+    case gcore.TriangleAdvantage:
+        return "有利", uicore.ColAccent
+    case gcore.TriangleDisadvantage:
+        return "不利", color.RGBA{255, 170, 70, 255}
+    default:
+        return "中立", color.RGBA{180, 180, 180, 255}
+    }
+}
+
 func drawTerrainLabels(dst *ebiten.Image, sw, lm, ax, ay, dx, dy int, attT, defT gcore.Terrain) {
-    wrapLeft := dynamicWrap(sw, lm, true)
-    wrapRight := dynamicWrap(sw, lm, false)
-    _ = uicore.DrawWrapped(dst, uicore.FaceSmall, terrainLine(attT), ax, ay+uicore.S(26), color.RGBA{200,220,255,255}, wrapLeft, uicore.LineHSmallPx())
-    _ = uicore.DrawWrapped(dst, uicore.FaceSmall, terrainLine(defT), dx, dy+uicore.S(26), color.RGBA{200,220,255,255}, wrapRight, uicore.LineHSmallPx())
+    // 地形ラベル
+    as := terrainLine(attT)
+    ds := terrainLine(defT)
+    uicore.TextDraw(dst, as, uicore.FaceSmall, ax, ay+uicore.S(90), uicore.ColText)
+    tw := int(font.MeasureString(uicore.FaceSmall, ds) >> 6)
+    uicore.TextDraw(dst, ds, uicore.FaceSmall, sw-lm-uicore.S(560)+uicore.S(540)-tw, dy+uicore.S(90), uicore.ColText)
 }
 
 func drawBattleSide(dst *ebiten.Image, u uicore.Unit, x, y int) {
-    sz := uicore.S(320)
-    uicore.DrawFramedRect(dst, float32(x), float32(y), float32(sz), float32(sz))
+    w := uicore.S(520)
+    h := uicore.S(420)
+    uicore.DrawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
+    vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), color.RGBA{25, 30, 50, 230}, false)
+    // 基本情報
+    uicore.TextDraw(dst, u.Name, uicore.FaceMain, x+uicore.S(16), y+uicore.S(16), uicore.ColAccent)
+    uicore.TextDraw(dst, u.Class, uicore.FaceSmall, x+uicore.S(16), y+uicore.S(48), uicore.ColText)
+    // ポトレ
+    ps := uicore.S(120)
+    px := x + uicore.S(16)
+    py := y + uicore.S(80)
+    uicore.DrawFramedRect(dst, float32(px), float32(py), float32(ps), float32(ps))
     if u.Portrait != nil {
-        uicore.DrawPortrait(dst, u.Portrait, float32(x), float32(y), float32(sz), float32(sz))
+        uicore.DrawPortrait(dst, u.Portrait, float32(px), float32(py), float32(ps), float32(ps))
+    } else {
+        uicore.DrawPortraitPlaceholder(dst, float32(px), float32(py), float32(ps), float32(ps))
     }
-    uicore.TextDraw(dst, u.Name, uicore.FaceTitle, x, y-uicore.S(16), uicore.ColText)
-    uicore.TextDraw(dst, u.Class+"  Lv "+uicore.Itoa(u.Level), uicore.FaceMain, x, y+uicore.S(350), uicore.ColAccent)
-    uicore.TextDraw(dst, uicore.Itoa(u.HP)+"/"+uicore.Itoa(u.HPMax), uicore.FaceMain, x, y+uicore.S(384), uicore.ColText)
-    uicore.DrawHPBar(dst, x, y+uicore.S(390), sz, uicore.S(14), u.HP, u.HPMax)
+    // 主武器など
     wep := "-"
-    if len(u.Equip) > 0 { wep = u.Equip[0].Name }
+    if len(u.Equip) > 0 && u.Equip[0].Name != "" { wep = u.Equip[0].Name }
+    uicore.TextDraw(dst, "HP: ", uicore.FaceSmall, x+uicore.S(160), y+uicore.S(90), uicore.ColText)
+    uicore.DrawHPBar(dst, x+uicore.S(200), y+uicore.S(86), uicore.S(280), uicore.S(14), u.HP, u.HPMax)
     // 攻撃速度
     var wt *model.WeaponTable
     if p := gdata.Provider(); p != nil { wt = p.WeaponsTable() }
@@ -137,7 +159,6 @@ func drawBattleSide(dst *ebiten.Image, u uicore.Unit, x, y int) {
 }
 
 // dynamicWrap は左右列の折返し幅をウィンドウ幅とマージンから決めます。
-// 左右で若干の差をつけ、最小/最大幅を設けます。
 func dynamicWrap(sw, lm int, left bool) int {
     panelW := sw - 2*lm
     base := panelW/2 - uicore.S(100)
@@ -176,17 +197,6 @@ func weaponTypeOf(wt *model.WeaponTable, u uicore.Unit) string {
     if len(u.Equip) == 0 { return "" }
     if w, ok := wt.Find(u.Equip[0].Name); ok { return w.Type }
     return ""
-}
-
-func triangleRelationLabelColor(rel gcore.TriangleRelation) (string, color.Color) {
-    switch rel {
-    case gcore.TriangleAdvantage:
-        return "有利", uicore.ColAccent
-    case gcore.TriangleDisadvantage:
-        return "不利", color.RGBA{255, 170, 70, 255}
-    default:
-        return "中立", color.RGBA{180, 180, 180, 255}
-    }
 }
 
 // DrawBattleLogOverlay は全画面を半透明で覆い、中央にログを表示します。
