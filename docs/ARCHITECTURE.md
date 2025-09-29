@@ -16,6 +16,7 @@
 - `internal/game/ui/draw`: 描画関数（見た目）。レイアウトに依存、I/Oはしない。
 - `internal/game/ui/view`: 表示用データ構造（行モデル等）。画像は参照（`*ebiten.Image`）に留める。
 - `internal/game/ui/adapter`: view-model 生成（テーブル/ユーザデータ→view）。`PortraitLoader` 抽象で画像読込を疎結合化。
+- `internal/game/ui/input`: 抽象入力（`Action`）の公開と最小リーダAPI（`Press/Down`）。実装取得はアプリ層に残し、UIからは意図のみ参照。
 
 - Usecase（アプリケーションサービス）
   - ビジネスルールの調停・副作用の集約（保存・巻き戻し・整合）。

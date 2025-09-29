@@ -3,7 +3,8 @@
 package game
 
 import (
-    "ui_sample/internal/game/service"
+    service "ui_sample/internal/game/service"
+    uinput "ui_sample/internal/game/ui/input"
     g_rng "ui_sample/internal/game/rng"
 )
 
@@ -15,7 +16,7 @@ type Ctx struct {
     ScreenW int
     ScreenH int
 
-    Input  *service.Input
+    Input  uinput.Reader
     Assets *service.Assets
     Audio  *service.Audio
     Camera *service.Camera

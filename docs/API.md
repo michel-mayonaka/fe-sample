@@ -14,6 +14,11 @@
   地形切替 `TerrainAtt1..3/TerrainDef1..3` を提供。`Snapshot/Press/Down` に加え、
   テスト用の `SnapshotWith(func(ebiten.Key) bool)` を用意。
 
+- `package ui/input`: UI 層向けの最小API。
+  - `type Action`（当面は `service.Action` のエイリアスを再公開）
+  - `type Reader interface { Press(Action) bool; Down(Action) bool }`
+  - 目的: Scenes からは「入力の意味（Action/Press/Down）」のみ参照し、取得実装（Snapshot/マッピング）はアプリ層で隠蔽。
+
 ## internal/model（マスタデータ / mst_）
 - `type Character`
   - 初期値のみ保持（`Name`, `Class`, `Portrait`, `Stats`, `Growth`, `Weapon`, `Magic`, `Equip(max)` など）。

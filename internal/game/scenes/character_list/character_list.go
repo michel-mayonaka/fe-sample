@@ -13,7 +13,7 @@ import (
     "github.com/hajimehoshi/ebiten/v2/vector"
     "image/color"
     "ui_sample/internal/game"
-    gamesvc "ui_sample/internal/game/service"
+    uinput "ui_sample/internal/game/ui/input"
     uicore "ui_sample/internal/game/service/ui"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     scenes "ui_sample/internal/game/scenes"
@@ -159,12 +159,12 @@ func (s *List) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     }
 
     // キー/アクション意図（chooseHover 計算後に生成）
-    if ctx != nil && ctx.Input != nil {
-        if ctx.Input.Press(gamesvc.OpenWeapons) { intents = append(intents, Intent{Kind: intentOpenWeapons}) }
-        if ctx.Input.Press(gamesvc.OpenItems)  { intents = append(intents, Intent{Kind: intentOpenItems}) }
+        if ctx != nil && ctx.Input != nil {
+        if ctx.Input.Press(uinput.OpenWeapons) { intents = append(intents, Intent{Kind: intentOpenWeapons}) }
+        if ctx.Input.Press(uinput.OpenItems)  { intents = append(intents, Intent{Kind: intentOpenItems}) }
         if s.simSelecting {
-            if ctx.Input.Press(gamesvc.Cancel) { intents = append(intents, Intent{Kind: intentCancelSim}) }
-            if s.chooseHover >= 0 && ctx.Input.Press(gamesvc.Confirm) {
+            if ctx.Input.Press(uinput.Cancel) { intents = append(intents, Intent{Kind: intentCancelSim}) }
+            if s.chooseHover >= 0 && ctx.Input.Press(uinput.Confirm) {
                 if s.simSelectStep == 0 {
                     intents = append(intents, Intent{Kind: intentSelectAtk, Index: s.chooseHover})
                 } else {
@@ -172,9 +172,9 @@ func (s *List) scHandleInput(ctx *game.Ctx) []scenes.Intent {
                 }
             }
         } else {
-            if s.hoverIndex >= 0 && ctx.Input.Press(gamesvc.Confirm) {
+            if s.hoverIndex >= 0 && ctx.Input.Press(uinput.Confirm) {
                 intents = append(intents, Intent{Kind: intentOpenStatus, Index: s.hoverIndex}) }
-            if s.simBtnHovered && len(s.E.Units) > 1 && ctx.Input.Press(gamesvc.Confirm) {
+            if s.simBtnHovered && len(s.E.Units) > 1 && ctx.Input.Press(uinput.Confirm) {
                 intents = append(intents, Intent{Kind: intentOpenSimSelect}) }
         }
     }

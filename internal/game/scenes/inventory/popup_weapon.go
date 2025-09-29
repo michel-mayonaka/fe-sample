@@ -3,12 +3,12 @@ package inventory
 import (
     "github.com/hajimehoshi/ebiten/v2"
     "ui_sample/internal/game"
-    gamesvc "ui_sample/internal/game/service"
     "ui_sample/internal/game/scenes"
     gdata "ui_sample/internal/game/data"
     uidraw "ui_sample/internal/game/ui/draw"
     uilayout "ui_sample/internal/game/ui/layout"
     uiadapter "ui_sample/internal/game/ui/adapter"
+    uinput "ui_sample/internal/game/ui/input"
     "ui_sample/pkg/game/geom"
 )
 
@@ -65,7 +65,7 @@ func (v *WeaponView) scHandleInput(ctx *game.Ctx) []scenes.Intent {
         if geom.RectContains(mx, my, x, y, w, h) { v.hover = i }
     }
     if ctx != nil && ctx.Input != nil {
-        if v.Host.E.SelectingEquip && v.hover >= 0 && ctx.Input.Press(gamesvc.Confirm) {
+        if v.Host.E.SelectingEquip && v.hover >= 0 && ctx.Input.Press(uinput.Confirm) {
             intents = append(intents, wvIntent{Kind: wvChooseRow, Index: v.hover})
         }
     }

@@ -10,6 +10,7 @@ import (
     "ui_sample/internal/game/scenes"
     characterlist "ui_sample/internal/game/scenes/character_list"
     gamesvc "ui_sample/internal/game/service"
+    uinput "ui_sample/internal/game/ui/input"
     "ui_sample/internal/repo"
     uicore "ui_sample/internal/game/service/ui"
     gdata "ui_sample/internal/game/data"
@@ -52,7 +53,7 @@ func NewUIAppGame() *Game {
     }
 
     // Game（Runner + AfterUpdate）
-    g := &Game{Runner: Runner{}, Input: in, Env: env, prevTime: time.Now()}
+    g := &Game{Runner: Runner{}, Input: in, InputR: uinput.WrapService(in), Env: env, prevTime: time.Now()}
     g.Runner.AfterUpdate = func(sc game.Scene) bool {
         if p, ok := sc.(interface{ ShouldPop() bool }); ok { return p.ShouldPop() }
         return false

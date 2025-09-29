@@ -2,10 +2,10 @@ package sim
 
 import (
     "ui_sample/internal/game"
-    gamesvc "ui_sample/internal/game/service"
     "github.com/hajimehoshi/ebiten/v2"
     scenes "ui_sample/internal/game/scenes"
     uidraw "ui_sample/internal/game/ui/draw"
+    uinput "ui_sample/internal/game/ui/input"
 )
 
 // LogView は戦闘ログのポップアップビューです。
@@ -43,7 +43,7 @@ func (lvIntent) IsSceneIntent() {}
 func (v *LogView) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     intents := make([]scenes.Intent, 0, 1)
     if ctx != nil && ctx.Input != nil {
-        if ctx.Input.Press(gamesvc.Confirm) { intents = append(intents, lvIntent{Kind: lvClose}) }
+        if ctx.Input.Press(uinput.Confirm) { intents = append(intents, lvIntent{Kind: lvClose}) }
     }
     return intents
 }

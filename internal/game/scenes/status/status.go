@@ -4,7 +4,7 @@ import (
     "github.com/hajimehoshi/ebiten/v2"
     "github.com/hajimehoshi/ebiten/v2/ebitenutil"
     "ui_sample/internal/game"
-    gamesvc "ui_sample/internal/game/service"
+    uinput "ui_sample/internal/game/ui/input"
     uicore "ui_sample/internal/game/service/ui"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     scenes "ui_sample/internal/game/scenes"
@@ -109,32 +109,32 @@ func (s *Status) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     s.lvHovered = geom.RectContains(mx, my, lvx, lvy, lvw, lvh)
 
     if ctx != nil && ctx.Input != nil {
-        if ctx.Input.Press(gamesvc.Cancel) { intents = append(intents, Intent{Kind: intentBack}) }
+        if ctx.Input.Press(uinput.Cancel) { intents = append(intents, Intent{Kind: intentBack}) }
 
         // ポップアップ中の操作
         if s.E.PopupActive {
-            if s.E.PopupJustOpened { s.E.PopupJustOpened = false } else if ctx.Input.Press(gamesvc.Confirm) { intents = append(intents, Intent{Kind: intentClosePopup}) }
+            if s.E.PopupJustOpened { s.E.PopupJustOpened = false } else if ctx.Input.Press(uinput.Confirm) { intents = append(intents, Intent{Kind: intentClosePopup}) }
             // ポップアップを閉じる確定と同フレームでは以降を処理しない
             if wasPopup { return intents }
         }
 
         // レベルアップ
         unit := s.E.Selected()
-        if unit.Level < game.LevelCap && !s.E.PopupActive && s.lvHovered && ctx.Input.Press(gamesvc.Confirm) {
+        if unit.Level < game.LevelCap && !s.E.PopupActive && s.lvHovered && ctx.Input.Press(uinput.Confirm) {
             intents = append(intents, Intent{Kind: intentLevelUp})
         }
 
         // スロット選択→在庫
         for i := 0; i < 5; i++ {
             x, y, w, h := uilayout.EquipSlotRect(s.sw, s.sh, i)
-            if geom.RectContains(mx, my, x, y, w, h) && ctx.Input.Press(gamesvc.Confirm) {
+            if geom.RectContains(mx, my, x, y, w, h) && ctx.Input.Press(uinput.Confirm) {
                 intents = append(intents, Intent{Kind: intentOpenInvSlot, Index: i})
                 break
             }
         }
         // ショートカット（E/I）
-        if ctx.Input.Press(gamesvc.EquipToggle) { intents = append(intents, Intent{Kind: intentOpenInvWeapons}) }
-        if ctx.Input.Press(gamesvc.OpenItems)   { intents = append(intents, Intent{Kind: intentOpenInvItems}) }
+        if ctx.Input.Press(uinput.EquipToggle) { intents = append(intents, Intent{Kind: intentOpenInvWeapons}) }
+        if ctx.Input.Press(uinput.OpenItems)   { intents = append(intents, Intent{Kind: intentOpenInvItems}) }
     }
     return intents
 }

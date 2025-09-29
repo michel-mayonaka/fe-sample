@@ -10,6 +10,7 @@ import (
     gamesvc "ui_sample/internal/game/service"
     "ui_sample/internal/game/scenes"
     uicore "ui_sample/internal/game/service/ui"
+    uinput "ui_sample/internal/game/ui/input"
     "ui_sample/internal/assets"
 )
 
@@ -22,6 +23,7 @@ const (
 type Game struct {
     Runner    Runner
     Input     *gamesvc.Input
+    InputR    uinput.Reader
     Env       *scenes.Env
     prevTime  time.Time
     frame     uint64
@@ -39,7 +41,9 @@ func (g *Game) Update() error {
     if !g.prevTime.IsZero() { dt = now.Sub(g.prevTime).Seconds() }
     g.prevTime = now
     g.frame++
-    ctx := &game.Ctx{ScreenW: screenW, ScreenH: screenH, Input: g.Input, DT: dt, Frame: g.frame}
+    // Reader（UI向けインターフェース）をコンテキストへ供給
+    if g.InputR == nil && g.Input != nil { g.InputR = uinput.WrapService(g.Input) }
+    ctx := &game.Ctx{ScreenW: screenW, ScreenH: screenH, Input: g.InputR, DT: dt, Frame: g.frame}
     return g.Runner.Update(ctx)
 }
 
@@ -61,7 +65,7 @@ func (*Game) Layout(_, _ int) (int, int) { return screenW, screenH }
 // updateGlobalToggles はヘルプ表示やデータ再読み込みなどのグローバル操作を処理します。
 func (g *Game) updateGlobalToggles() {
     // Backspace(Menu) 長押しでデータ再読み込み
-    if g.Input != nil && g.Input.Down(gamesvc.Menu) {
+    if g.InputR != nil && g.InputR.Down(uinput.Menu) {
         g.reloadHold++
         if g.reloadHold == 30 { // 約0.5秒（60FPS時）
             if g.Env != nil && g.Env.Data != nil {
@@ -83,7 +87,7 @@ func (g *Game) updateGlobalToggles() {
     // ヘルプ
     if ebiten.IsKeyPressed(ebiten.KeyH) {
         g.showHelp = true
-    } else if g.Input != nil && g.Input.Down(gamesvc.Cancel) {
+    } else if g.InputR != nil && g.InputR.Down(uinput.Cancel) {
         g.showHelp = false
     }
 }

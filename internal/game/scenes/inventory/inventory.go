@@ -6,7 +6,7 @@ import (
     "github.com/hajimehoshi/ebiten/v2/vector"
     "image/color"
     "ui_sample/internal/game"
-    gamesvc "ui_sample/internal/game/service"
+    uinput "ui_sample/internal/game/ui/input"
     uicore "ui_sample/internal/game/service/ui"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     scenes "ui_sample/internal/game/scenes"
@@ -153,8 +153,8 @@ func (s *Inventory) scHandleInput(ctx *game.Ctx) []scenes.Intent {
     s.backHovered = geom.RectContains(mx, my, bx, by, bw, bh)
 
     if ctx != nil && ctx.Input != nil {
-        if ctx.Input.Press(gamesvc.Cancel) { intents = append(intents, Intent{Kind: intentBack}) }
-        if ctx.Input.Press(gamesvc.Confirm) {
+        if ctx.Input.Press(uinput.Cancel) { intents = append(intents, Intent{Kind: intentBack}) }
+        if ctx.Input.Press(uinput.Confirm) {
             switch s.tabHover {
             case 0: intents = append(intents, Intent{Kind: intentTabWeapons})
             case 1: intents = append(intents, Intent{Kind: intentTabItems})
