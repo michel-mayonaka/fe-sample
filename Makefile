@@ -77,12 +77,12 @@ run:
 # ロジック層のみテスト（UI依存を避けるため pkg/... のみに限定）
 .PHONY: test
 test:
-    @mkdir -p .gocache .gomodcache
-    GOFLAGS='-mod=readonly' \
-    GOMODCACHE=$(PWD)/.gomodcache \
-    GOCACHE=$(PWD)/.gocache \
-    GOWORK=off \
-    go test ./pkg/...
+	@mkdir -p .gocache .gomodcache
+	GOFLAGS='-mod=readonly' \
+	GOMODCACHE=$(PWD)/.gomodcache \
+	GOCACHE=$(PWD)/.gocache \
+	GOWORK=off \
+	go test ./pkg/...
 
 # すべてのユニットテスト（UI 依存を避けるため、pkg と internal/usecase に限定）
 # 既定は -race -cover。重い場合は TEST_FLAGS="" で上書き可能。
@@ -90,12 +90,12 @@ TEST_FLAGS ?= -race -cover
 TEST_PKGS  ?= ./pkg/... ./internal/usecase
 .PHONY: test-all
 test-all:
-    @mkdir -p .gocache .gomodcache
-    GOFLAGS='-mod=readonly' \
-    GOMODCACHE=$(PWD)/.gomodcache \
-    GOCACHE=$(PWD)/.gocache \
-    GOWORK=off \
-    go test $(TEST_FLAGS) $(TEST_PKGS)
+	@mkdir -p .gocache .gomodcache
+	GOFLAGS='-mod=readonly' \
+	GOMODCACHE=$(PWD)/.gomodcache \
+	GOCACHE=$(PWD)/.gocache \
+	GOWORK=off \
+	go test $(TEST_FLAGS) $(TEST_PKGS)
 
 # MCP: 変更前チェック（必須）
 # 既定はローカル: lint / CI: lint-ci
