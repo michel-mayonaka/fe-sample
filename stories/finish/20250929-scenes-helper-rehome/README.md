@@ -1,6 +1,6 @@
 # [story] scenes/helper の機能別分割と配置見直し
 
-- ステータス: 進行中
+ステータス: [完了]
 - 日付: 2025-09-29
 - 参照: docs/NAMING.md, docs/ARCHITECTURE.md
 
