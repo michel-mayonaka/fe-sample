@@ -194,6 +194,19 @@ Session（UI 状態）:
 2) Usecase 内で `adapter.UIToGame` して解決→HP/耐久を反映→`UserRepo/InventoryRepo.Save()`
 3) Scene がログを受け取りオーバレイ表示
 
+## 6.x Scene ライフサイクル（共通約束）
+
+全ての Scene は以下の順序で実装する。
+
+1) `scHandleInput(ctx) []Intent` — 入力を意味（Intent）へ変換（ホバー/一時状態の更新を含む）
+2) `scAdvance(intents)` — 意図に基づく状態遷移・Port呼び出し（保存/装備確定などの副作用はPortへ）
+3) `scFlush(ctx)` — フレーム末尾の後処理（オーディオ、遅延解放など）
+4) `Draw(dst)` — 表示のみ（副作用は持たせない）
+
+補足:
+- 入力の Press/Down を使い分ける。Press=決定/戻る等の単発、Down=押下継続に意味がある操作。
+- 参照はすべて `gdata.Provider()`、保存は Port（`Env.Data/Inv/Battle`）。
+
 ## 7. クエリ/コマンドの分離（Why Provider?）
 
 - クエリは参照専用・副作用なし。`gdata.Provider()` を用いることで UI からの参照経路を 1 本化できる。

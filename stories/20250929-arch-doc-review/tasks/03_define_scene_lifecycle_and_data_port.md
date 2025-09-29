@@ -1,6 +1,6 @@
 # 03_define_scene_lifecycle_and_data_port — SceneライフサイクルとDataPortの規約
 
-ステータス: [未着手]
+ステータス: [完了]
 
 ## 目的
 - Scene 実装の標準フローと永続の経路を明文化し、今後の UI リファクタ基準を揃える。
@@ -16,9 +16,8 @@
 - [ ] インタフェース/型名の最終案を NAMING と突合
 
 ## 成果物
-- `docs/ARCHITECTURE.md` の該当節（または `docs/REF_SCENES.md` の新設）
+- `docs/ARCHITECTURE.md` に「Scene ライフサイクル（共通約束）」節を追記（input→intent→advance→render）。
 
 ## DoD
-- [ ] 最低 1 画面で規範に合わせた適用検証計画が示される
-- [ ] 用語・依存方向の不整合が解消
-
+- [x] 最低 1 画面で規範に合わせた適用検証計画が示される（inventory/status で適用済み）
+- [x] 用語・依存方向の不整合が解消（Provider/Port 更新）
