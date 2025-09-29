@@ -1,6 +1,6 @@
 # [task] 現状棚卸しと分類表作成
 
-- ステータス: 進行中
+- ステータス: 完了
 - 目的: `scenes/helper` 系（現 `rect_helpers.go` を含む）の中身を洗い出し、UI系/サービス系/純ロジック系に分類して移設方針を確定する。
 
 ## 入力
@@ -38,4 +38,3 @@
 | 識別子 | 責務 | 現在地 | 提案先 | 備考 |
 |---|---|---|---|---|
 | `PointIn(px,py,x,y,w,h)` | 矩形内判定 | `internal/game/scenes/rect_helpers.go` | `pkg/game/geom`（`RectContains` 等） | 純ロジック。全シーンから利用。
-

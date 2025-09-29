@@ -1,6 +1,6 @@
 # [task] UI 系（描画/入力）の移設
 
-- ステータス: 未着手
+- ステータス: 完了
 - 目的: UI 補助ロジック（描画・入力関連）が `scenes` に混在していれば UI 層へ移す。
 
 ## 入力
@@ -29,4 +29,3 @@
 - `mkdir -p internal/game/ui/{draw,input}`
 - `rg -n "draw|layout|hover|cursor|input" internal/game/scenes || true`
 - `make mcp`
-
