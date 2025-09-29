@@ -18,18 +18,7 @@
 
 初期エントリ
 
-## 2025-09-29: アーキテクチャドキュメントの再レビュー
-- [採択: stories/20250929-arch-doc-review]
-- 目的: `docs/ARCHITECTURE.md` 等を現状実装と整合させ、境界・依存を明確化
-- 背景: UI/Scene/Usecase/Provider/Model の役割に揺れが見られるため、以降のリファクタ前提を固めたい
-- DoD: 差分の洗い出し→更新/却下の記録、主要図の更新、`make mcp` グリーン
-- 参考/関連: docs/ARCHITECTURE.md, docs/NAMING.md, internal/game, pkg/game, README.md
 
-## 2025-09-29: scenes/inventory・status・character_list の設計準拠リファクタ
-- 目的: Scene 層の責務分離と依存方向の是正
-- 背景: 入力解釈/状態遷移/描画/永続の境界が一部曖昧
-- DoD: 各 Scene の Update を input→intent→advance→render に整理、永続は `Env.Data` 経由に統一、既存機能非退行、関連ユニットテスト通過
-- 参考/関連: internal/game/scenes/{inventory,status,character_list}, internal/usecase, docs/ARCHITECTURE.md
 
 ## 2025-09-29: UI 表示位置・サイズのメトリクス外部化
 - 目的: UI レイアウトを外部ファイル(JSON/TOML 等)から読み込み可能にし、解像度差分の調整を容易化
