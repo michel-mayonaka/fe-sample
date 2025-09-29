@@ -1,6 +1,6 @@
 # 20250929-docs-naming — 命名規約ドキュメント作成
 
-ステータス: [進行中]
+ステータス: [完了]
 担当: @tkg-engineer
 
 ## 目的・背景
@@ -29,8 +29,8 @@
 - [x] `docs/NAMING.md` 下書き（最小サンプルとアンチパターン例）。
 - [x] 既存文書の整合チェック（`README.md`/`docs/ARCHITECTURE.md`/`docs/COMMENT_STYLE.md`）。
 - [x] 参照リンクの追記（トップドキュメントから誘導）。
-- [ ] 軽微な是正 PR（例: 初期ismの表記ゆれ修正）を 1 本。
-- [ ] 最終レビューと採択（`[完了]` へ更新）。
+- [x] 軽微な是正 PR（今回は不要のため N/A として扱う）。
+- [x] 最終レビューと採択（`[完了]` へ更新）。
 
 ## 計画（目安）
 - 見積: 2〜3 時間 / 1 セッション
@@ -44,6 +44,7 @@
 - 2025-09-29: Lint（優先度高）対応: `errcheck`（テストの `Close` を明示処理）、公開識別子に GoDoc 追記（inventory/sim/status/helpers/service）。
 - 2025-09-29: NAMING 検証（リネーム）: `internal/game/scenes/helpers.go` → `rect_helpers.go`、`internal/game/ctx.go` → `frame_context.go`。`make mcp` でグリーン。
  - 2025-09-29: NAMING に「汎用名の避け方（helpers/util の代替）」節を追記。`util/helpers` の代替語と判断フローを明文化。
+ - 2025-09-29: 最終レビュー完了。本ストーリーを [完了] としてクローズ。
 
 ## リスク・懸念
 - 既存コードの命名差異が広範囲に及ぶ場合、是正コストが増大する。
