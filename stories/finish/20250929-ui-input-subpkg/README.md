@@ -1,6 +1,6 @@
 # [story] `ui/input` サブパッケージ導入の検討
 
-- ステータス: [完了]
+ステータス: [完了]
 - 日付: 2025-09-29
 - 参照: docs/ARCHITECTURE.md, docs/NAMING.md, stories/BACKLOG.md
 

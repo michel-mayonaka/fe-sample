@@ -137,3 +137,7 @@ new-story:
 .PHONY: finish-story
 finish-story:
 	@./scripts/finish_story.sh "$(SLUG)" "$(PATH)"
+
+.PHONY: story-index
+story-index:
+	@./scripts/gen_story_index.sh

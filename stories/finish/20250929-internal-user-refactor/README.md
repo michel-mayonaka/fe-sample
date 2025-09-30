@@ -1,6 +1,6 @@
 # [story] internal/user 再編（モデル/I-O 分離）
 
-- ステータス: [完了]
+ステータス: [完了]
 - 日付: 2025-09-29
 - 参照: docs/ARCHITECTURE.md, docs/NAMING.md, docs/REF_STORIES.md
 

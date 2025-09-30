@@ -13,7 +13,7 @@ var triangle = map[string]map[string]struct{ Hit, Mt int }{
 func Forecast(att, def Unit) ForecastResult { return ForecastAt(att, def, Terrain{}, Terrain{}) }
 
 // ForecastAt は地形補正を考慮して命中表示値/与ダメ/必殺%を返します。
-// 仕様（tasks/battlepart.md準拠）:
+// 仕様（stories/finish/20250930-battle-notes-archive/artifacts/battlepart.md 準拠）:
 //
 //	atk_hit = weapon.hit + skl*2 + floor(lck/2) + attacker_tile_hit
 //	def_avo = spd*2 + lck + defender_tile_avoid

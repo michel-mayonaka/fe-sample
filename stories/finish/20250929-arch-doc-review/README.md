@@ -38,5 +38,6 @@
 
 ## 関連
 - PR: #
+- 資料: `artifacts/architecture_review.md`
 - Issue: #
 - Docs: `docs/ARCHITECTURE.md`, `docs/NAMING.md`, `README.md`

@@ -42,14 +42,20 @@ if [[ -e "$dest" ]]; then
   exit 1
 fi
 
-# Update status in README.md to [完了]
+# Update status in README.md to [完了] and append timestamped log
 readme="$src/README.md"
 if [[ -f "$readme" ]]; then
-  # try BSD sed (macOS)
-  if sed -i '' -E 's/^ステータス: \[[^]]+\]/ステータス: [完了]/' "$readme" 2>/dev/null; then :; else
+  # try BSD sed (macOS) — 各種表記揺れ（先頭ハイフン/角括弧無し）を許容
+  # 例: "ステータス: 提案中" / "- ステータス: [進行中]"
+  pat='s/^[[:space:]]*(-[[:space:]]*)?ステータス:[[:space:]]*(\[[^]]+\]|[^[:space:]].*)/ステータス: [完了]/'
+  if sed -i '' -E "$pat" "$readme" 2>/dev/null; then :; else
     # fallback to GNU sed
-    sed -i -E 's/^ステータス: \[[^]]+\]/ステータス: [完了]/' "$readme"
+    sed -i -E "$pat" "$readme"
   fi
+
+  # Append archive log with seconds
+  now_ts="$(date +'%Y-%m-%d %H:%M:%S %z')"
+  printf "\n- %s: アーカイブ（finish へ移動）\n" "$now_ts" >> "$readme"
 fi
 
 # Move directory (use git mv when possible)

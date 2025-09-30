@@ -17,11 +17,16 @@ if [[ -e "$dir" ]]; then
 fi
 
 mkdir -p "$dir"
-cat >"$dir/README.md" <<'EOF'
-# YYYYMMDD-slug — Story タイトル
+
+# 現在時刻（秒精度、タイムゾーン付き）
+now_ts="$(date +'%Y-%m-%d %H:%M:%S %z')"
+
+cat >"$dir/README.md" <<EOF
+# ${dateprefix}-${slug} — Story タイトル
 
 ステータス: [進行中]
 担当: @yourname
+開始: ${now_ts}
 
 ## 目的・背景
 - このストーリーで解決する課題/価値を1〜3行で。
@@ -35,7 +40,7 @@ cat >"$dir/README.md" <<'EOF'
 - [ ] ドキュメント整合
 
 ## 工程（サブタスク）
-- [ ] タスクA（リンク: `tasks/...`）
+- [ ] タスクA（リンク: \`stories/YYYYMMDD-slug/tasks/01_xxx.md\`）
 - [ ] タスクB
 - [ ] タスクC
 
@@ -44,8 +49,7 @@ cat >"$dir/README.md" <<'EOF'
 - マイルストン: M1 / M2 / M3
 
 ## 進捗・決定事項（ログ）
-- YYYY-MM-DD: 着手/方針決定
-- YYYY-MM-DD: 実装/検証
+- ${now_ts}: ストーリー作成
 
 ## リスク・懸念
 - 例: 依存の変更、CI制約 など
@@ -53,7 +57,7 @@ cat >"$dir/README.md" <<'EOF'
 ## 関連
 - PR: #
 - Issue: #
-- Docs: `docs/...`
+- Docs: \`docs/...\`
 EOF
 
 echo "[new_story] created: $dir"

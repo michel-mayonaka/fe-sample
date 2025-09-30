@@ -1,8 +1,9 @@
 # [story] pkg/game の可視性見直し（internal 移行の是非判断）
 
-- ステータス: 提案中
-- 日付: 2025-09-29
-- 参照: README.md, docs/ARCHITECTURE.md
+ステータス: [提案中]
+担当: @tkg-engineer
+開始: 2025-09-29 00:00:00 +0900
+参照: README.md, docs/ARCHITECTURE.md
 
 ## 背景
 `pkg/game` は「ドメインロジック（テスト対象）」として公開可能層に置かれている。外部再利用性/安定APIの要件を再確認し、`internal` への移行是非を判断する。
