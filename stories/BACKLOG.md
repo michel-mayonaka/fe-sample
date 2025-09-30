@@ -18,6 +18,13 @@
 
 初期エントリ
 
+## 2025-09-30: `make mcp` をネットワーク接続なしで実行可能にする
+<!-- 昇格: stories/20250930-mcp-offline へ移行（2025-09-30） -->
+- 目的: ローカル/サンドボックスなどネットワーク遮断環境でも vet/build/lint/test を完走させる。
+- 背景: 現状 `-mod=readonly` で未キャッシュ依存があると取得を試みて失敗。初回の `golangci-lint` 有無にも依存。
+- DoD: `MCP_OFFLINE=1 make mcp` がオフライン・空の `.gomodcache` でも成功、`go mod vendor` 採用と `-mod=vendor` の適用、`vendor/` のコミット、`make vendor-sync` 追加、lint は未導入時スキップまたは固定バイナリ使用、README に手順追記。
+- 参考/関連: Makefile, go.mod/go.sum, vendor/, .golangci.yml, README.md
+
 ## 2025-09-29: `internal/game/service/ui/apply.go` の分割検討
 - 目的: UI メトリクス適用処理を責務単位で分割し、可読性・変更容易性・テスト容易性を向上する。
 - 背景: 現在の `apply.go` は複数ドメイン（List/Status/Sim/Popup/Widgets）への一括適用を担っており、変更差分の把握や衝突が起きやすい。
