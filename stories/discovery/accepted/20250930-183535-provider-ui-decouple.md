@@ -1,4 +1,4 @@
-# discovery: provider-ui-decouple
+# discovery: Provider から UI 型依存を分離（Port/Adapter 再整理）
 
 ステータス: [promoted]
 担当: @tkg-engineer

@@ -18,7 +18,103 @@
 
 初期エントリ
 
-## [P0] 2025-09-30: provider-ui-decouple
+## [P0] 2025-09-30: ItemsTable 取得の Repo 化・キャッシュ一貫化
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P0] 2025-09-30: Provider から UI 型依存を分離（Port/Adapter 再整理）
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P1] 2025-09-30: CI にストーリー検証/索引生成を統合
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P1] 2025-09-30: PR テンプレ/Story 参照の必須化（軽量）
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P1] 2025-09-29: `internal/game/service/ui/apply.go` の分割検討
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P1] 2025-09-27: レイヤリング/依存の整理（main→app 移譲）
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P2] 2025-09-30: `internal/game/util` の撤去または責務特化サブパッケージ化
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P2] 2025-09-30: 入力レイアウト設定の外部化（config 駆動）
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P2] 2025-09-29: FPS デバッグ表示
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P2] 2025-09-29: マウス座標デバッグ表示
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P2] 2025-09-27: SQLite 準備（将来）
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P2] 2025-09-27: UI スケーリング調整
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P2] 2025-09-27: テスト拡充
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P2] 2025-09-27: ドキュメント更新の追従（README/API/DB_NOTES）
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P2] 2025-09-27: ドメインロジックの整理（UI色/文言生成）
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P3] 2025-09-29: FE風バトル マップ画面の叩き追加
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: Story: N/A
+
+## [P3] 2025-09-29: Portrait のロード責務の最終整理
 - 目的: （discovery参照）
 - 背景: （discovery参照）
 - DoD: （discoveryの DoD候補を要約 or 後続で具体化）

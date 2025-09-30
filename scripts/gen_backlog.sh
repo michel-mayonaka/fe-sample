@@ -53,7 +53,7 @@ find "$acc_dir" -maxdepth 1 -type f -name '*.md' -print | while read -r f; do
 done
 
 # Sort by priority (asc) then date (desc)
-sort -t $'\t' -k1,1n -k2,2r "$tmp_list" | while IFS=$'\t' read -r prio_s d prio title story; do
+sort -t $'\t' -k1,1n -k2,2r "$tmp_list" | awk -F '\t' '!seen[$4]++' | while IFS=$'\t' read -r prio_s d prio title story; do
   printf "## [%s] %s: %s\n" "$prio" "$d" "$title" >> "$body_tmp"
   printf -- "- 目的: （discovery参照）\n" >> "$body_tmp"
   printf -- "- 背景: （discovery参照）\n" >> "$body_tmp"
