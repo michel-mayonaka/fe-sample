@@ -1,6 +1,6 @@
 # [story] ストーリー運用の強化（テンプレ/秒精度ログ/finish索引/スクリプト）
 
-ステータス: [進行中]
+ステータス: [完了]
 担当: @tkg-engineer
 開始: 2025-09-30 17:53:37 +0900
 
@@ -60,3 +60,5 @@
 - 2025-09-30 18:05:36 +0900: 直下 tasks の棚卸し開始（移管先の決定/分類）
 - 2025-09-30 18:05:36 +0900: Backlog へ内容を統合（battle_map/data_repo/docs/domain/sqlite/testing/ui_scaling）
 - 2025-09-30 18:05:36 +0900: finish 配下への歴史タスク移管（arch-doc-review/arch-review/scenes-helper-rehome/mcp-offline/battle-notes）
+
+- 2025-09-30 18:47:31 +0900: アーカイブ（finish へ移動）

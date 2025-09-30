@@ -1,6 +1,6 @@
 # 20250930-provider-ui-port — Provider から UI 型依存を分離（Port/Adapter 再整理）
 
-ステータス: [進行中]
+ステータス: [完了]
 担当: @codex
 
 ## 目的・背景
@@ -39,3 +39,5 @@
 ## 関連
 - Docs: `docs/ARCHITECTURE.md`
 - 参考: `internal/game/data/provider.go`, `internal/game/service/ui/adapter`
+
+- 2025-09-30 18:47:31 +0900: アーカイブ（finish へ移動）
