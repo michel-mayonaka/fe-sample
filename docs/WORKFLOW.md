@@ -20,11 +20,37 @@
 - ワークフロー本書: `docs/WORKFLOW.md`（本ドキュメント）
 - 参考: AI内部の動作を知りたい場合は `docs/AI_OPERATIONS.md` を参照。
 
-## 作業開始ルール（重要）
-- ストーリー作成直後の実装着手は禁止。開始指示があるまで「ディスカッション/レビュー/Story配下MDの更新」のみ可。
-- コード変更を含む作業は `make mcp` 成功が前提。マージは基本 Squash。
+## ストーリーの作成（Codex へのプロンプト例／ブランチ）
+例1（新規ストーリーをゼロから作る）
+```
+Codex へ:
+新しいストーリーを起票して。タイトルは「dev-workflow-doc」。
+目的/スコープ/DoD/タスク雛形を用意して、実装は開始しないで。
+```
 
-## 最小コマンド（覚えるのはこれだけ）
-- ストーリー関連: `make new-story SLUG=...` / `make finish-story SLUG=...`
-- Discovery関連: `make new-discovery` / `make promote-discovery` / `make consume-discovery`
-- 索引・生成: `make story-index` / `make backlog-index`
+例2（Backlog/accepted からストーリー化する）
+```
+Codex へ:
+accepted の 2025-10-02-xxx をベースにストーリー化して。
+FROM_DISCOVERY を使って退避し、DoD とタスクを整えて。実装は開始しないで。
+```
+
+ブランチ方針（コード変更を伴う場合のみ）
+- 作業ブランチ: `feat/<slug>` を推奨（例: `feat/dev-workflow-doc`）。
+- ドキュメント/ストーリーのみの編集は master 直コミット可。
+
+## ストーリーの作業開始（Vibe‑kanban へのプロンプト例）
+例1（単一ストーリーを開始）
+```
+Vibe‑kanban へ:
+カード「20250930-dev-workflow-doc」を開始（In Progress）。
+競合しない計画単位: docs/WORKFLOW.md と AGENTS.md の一部追記のみ。
+```
+
+例2（並行ストーリー開始時の注意付き依頼）
+```
+Vibe‑kanban へ:
+カード「20251002-provider-ui-decouple」を開始（In Progress）。
+競合しない計画単位: internal/game/data/* の Read系I/F、UI層はノータッチ。
+他ストーリーと衝突しそうなら指摘して保留にしてください。
+```
