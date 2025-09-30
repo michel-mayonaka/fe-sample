@@ -1,56 +1,33 @@
 # 開発者向けワークフロー（最小ガイド）
 
-目的: AI駆動開発で「何を・誰と・どこを確認するか」だけを最短で把握する。
+本プロジェクトではAI駆動開発を採用しており、主に下記サービスを使用して進行します。
 
-## 誰とやり取りするか
-- Codex（AIコーディングエージェント）: 設計相談→開始指示→実装/レビュー→フィニッシュまでを対話で進行。
-- Vibe‑kanban: ストーリー/タスクの状態管理と合意事項の記録（DoD/決定事項）。
-
-## 典型フロー（開発者の行動だけ）
-1) ディスカッション/合意: Vibe‑kanban のカードに目的/スコープ/DoD を記録し、Codex と方針を固める。
-2) 開始指示: 「YYYYMMDD-slug を開始」の一言で実装着手を許可（指示が出るまでは実装禁止）。
-3) 実装/確認: Codex が変更を提案・実装。コード変更時は `make mcp` 成功が前提。疑問は対話で都度解消。
-4) レビュー/終了: DoD満たす→フィニッシュ（索引/Backlogは自動再生成）。
-
-## どのドキュメントを確認するか（チェックリスト）
-- 命名規約: `docs/NAMING.md`（識別子/ファイル/パッケージ）
-- ストーリー運用: `docs/REF_STORIES.md`（Discovery/Backlog/Story の扱い）
-- アーキテクチャ: `docs/ARCHITECTURE.md`（層・依存・境界）
-- コメント記法: `docs/COMMENT_STYLE.md`（GoDoc 最小ルール）
-- ワークフロー本書: `docs/WORKFLOW.md`（本ドキュメント）
-- 参考: AI内部の動作を知りたい場合は `docs/AI_OPERATIONS.md` を参照。
-
-## ストーリーの作成（Codex へのプロンプト例／ブランチ）
-例1（新規ストーリーをゼロから作る）
+## Codex（AIコーディングエージェント）
+### ストーリーの作成
+- ストーリーの作成は主にstories/BACKLOG.mdにあるものから作成するか、突発ストーリーの作成をお願いするかの2択に
+なります。
+- 作成の際にはmasterブランチにて下記のようなプロンプトを実行して作成します。
 ```
 Codex へ:
-新しいストーリーを起票して。タイトルは「dev-workflow-doc」。
-目的/スコープ/DoD/タスク雛形を用意して、実装は開始しないで。
+開発者向けワークフローガイド策定 のストーリーを作成したい
 ```
+- 具体的なストーリー運用に関してはリンクをチェックしてください: `docs/REF_STORIES.md`（Discovery/Backlog/Story の扱い）
+- Codexではストーリーの作成・レビュー・承認・コミットまでを行い実際の作業はVibe-kanbanを使用して行います。
+ - コード変更を伴う作業は `feat/<slug>` ブランチで実施（ドキュメント/ストーリーのみは master 直コミット可）。
 
-例2（Backlog/accepted からストーリー化する）
-```
-Codex へ:
-accepted の 2025-10-02-xxx をベースにストーリー化して。
-FROM_DISCOVERY を使って退避し、DoD とタスクを整えて。実装は開始しないで。
-```
+### stories/discovery の昇格について
+- 新規の課題は `stories/discovery/`（open）へ起票されます。見送りは `stories/discovery/declined/`、採択は `stories/discovery/accepted/` です（Backlog は accepted から自動生成）。
+- ストーリー化したら FROM_DISCOVERY を使って `stories/discovery/consumed/` へ退避します（Backlog から自動で消えます）。
+- 手動でファイル編集を行った場合はコミットを忘れずに。
 
-ブランチ方針（コード変更を伴う場合のみ）
-- 作業ブランチ: `feat/<slug>` を推奨（例: `feat/dev-workflow-doc`）。
-- ドキュメント/ストーリーのみの編集は master 直コミット可。
-
-## ストーリーの作業開始（Vibe‑kanban へのプロンプト例）
-例1（単一ストーリーを開始）
+## Vibe‑kanban
+### ストーリーの作業開始（Vibe‑kanban）
+- local で立ち上げている Vibe‑kanban にてストーリーの作業を行います（URL は環境により異なる例）。
+  - 例: http://127.0.0.1:64909/projects/a6dcabe1-fa65-4110-8fab-810427163ed8/tasks
+- 作業を行いたいストーリーの slug をタイトルに指定して作業を開始します。
+例
 ```
-Vibe‑kanban へ:
-カード「20250930-dev-workflow-doc」を開始（In Progress）。
-競合しない計画単位: docs/WORKFLOW.md と AGENTS.md の一部追記のみ。
+20250929-input-decouple-ui-plan-c ストーリーの作業開始
 ```
-
-例2（並行ストーリー開始時の注意付き依頼）
-```
-Vibe‑kanban へ:
-カード「20251002-provider-ui-decouple」を開始（In Progress）。
-競合しない計画単位: internal/game/data/* の Read系I/F、UI層はノータッチ。
-他ストーリーと衝突しそうなら指摘して保留にしてください。
-```
+- 作業の中で新たな提案や分割して実行するタスクやストーリーが発生した場合はVibe-kanban内で稼働しているCodexがdiscovery/declinedに自動的に内容を追加してくれます。
+- 作業が完了したらレビューを行い問題なければマージを行なってください。
