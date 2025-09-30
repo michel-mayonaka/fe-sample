@@ -7,6 +7,7 @@
 - コメント記法: docs/COMMENT_STYLE.md
 - アーキテクチャ: docs/ARCHITECTURE.md
 - ストーリー運用: docs/REF_STORIES.md
+- ワークフロー: docs/WORKFLOW.md
 - DB メモ: docs/DB_NOTES.md
 - ルート概要: README.md
 
@@ -31,7 +32,14 @@
 - コマンド: `make new-discovery SLUG=<slug> [TITLE=..] [PRIORITY=Px] [STORY=YYYYMMDD-slug]`
 - 採択時は `make promote-discovery FILE=...` で Backlog に昇格（discovery は accepted/ へ移動）。
 - 見送り時は `make decline-discovery FILE=...` で declined/ へ移動し、理由を記録。
- - 索引/検証: `make discovery-index`, `make validate-meta`（警告のみ）
+- 索引/検証: `make discovery-index`, `make validate-meta`（警告のみ）
+
+## 作業開始ルール（重要）
+- ストーリー作成直後の実装着手は禁止。
+- 実装開始には、明示的な開始指示が必要（例: 「20250930-xxx を開始」）。
+- 開始指示前に許可される作業: ディスカッション/レビュー/ストーリー配下の Markdown 更新のみ。
+- コード/ドキュメント本体（`docs/*` や `*.go` 等）の変更は開始指示後に行う。
+- コード変更を含むPRは `make mcp` 成功が前提。マージは Squash を既定とする。
 
 ## 命名・コーディング（要約）
 - ルール全文: docs/NAMING.md

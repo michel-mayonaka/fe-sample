@@ -106,6 +106,7 @@ CI（GitHub Actions）
 - コメント記法: `docs/COMMENT_STYLE.md`
 - アーキテクチャ: `docs/ARCHITECTURE.md`
 - ストーリー運用: `docs/REF_STORIES.md`
+- ワークフロー: `docs/WORKFLOW.md`
 - DB メモ: `docs/DB_NOTES.md`
 
 ## 戦闘画面（簡易）
