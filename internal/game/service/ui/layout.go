@@ -1,3 +1,5 @@
+//go:build !headless
+
 package uicore
 
 // レイアウト既定値（論理解像度に対する基準値）。

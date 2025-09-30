@@ -2,6 +2,7 @@ package adapter
 
 import (
     "testing"
+    "github.com/hajimehoshi/ebiten/v2"
     gdata "ui_sample/internal/game/data"
     usr "ui_sample/internal/model/user"
     "ui_sample/internal/model"
@@ -17,9 +18,6 @@ func (m *mockPL) Load(name string) (*ebiten.Image, error) {
     return nil, nil
 }
 
-// ebiten import needs to be after func to avoid unused during formatting
-import "github.com/hajimehoshi/ebiten/v2"
-
 // fakeProv はテスト用の簡易 TableProvider 実装です（必要メソッドのみ）。
 type fakeProv struct{ ut *usr.Table }
 func (f fakeProv) WeaponsTable() *model.WeaponTable                 { return nil }
@@ -27,11 +25,9 @@ func (f fakeProv) ItemsTable() *model.ItemDefTable                  { return nil
 func (f fakeProv) UserWeapons() []usr.OwnWeapon                     { return nil }
 func (f fakeProv) UserItems() []usr.OwnItem                         { return nil }
 func (f fakeProv) UserTable() *usr.Table                            { return f.ut }
-func (f fakeProv) UserUnitByID(string) (ui.Unit, bool)              { return ui.Unit{}, false }
 func (f fakeProv) EquipKindAt(string, int) (bool, bool)             { return false, false }
 
-// import 循環回避のため ui は後段で別名import
-import ui "ui_sample/internal/game/service/ui"
+// ui 型はここでは不要
 
 func TestBuildItemRows_OwnersAndPortraits(t *testing.T) {
     owns := []usr.OwnItem{{ID:"u_item_1", MstItemsID:"mst_potion", Uses:3, Max:10}}

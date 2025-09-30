@@ -1,10 +1,10 @@
 package usecase
 
 import (
-	"ui_sample/internal/config"
-	uicore "ui_sample/internal/game/service/ui"
-	"ui_sample/internal/model"
-	usr "ui_sample/internal/model/user"
+    "ui_sample/internal/config"
+    uicore "ui_sample/internal/game/service/ui"
+    "ui_sample/internal/model"
+    usr "ui_sample/internal/model/user"
 )
 
 // ReloadData は JSON バックエンドのキャッシュを再読み込みします（UI資産のクリアは呼び出し側で実施）。
@@ -82,16 +82,8 @@ func (a *App) UserTable() *usr.Table {
 }
 
 // UserUnitByID はユーザキャラクタIDから UI 用ユニットを生成して返します。
-func (a *App) UserUnitByID(id string) (uicore.Unit, bool) {
-	if a == nil || a.Users == nil {
-		return uicore.Unit{}, false
-	}
-	c, ok := a.Users.Find(id)
-	if !ok {
-		return uicore.Unit{}, false
-	}
-	return uicore.UnitFromUser(c), true
-}
+// Note: 以前は TableProvider 経由で UI 型を返す `UserUnitByID` を提供していたが、
+// Port の UI 依存排除に伴い UI 変換は呼び出し側（UI/adapter）へ移管した。
 
 // EquipKindAt は指定スロットに武器/アイテムのどちらが入っているかを返します。
 func (a *App) EquipKindAt(unitID string, slot int) (bool, bool) {

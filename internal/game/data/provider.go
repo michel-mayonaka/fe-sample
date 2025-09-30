@@ -2,7 +2,6 @@
 package data
 
 import (
-	uicore "ui_sample/internal/game/service/ui"
 	"ui_sample/internal/model"
 	usr "ui_sample/internal/model/user"
 )
@@ -10,17 +9,15 @@ import (
 // TableProvider はシーンから参照するテーブル群の最小ポートです。
 // 将来的に Items/Classes 等を追加可能ですが、まずは武器のみ。
 type TableProvider interface {
-	WeaponsTable() *model.WeaponTable
-	ItemsTable() *model.ItemDefTable
-	// UserInventory: ユーザ在庫の参照（スナップショット）。
-	UserWeapons() []usr.OwnWeapon
-	UserItems() []usr.OwnItem
-	// UserTable: ユーザテーブル参照（読み取り用途）。
-	UserTable() *usr.Table
-	// UserUnitByID: UI 用ユニットへの変換を提供（表示同期などに利用）。
-	UserUnitByID(id string) (uicore.Unit, bool)
-	// EquipKindAt: 指定スロットの種別（武器/アイテムのどちらが入っているか）を返す。
-	EquipKindAt(unitID string, slot int) (hasWeapon bool, hasItem bool)
+    WeaponsTable() *model.WeaponTable
+    ItemsTable() *model.ItemDefTable
+    // UserInventory: ユーザ在庫の参照（スナップショット）。
+    UserWeapons() []usr.OwnWeapon
+    UserItems() []usr.OwnItem
+    // UserTable: ユーザテーブル参照（読み取り用途）。
+    UserTable() *usr.Table
+    // EquipKindAt: 指定スロットの種別（武器/アイテムのどちらが入っているか）を返す。
+    EquipKindAt(unitID string, slot int) (hasWeapon bool, hasItem bool)
 }
 
 var provider TableProvider

@@ -132,24 +132,28 @@ func (s *Inventory) Draw(dst *ebiten.Image) {
 
 // refreshUnitByID はユーザテーブルの変更を UI 表示用ユニット配列へ反映します。
 func (s *Inventory) refreshUnitByID(id string) {
-	if s.E == nil {
-		return
-	}
-	var (
-		u  uicore.Unit
-		ok bool
-	)
-	if p := gdata.Provider(); p != nil {
-		u, ok = p.UserUnitByID(id)
-	}
-	if !ok {
-		return
-	}
-	for i := range s.E.Units {
-		if s.E.Units[i].ID == id {
-			s.E.Units[i] = u
-		}
-	}
+    if s.E == nil {
+        return
+    }
+    var (
+        u  uicore.Unit
+        ok bool
+    )
+    if p := gdata.Provider(); p != nil {
+        if ut := p.UserTable(); ut != nil {
+            if c, found := ut.Find(id); found {
+                u, ok = uicore.UnitFromUser(c), true
+            }
+        }
+    }
+    if !ok {
+        return
+    }
+    for i := range s.E.Units {
+        if s.E.Units[i].ID == id {
+            s.E.Units[i] = u
+        }
+    }
 }
 
 // --- 内部: scHandleInput → scAdvance → scFlush --------------------------------------

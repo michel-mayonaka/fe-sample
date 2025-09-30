@@ -100,18 +100,22 @@ test:
 # すべてのユニットテスト（UI 依存を避けるため、pkg と internal/usecase に限定）
 # 既定は -race -cover。重い場合は TEST_FLAGS="" で上書き可能。
 TEST_FLAGS ?= -race -cover
+TEST_TAGS  ?=
+ifdef MCP_OFFLINE
+TEST_TAGS := headless
+endif
 TEST_PKGS  ?= ./pkg/... ./internal/usecase
 .PHONY: test-all
 test-all:
 	@mkdir -p .gocache .gomodcache
-	$(GOENV) go test $(TEST_FLAGS) $(TEST_PKGS)
+	$(GOENV) go test $(TEST_FLAGS) -tags "$(TEST_TAGS)" $(TEST_PKGS)
 
 # UI 関連パッケージも含めたテスト（CI 追加ジョブ向け）
 .PHONY: test-all-ui
 TEST_PKGS_UI ?= ./pkg/... ./internal/usecase ./internal/game/service/... ./internal/game/ui/...
 test-all-ui:
 	@mkdir -p .gocache .gomodcache
-	$(GOENV) go test $(TEST_FLAGS) $(TEST_PKGS_UI)
+	$(GOENV) go test $(TEST_FLAGS) -tags "$(TEST_TAGS)" $(TEST_PKGS_UI)
 
 # MCP: 変更前チェック（必須）
 # 既定はローカル: lint / CI: lint-ci
