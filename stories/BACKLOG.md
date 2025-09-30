@@ -18,12 +18,6 @@
 
 初期エントリ
 
-## [P0] 2025-09-30: Provider から UI 型依存を分離（Port/Adapter 再整理）
-- 目的: `internal/game/data.TableProvider` を純参照Portにし、UI 型依存を排除して移植性/テスト容易性を高める。
-- 背景: 現行 `UserUnitByID(id) (uicore.Unit, bool)` が UI 型を返し、Provider が UI に結合している。
-- DoD: Provider から `UserUnitByID` を撤去し、`service/ui/adapter` に `User→Unit` 変換を移管。呼び出し箇所を置換し `make mcp` グリーン。
-- 参考/関連: internal/game/data/provider.go, internal/game/service/ui/adapter, docs/ARCHITECTURE.md
-
 ## [P0] 2025-09-30: ItemsTable 取得の Repo 化・キャッシュ一貫化
 - 目的: `usecase.App.ItemsTable()` の直読みを廃止し、Repo/キャッシュを経由する設計に統一する。
 - 背景: 参照経路が分散し、オフライン/性能面の振る舞いが読みづらい。
