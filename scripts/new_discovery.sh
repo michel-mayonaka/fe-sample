@@ -7,6 +7,7 @@ slug="${SLUG:-${1:-}}"
 title="${TITLE:-}"
 priority="${PRIORITY:-P2}"
 story="${STORY:-}"
+no_suggest="${NO_SUGGEST:-0}"
 
 if [[ -z "$slug" ]]; then
   echo "Usage: SLUG=<slug> [TITLE=...] [PRIORITY=P2] [STORY=YYYYMMDD-slug]" >&2
@@ -23,6 +24,12 @@ path="$dir/${ts_file}-${slug}.md"
 
 title_default="${slug}"
 title_final="${title:-$title_default}"
+
+# Suggest similar entries (titles or slugs) to reduce duplicates
+if [[ "$no_suggest" != "1" ]]; then
+  echo "[new_discovery] similarity suggestions (if any):" >&2
+  rg -n --no-heading -i "${slug//-/ }|${title_final}" stories/discovery stories/BACKLOG.md 2>/dev/null | head -n 10 || true
+fi
 
 cat >"$path" <<EOF
 # discovery: ${title_final}
@@ -50,4 +57,3 @@ cat >"$path" <<EOF
 EOF
 
 echo "[new_discovery] created: $path"
-

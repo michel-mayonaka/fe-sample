@@ -16,6 +16,8 @@
 - テスト: `make test-all`（`-race -cover` 既定）
 - 実行: `go run ./cmd/ui_sample`
 - ビルド: `go build -o bin/ui_sample ./cmd/ui_sample`
+ - Backlog生成: `make backlog-index`（discovery/accepted から自動生成）
+ - Discovery索引: `make discovery-index`
 
 ## ストーリー駆動の運用
 - 新規作成: `make new-story SLUG=<slug>` → `stories/YYYYMMDD-slug/README.md`
@@ -29,6 +31,7 @@
 - コマンド: `make new-discovery SLUG=<slug> [TITLE=..] [PRIORITY=Px] [STORY=YYYYMMDD-slug]`
 - 採択時は `make promote-discovery FILE=...` で Backlog に昇格（discovery は accepted/ へ移動）。
 - 見送り時は `make decline-discovery FILE=...` で declined/ へ移動し、理由を記録。
+ - 索引/検証: `make discovery-index`, `make validate-meta`（警告のみ）
 
 ## 命名・コーディング（要約）
 - ルール全文: docs/NAMING.md

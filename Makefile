@@ -158,3 +158,15 @@ promote-discovery:
 .PHONY: decline-discovery
 decline-discovery:
 	@./scripts/decline_discovery.sh
+
+.PHONY: backlog-index
+backlog-index:
+	@./scripts/gen_backlog.sh
+
+.PHONY: discovery-index
+discovery-index:
+	@./scripts/gen_discovery_index.sh
+
+.PHONY: validate-meta
+validate-meta:
+	@./scripts/validate_meta.sh || true
