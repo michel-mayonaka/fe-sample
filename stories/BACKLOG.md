@@ -18,21 +18,13 @@
 
 初期エントリ
 
-## [P0] 2025-09-30: ItemsTable 取得の Repo 化・キャッシュ一貫化
-- `usecase.App.ItemsTable()` の直読みを廃止し、Repo/キャッシュを経由する設計に統一する。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-04.md)）
-- 参照経路が分散し、オフライン/性能面の振る舞いが読みづらい。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-04.md)）
-- `repo.ItemsRepo` を追加（または WeaponsRepo に隣接キャッシュ追加）。Usecase をRepo経由に切替、呼び出し箇所更新、`make mcp` グリーン。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-04.md)）
-
 ## [P0] 2025-09-30: Provider から UI 型依存を分離（Port/Adapter 再整理）
-- `internal/game/data.TableProvider` を純参照Portにし、UI 型依存を排除して移植性/テスト容易性を高める。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-03.md)）
-- 現行 `UserUnitByID(id) (uicore.Unit, bool)` が UI 型を返し、Provider が UI に結合している。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-03.md)）
-- Provider から `UserUnitByID` を撤去し、`service/ui/adapter` に `User→Unit` 変換を移管。呼び出し箇所を置換し `make mcp` グリーン。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-03.md)）
+- （簡潔に）
+  （[→ Discovery](stories/discovery/accepted/20250930-183535-provider-ui-decouple.md)）
+- （補足があれば）
+  （[→ Discovery](stories/discovery/accepted/20250930-183535-provider-ui-decouple.md)）
+- [ ] （採用時に Backlog へ転記）
+  （[→ Discovery](stories/discovery/accepted/20250930-183535-provider-ui-decouple.md)）
 
 ## [P1] 2025-09-30: CI にストーリー検証/索引生成を統合
 - 〜〜を改善/実現する\n- PR/Push 時に `make story-index` と最小の Story 検証（テンプレ必須項目の存在チェック）を自動実行し、索引とメタの整合性を常に維持する。\n
