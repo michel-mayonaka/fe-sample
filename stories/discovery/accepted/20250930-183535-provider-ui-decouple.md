@@ -1,8 +1,9 @@
 # discovery: provider-ui-decouple
 
-状態: [promoted]
+ステータス: [promoted]
+担当: @tkg-engineer
+開始: 2025-09-30 18:35:35 +0900
 優先度: P0
-作成: 2025-09-30 18:35:35 +0900
 提案元: branch=master
 関連ストーリー: N/A
 

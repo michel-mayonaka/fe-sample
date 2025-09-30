@@ -8,6 +8,10 @@ title="${TITLE:-}"
 priority="${PRIORITY:-P2}"
 story="${STORY:-}"
 no_suggest="${NO_SUGGEST:-0}"
+owner_default="@${GIT_AUTHOR_NAME:-}"
+if [[ -z "$owner_default" || "$owner_default" == "@" ]]; then
+  owner_default="@$(git config --global user.name 2>/dev/null | tr ' ' '_' || echo owner)"
+fi
 
 if [[ -z "$slug" ]]; then
   echo "Usage: SLUG=<slug> [TITLE=...] [PRIORITY=P2] [STORY=YYYYMMDD-slug]" >&2
@@ -34,9 +38,10 @@ fi
 cat >"$path" <<EOF
 # discovery: ${title_final}
 
-状態: [open]
+ステータス: [open]
+担当: ${owner_default}
+開始: ${ts_now}
 優先度: ${priority}
-作成: ${ts_now}
 提案元: branch=${branch}
 関連ストーリー: ${story:-N/A}
 

@@ -13,7 +13,7 @@ fi
 
 ts_now="$(date +'%Y-%m-%d %H:%M:%S %z')"
 
-pat='s/^[[:space:]]*状態:[[:space:]]*(\[[^]]+\]|[^[:space:]].*)/状態: [declined]/'
+pat='s/^[[:space:]]*(状態|ステータス):[[:space:]]*(\[[^]]+\]|[^[:space:]].*)/ステータス: [declined]/'
 if sed -i '' -E "$pat" "$file" 2>/dev/null; then :; else sed -i -E "$pat" "$file"; fi
 printf "\n- %s: Decline（理由: %s）\n" "$ts_now" "$reason" >> "$file"
 
@@ -22,4 +22,3 @@ mkdir -p "$dest_dir"
 mv "$file" "$dest_dir/"
 
 echo "[decline_discovery] moved to declined/ with reason."
-

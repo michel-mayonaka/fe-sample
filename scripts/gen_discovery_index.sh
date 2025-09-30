@@ -15,8 +15,8 @@ list_items() {
   find "$dir" -maxdepth 1 -type f -name '*.md' ! -name 'INDEX.md' ! -name '.gitkeep' -print | while read -r f; do
     title=$(grep -m1 -E '^# ' "$f" | sed -E 's/^# +//; s/^discovery: +//;')
     prio=$(grep -m1 -E '^優先度:' "$f" | awk -F: '{gsub(/ /, "", $2); print $2}')
-    created=$(grep -m1 -E '^作成:' "$f" | sed -E 's/^作成:[[:space:]]*//')
-    state=$(grep -m1 -E '^(状態|ステータス):' "$f" | sed -E 's/^(状態|ステータス):[[:space:]]*//')
+    created=$(grep -m1 -E '^(作成|開始):' "$f" | sed -E 's/^(作成|開始):[[:space:]]*//')
+    state=$(grep -m1 -E '^ステータス:' "$f" | sed -E 's/^ステータス:[[:space:]]*//')
     printf -- "- [%s] %s | %s | %s\n" "${prio:-P?}" "${title:-(no title)}" "${created:-N/A}" "${state:-N/A}"
     count=$((count+1))
   done

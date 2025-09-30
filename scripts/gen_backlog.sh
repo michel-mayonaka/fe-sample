@@ -42,7 +42,7 @@ tmp_list="$(mktemp)"; trap 'rm -f "$tmp_list"' EXIT
 find "$acc_dir" -maxdepth 1 -type f -name '*.md' -print | while read -r f; do
   title=$(grep -m1 -E '^# ' "$f" | sed -E 's/^# +//; s/^discovery: +//;')
   prio=$(grep -m1 -E '^優先度:' "$f" | awk -F: '{gsub(/ /, "", $2); print $2}')
-  created=$(grep -m1 -E '^作成:' "$f" | sed -E 's/^作成:[[:space:]]*//')
+  created=$(grep -m1 -E '^(作成|開始):' "$f" | sed -E 's/^(作成|開始):[[:space:]]*//')
   date_short=$(echo "$created" | cut -d' ' -f1)
   story=$(grep -m1 -E '^関連ストーリー:' "$f" | sed -E 's/^関連ストーリー:[[:space:]]*//')
   prio_sort=9

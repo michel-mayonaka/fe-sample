@@ -52,7 +52,7 @@ else
 fi
 
 # Update discovery status/priority and move to accepted
-pat='s/^[[:space:]]*状態:[[:space:]]*(\[[^]]+\]|[^[:space:]].*)/状態: [promoted]/'
+pat='s/^[[:space:]]*(状態|ステータス):[[:space:]]*(\[[^]]+\]|[^[:space:]].*)/ステータス: [promoted]/'
 if sed -i '' -E "$pat" "$file" 2>/dev/null; then :; else sed -i -E "$pat" "$file"; fi
 pat2="s/^優先度:.*/優先度: ${prio}/"
 if sed -i '' -E "$pat2" "$file" 2>/dev/null; then :; else sed -i -E "$pat2" "$file"; fi
