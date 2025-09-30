@@ -1,6 +1,6 @@
 # 20250930-usecase-battle-double-uses — 追撃時の耐久消費を修正
 
-ステータス: [進行中]
+ステータス: [完了]
 担当: @tkg-engineer
 
 ## 目的・背景
