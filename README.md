@@ -114,3 +114,9 @@ CI（GitHub Actions）
 - ダメージ計算: `攻撃 = 力 + 武器威力 - 相手守備`（命中は簡易式）
 
 デザイン調整は `internal/game/service/ui` と `internal/game/ui/{layout,draw}` の色・座標・フォントサイズを編集してください。必要に応じて画像/TTF を `assets/` に追加し、`embed` で組み込み可能です。
+## オフライン実行
+- 一度オンラインで `make vendor-sync` を実行して `vendor/` を更新し、コミットします。
+- 以降はオフラインで以下を実行できます。
+```sh
+GOPROXY=off MCP_OFFLINE=1 make mcp
+```
