@@ -1,6 +1,6 @@
 # Discovery Index
 
-生成: 2025-09-30 18:57:46 +0900
+生成: 2025-09-30 19:01:25 +0900
 
 ## Open (stories/discovery/*.md)
 
