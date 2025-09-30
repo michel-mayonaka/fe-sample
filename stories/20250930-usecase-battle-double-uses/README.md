@@ -13,9 +13,9 @@
 - インベントリ保存（`Inv.Consume`）の回数も装備表示と一致。
 
 ## 受け入れ基準（Definition of Done）
-- [ ] `TestRunBattleRound_AttackerDouble_ConsumesTwo` が安定して成功する。
-- [ ] RNG に依存しない（seed 固定 or ロジックで追撃有無が確定）。
-- [ ] 既存の `RunBattleRound` 仕様（HP更新/Save 呼び出しなど）に回 regress がない。
+- [x] `TestRunBattleRound_AttackerDouble_ConsumesTwo` が安定して成功する。
+- [x] RNG に依存しない（seed 固定 or ロジックで追撃有無が確定）。
+- [x] 既存の `RunBattleRound` 仕様（HP更新/Save 呼び出しなど）に回 regress がない。
 
 ## 工程（サブタスク）
 - [ ] 調査: 再現と原因切り分け（AS計算/追撃分岐/消費箇所） — `tasks/01_investigate.md`
@@ -29,6 +29,7 @@
 
 ## 進捗・決定事項（ログ）
 - 2025-09-30: ストーリー作成。失敗事象を README に記録。
+- 2025-09-30: 原因はテストの乱数依存と判明。シード固定で解消。`make test-all` グリーン。
 
 ## リスク・懸念
 - 乱数により与ダメが閾値を跨ぐと反撃/追撃の可否が揺れる可能性（seed 固定で解消）。

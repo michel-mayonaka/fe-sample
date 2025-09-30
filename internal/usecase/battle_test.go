@@ -1,15 +1,14 @@
 package usecase
 
 import (
-	"encoding/json"
-	"math/rand"
-	"os"
-	"testing"
-	"time"
-	uicore "ui_sample/internal/game/service/ui"
-	"ui_sample/internal/model"
-	usr "ui_sample/internal/model/user"
-	gcore "ui_sample/pkg/game"
+    "encoding/json"
+    "math/rand"
+    "os"
+    "testing"
+    uicore "ui_sample/internal/game/service/ui"
+    "ui_sample/internal/model"
+    usr "ui_sample/internal/model/user"
+    gcore "ui_sample/pkg/game"
 )
 
 // ---- fakes -----------------------------------------------------------------
@@ -112,7 +111,9 @@ func TestRunBattleRound_UpdatesHP_Uses_Saves(t *testing.T) {
 }
 
 func TestRunBattleRound_AttackerDouble_ConsumesTwo(t *testing.T) {
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+    // 乱数事象（ミス/クリティカル）により追撃や死亡が揺れるのを避けるため、
+    // シードを固定して再現性を確保する。
+    rng := rand.New(rand.NewSource(1))
 	wt := weaponsTableForTest()
 	ut := newUserTableForTest2(t, []usr.Character{{ID: "u1"}, {ID: "u2"}})
 	a := &App{Weapons: &fakeWeapons{t: wt}, Users: &fakeUsers{t: ut}, Inv: &fakeInv{}, RNG: rng}
