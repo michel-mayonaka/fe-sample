@@ -40,27 +40,5 @@ func TestBuildWeaponRows_WithDefinitions(t *testing.T) {
     }
 }
 
-// ------- テスト補助 -------
-
-type mockPL struct{ called []string; withImage bool }
-
-func (m *mockPL) Load(name string) (*ebiten.Image, error) {
-    m.called = append(m.called, name)
-    if m.withImage {
-        return ebiten.NewImage(1,1), nil
-    }
-    return nil, nil
-}
-
-import "github.com/hajimehoshi/ebiten/v2"
-
-type fakeProv struct{ ut *usr.Table }
-func (f fakeProv) WeaponsTable() *model.WeaponTable                 { return nil }
-func (f fakeProv) ItemsTable() *model.ItemDefTable                  { return nil }
-func (f fakeProv) UserWeapons() []usr.OwnWeapon                     { return nil }
-func (f fakeProv) UserItems() []usr.OwnItem                         { return nil }
-func (f fakeProv) UserTable() *usr.Table                            { return f.ut }
-func (f fakeProv) UserUnitByID(string) (ui.Unit, bool)              { return ui.Unit{}, false }
-func (f fakeProv) EquipKindAt(string, int) (bool, bool)             { return false, false }
-
-import ui "ui_sample/internal/game/service/ui"
+// テスト補助（mockPL, fakeProv）は inventory_items_test.go で定義を共有
+// ui 型はここでは不要

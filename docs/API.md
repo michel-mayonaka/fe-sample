@@ -70,13 +70,14 @@
 - `func AttackSpeedOf(wt *model.WeaponTable, u ui.Unit) int`: 攻撃速度（武器重量考慮、未設定時は速さ）。
 
 ## internal/game/data（テーブル/在庫のDIプロバイダ）
-- `type TableProvider interface { WeaponsTable() *model.WeaponTable; ItemsTable() *model.ItemDefTable; UserWeapons() []user.OwnWeapon; UserItems() []user.OwnItem; UserTable() *user.Table; UserUnitByID(string) (ui.Unit,bool); EquipKindAt(unitID string, slot int) (bool,bool) }`
+- `type TableProvider interface { WeaponsTable() *model.WeaponTable; ItemsTable() *model.ItemDefTable; UserWeapons() []user.OwnWeapon; UserItems() []user.OwnItem; UserTable() *user.Table; EquipKindAt(unitID string, slot int) (bool,bool) }`
 - `func SetProvider(p TableProvider)`: アプリ側実装を注入（推奨ルート）。
 - `func Provider() TableProvider`: 現在のプロバイダ取得。
 
 利用指針（Provider=参照専用）:
 - Scene は `data.Provider().WeaponsTable()/ItemsTable()/UserWeapons()/UserItems()` 経由で参照。
 - 旧 `scenes.SetWeaponTable/WeaponTable` は廃止。JSON直読みフォールバックは開発ツール用途のみ。
+ - UI 用の `uicore.Unit` 変換は Provider では行わず、`uicore.UnitFromUser` 等 UI 層に集約する。
 
 Provider と Repository の役割の違い:
 - Provider: 読み取り専用の参照提供（Query）。追加/更新/保存はしない。

@@ -13,15 +13,15 @@
 - 関連する呼び出し箇所の差し替えと影響範囲のビルド/テスト整合を確認する。
 
 ## 受け入れ基準（Definition of Done）
-- [ ] `internal/game/data.TableProvider` から `UserUnitByID` を撤去し、代替 Port/API が導入されている。
-- [ ] `service/ui/adapter` でユーザモデルから `uicore.Unit` への変換が完結し、呼び出し元が新 API に移行している。
+- [x] `internal/game/data.TableProvider` から `UserUnitByID` を撤去し、代替 Port/API が導入されている。
+- [x] UI 側でユーザモデルから `uicore.Unit` への変換が完結し、呼び出し元が新 API に移行している（`inventory.refreshUnitByID`）。
 - [ ] `make mcp` が成功し、影響範囲のテストがグリーン。
-- [ ] 必要に応じて `docs/ARCHITECTURE.md` へ設計更新が反映されている。
+- [x] 必要に応じて `docs/API.md` / `docs/ARCHITECTURE.md` へ設計更新が反映されている。
 
 ## 工程（サブタスク）
-- [ ] `stories/20250930-provider-ui-port/tasks/01_port_api.md`
-- [ ] `stories/20250930-provider-ui-port/tasks/02_adapter_migration.md`
-- [ ] `stories/20250930-provider-ui-port/tasks/03_callsite_verification.md`
+- [x] `stories/20250930-provider-ui-port/tasks/01_port_api.md`
+- [x] `stories/20250930-provider-ui-port/tasks/02_adapter_migration.md`
+- [x] `stories/20250930-provider-ui-port/tasks/03_callsite_verification.md`
 
 ## 計画（目安）
 - 見積: 1.5 セッション
@@ -29,6 +29,7 @@
 
 ## 進捗・決定事項（ログ）
 - 2025-09-30: ストーリー作成、Backlog から昇格。
+- 2025-09-30: Provider から `UserUnitByID` を削除。`inventory.refreshUnitByID` を `UserTable().Find` → `uicore.UnitFromUser` へ置換。関連テスト/ドキュメントを更新。
 
 ## リスク・懸念
 - Provider API 変更に伴う予期しない呼び出し漏れ。

@@ -103,7 +103,7 @@ internal/
       runner.go           # SceneStack の更新/描画
 
     data/                 # 読み取り専用テーブル/在庫の Provider（UI 参照用）
-      provider.go         # SetProvider/Provider, TableProvider（WeaponsTable/ItemsTable/UserWeapons/UserItems/UserTable/UserUnitByID/EquipKindAt）
+      provider.go         # SetProvider/Provider, TableProvider（WeaponsTable/ItemsTable/UserWeapons/UserItems/UserTable/EquipKindAt）
 
     scenes/               # UI シーン群（UI の状態遷移と描画）
       # ports.go         # （廃止）合成 UseCases。現在は各 Port のみ使用。

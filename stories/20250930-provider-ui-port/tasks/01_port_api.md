@@ -1,6 +1,6 @@
 # 01 Port API 再設計
 
-ステータス: [未着手]
+ステータス: [完了]
 担当: @codex
 
 ## 目的
@@ -14,3 +14,4 @@
 
 ## 進捗ログ
 - 2025-09-30: タスクを起票。
+- 2025-09-30: `internal/game/data.TableProvider` から `UserUnitByID` を削除し、UI 依存を解消。

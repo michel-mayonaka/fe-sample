@@ -1,6 +1,6 @@
 # 02 UI Adapter 変換移行
 
-ステータス: [未着手]
+ステータス: [完了]
 担当: @codex
 
 ## 目的
@@ -14,3 +14,4 @@
 
 ## 進捗ログ
 - 2025-09-30: タスクを起票。
+- 2025-09-30: 変換は `uicore.UnitFromUser` を採用済み。`inventory.refreshUnitByID` を新経路へ移行。
