@@ -1,13 +1,14 @@
 # 完了ストーリー索引
 
-生成: 2025-09-30 19:01:25 +0900
-件数: 16
+生成: 2025-09-30 20:41:01 +0900
+件数: 17
 
 - 20250930-usecase-battle-double-uses — 20250930-usecase-battle-double-uses — 追撃時の耐久消費を修正 | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: N/A | 更新: 2025-09-30 14:17:24 +0900
 - 20250930-story-workflow-hardening — [story] ストーリー運用の強化（テンプレ/秒精度ログ/finish索引/スクリプト） | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-09-30 17:53:37 +0900 | 更新: 2025-09-30 18:47:49 +0900
 - 20250930-provider-ui-port — 20250930-provider-ui-port — Provider から UI 型依存を分離（Port/Adapter 再整理） | ステータス: [完了] | 担当: @codex | 日付: N/A | 開始: N/A | 更新: 2025-09-30 18:47:49 +0900
 - 20250930-mcp-offline — 20250930-mcp-offline — make mcp オフライン実行対応 | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: N/A | 更新: 2025-09-30 14:19:39 +0900
-- 20250930-discovery-automation — [story] Discovery 自動化とBacklog衝突回避（索引/自動生成/重複検知/メタ統一） | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-09-30 18:42:03 +0900 | 更新: 
+- 20250930-discovery-automation — [story] Discovery 自動化とBacklog衝突回避（索引/自動生成/重複検知/メタ統一） | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-09-30 18:42:03 +0900 | 更新: 2025-09-30 19:01:26 +0900
+- 20250930-dev-workflow-doc — [story] 開発者向けワークフローガイド策定（WORKFLOW.md/AGENTS更新） | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-09-30 19:43:16 +0900 | 更新: 
 - 20250930-battle-notes-archive — 20250930-battle-notes-archive — バトル関連計画・メモ（アーカイブ） | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-09-30 18:04:54 +0900 | 更新: 2025-09-30 18:15:12 +0900
 - 20250930-arch-review — 20250930-arch-review — アーキテクチャ再レビューと現況確認＋BACKLOG整備 | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: N/A | 更新: 2025-09-30 17:14:02 +0900
 - 20250929-ui-metrics-externalize — 20250929-ui-metrics-externalize — UI 表示位置・サイズのメトリクス外部化 | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: N/A | 更新: 2025-09-29 16:26:54 +0900
