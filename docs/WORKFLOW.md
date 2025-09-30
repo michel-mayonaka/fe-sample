@@ -12,13 +12,15 @@ Codex へ:
 開発者向けワークフローガイド策定 のストーリーを作成したい
 ```
 - 具体的なストーリー運用に関してはリンクをチェックしてください: `docs/REF_STORIES.md`（Discovery/Backlog/Story の扱い）
-- Codexではストーリーの作成・レビュー・承認・コミットまでを行い実際の作業はVibe-kanbanを使用して行います。
+- Codexではストーリーの作成・レビュー・承認・コミットまでを行い実際の作業はVibe‑kanbanを使用して行います。
  - コード変更を伴う作業は `feat/<slug>` ブランチで実施（ドキュメント/ストーリーのみは master 直コミット可）。
 
 ### stories/discovery の昇格について
-- 新規の課題は `stories/discovery/`（open）へ起票されます。見送りは `stories/discovery/declined/`、採択は `stories/discovery/accepted/` です（Backlog は accepted から自動生成）。
-- ストーリー化したら FROM_DISCOVERY を使って `stories/discovery/consumed/` へ退避します（Backlog から自動で消えます）。
-- 手動でファイル編集を行った場合はコミットを忘れずに。
+- Vibe‑kanbanからの課題提案は `stories/discovery/`（open）へ起票されます。
+  - 未整理の課題になるのでstories/BACKLOG.mdに載せるかの判断を定期的にCodexに伝えるようお願いします。
+    - 見送った場合は `stories/discovery/declined/`、採択は `stories/discovery/accepted/` に格納されます（Backlog は accepted から自動生成）。
+- 昇格してストーリー化したら FROM_DISCOVERY を使って `stories/discovery/consumed/` へ退避されます（Backlog からも自動で消えます）。
+- ※Codex に直接依頼して生成したストーリーはdiscoveryが存在しない形になります。
 
 ## Vibe‑kanban
 ### ストーリーの作業開始（Vibe‑kanban）
@@ -29,5 +31,5 @@ Codex へ:
 ```
 20250929-input-decouple-ui-plan-c ストーリーの作業開始
 ```
-- 作業の中で新たな提案や分割して実行するタスクやストーリーが発生した場合はVibe-kanban内で稼働しているCodexがdiscovery/declinedに自動的に内容を追加してくれます。
+- 作業の中で新たな提案や分割して実行するタスクやストーリーが発生した場合はVibe‑kanban内で稼働しているCodexが `stories/discovery/` に自動的に内容を追加してくれます。
 - 作業が完了したらレビューを行い問題なければマージを行なってください。
