@@ -1,53 +1,30 @@
-# 開発者向けワークフロー（WORKFLOW）
+# 開発者向けワークフロー（最小ガイド）
 
-目的: 5分で全体像を掴み、迷いなく手を動かせる最小ガイド。
+目的: AI駆動開発で「何を・誰と・どこを確認するか」だけを最短で把握する。
 
-## ライフサイクル概要
-- Discovery → Backlog(accepted) → Story → Consumed(退避) → Finish（索引反映）
-- 索引/自動生成:
-  - Backlog: `make backlog-index`（accepted/*.md がソース。目的/背景/DoDを各3行で展開＋リンク）
-  - 完了索引: `make story-index`
+## 誰とやり取りするか
+- Codex（AIコーディングエージェント）: 設計相談→開始指示→実装/レビュー→フィニッシュまでを対話で進行。
+- Vibe‑kanban: ストーリー/タスクの状態管理と合意事項の記録（DoD/決定事項）。
 
-## 日々の流れ（サマリ）
-- 朝: Discovery のトリアージ（48h以内に open/promote/decline を確定）
-- 作業開始: 明示の開始指示が出た Story のみ着手（詳細は「作業開始ルール」）
-- 終了時: DoDチェック → `make finish-story` → 索引/Backlog 再生成
+## 典型フロー（開発者の行動だけ）
+1) ディスカッション/合意: Vibe‑kanban のカードに目的/スコープ/DoD を記録し、Codex と方針を固める。
+2) 開始指示: 「YYYYMMDD-slug を開始」の一言で実装着手を許可（指示が出るまでは実装禁止）。
+3) 実装/確認: Codex が変更を提案・実装。コード変更時は `make mcp` 成功が前提。疑問は対話で都度解消。
+4) レビュー/終了: DoD満たす→フィニッシュ（索引/Backlogは自動再生成）。
 
-## プロジェクト管理
-- 新規課題の起票: `make new-discovery SLUG=... [TITLE=..] [PRIORITY=Px] [STORY=YYYYMMDD-slug]`
-  - 実行時に類似候補をサジェスト（重複抑止）
-- 採択（Backlogへ）: `make promote-discovery FILE=... [PRIORITY=Px]`
-  - accepted/ へ移動。Backlog は accepted のみから自動生成
-- ストーリー化と退避:
-  - `FROM_DISCOVERY=<accepted.md> make new-story SLUG=...`
-  - または `make consume-discovery FILE=<accepted.md> STORY_DIR=stories/YYYYMMDD-slug`
-  - consumed/ へ退避（Backlogから自動で消える）
-
-## 機能開発
-- ブランチ: `feat/<slug>` 推奨。コミットは Conventional Commits（`[story:YYYYMMDD-slug]` 任意）
-- 最低ゲート: 本体コードに対する変更は `make mcp` 成功が前提（vet/build/lint/test）
-- PRの本文: 目的/影響範囲/検証手順（手動確認やコマンド）を簡潔に記載
-- マージ: Squash を既定（履歴の簡潔性）。必要に応じ Rebase 可
-
-## 並行作業/衝突回避
-- 起票時に「競合しない計画単位」を明記（対象ディレクトリ/主要型/想定変更点）
-- Discovery は 1課題=1ファイル。Backlog は accepted のみ参照→ストーリー化で自動的に痩せる
-
-## レビュー/完了
-- レビュー観点: 目的とDoD一致/副作用範囲/命名規約/テスト/ロールバック
-- 完了手順:
-  - DoD 完了 → `make finish-story SLUG=...` → `make story-index` → `make backlog-index`
-  - 関連ファイル/リンクの整合（README/Docs/ストーリー）
+## どのドキュメントを確認するか（チェックリスト）
+- 命名規約: `docs/NAMING.md`（識別子/ファイル/パッケージ）
+- ストーリー運用: `docs/REF_STORIES.md`（Discovery/Backlog/Story の扱い）
+- アーキテクチャ: `docs/ARCHITECTURE.md`（層・依存・境界）
+- コメント記法: `docs/COMMENT_STYLE.md`（GoDoc 最小ルール）
+- ワークフロー本書: `docs/WORKFLOW.md`（本ドキュメント）
+- 参考: AI内部の動作を知りたい場合は `docs/AI_OPERATIONS.md` を参照。
 
 ## 作業開始ルール（重要）
-- ストーリー作成直後の実装着手は禁止（ディスカッション/レビュー/Story配下MDの更新のみ可）
-- 実装開始には「開始」指示が必要（例: 「20250930-xxx を開始」）
-- ルール違反の変更は Revert または Story に移管してやり直す
+- ストーリー作成直後の実装着手は禁止。開始指示があるまで「ディスカッション/レビュー/Story配下MDの更新」のみ可。
+- コード変更を含む作業は `make mcp` 成功が前提。マージは基本 Squash。
 
-## コマンド早見表
-- Discovery: `make new-discovery` / `make promote-discovery` / `make decline-discovery`
-- ストーリー: `make new-story SLUG=...` / `make finish-story SLUG=...`
-- 退避: `make consume-discovery FILE=... STORY_DIR=stories/YYYYMMDD-slug`
-- 索引/生成: `make story-index` / `make backlog-index` / `make discovery-index`
-- 検証: `make validate-meta`（必須メタの警告）/ `make mcp`
-
+## 最小コマンド（覚えるのはこれだけ）
+- ストーリー関連: `make new-story SLUG=...` / `make finish-story SLUG=...`
+- Discovery関連: `make new-discovery` / `make promote-discovery` / `make consume-discovery`
+- 索引・生成: `make story-index` / `make backlog-index`
