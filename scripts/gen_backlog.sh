@@ -49,16 +49,69 @@ find "$acc_dir" -maxdepth 1 -type f -name '*.md' -print | while read -r f; do
   if [[ "$prio" =~ ^P([0-9]+)$ ]]; then
     prio_sort="${BASH_REMATCH[1]}"
   fi
-  printf "%s\t%s\t%s\t%s\t%s\n" "${prio_sort}" "${date_short}" "${prio}" "${title}" "${story}" >> "$tmp_list"
+  printf "%s\t%s\t%s\t%s\t%s\t%s\n" "${prio_sort}" "${date_short}" "${prio}" "${title}" "${story}" "${f}" >> "$tmp_list"
 done
 
-# Sort by priority (asc) then date (desc)
-sort -t $'\t' -k1,1n -k2,2r "$tmp_list" | awk -F '\t' '!seen[$4]++' | while IFS=$'\t' read -r prio_s d prio title story; do
+# helpers: extract up to 3 lines from a section
+extract_section() {
+  local file="$1" sec="$2"; awk -v S="$sec" '
+    BEGIN{s="";c=0;on=0}
+    /^##[[:space:]]/ { on=($0 ~ ("^##[[:space:]]" S)); next }
+    on {
+      if ($0 ~ /^[[:space:]]*$/) { next }
+      if ($0 ~ /^##[[:space:]]/) { on=0; next }
+      if (c<3) { print $0; c++ }
+    }
+  ' "$file"
+}
+
+has_more_lines() {
+  local file="$1" sec="$2"; awk -v S="$sec" '
+    BEGIN{on=0;count=0}
+    /^##[[:space:]]/ { on=($0 ~ ("^##[[:space:]]" S)); next }
+    on {
+      if ($0 ~ /^[[:space:]]*$/) { next }
+      if ($0 ~ /^##[[:space:]]/) { on=0; next }
+      count++
+    }
+    END{ if (count>3) print "yes"; else print "no" }
+  ' "$file"
+}
+
+relpath() { local abs="$1"; echo "${abs#$root_dir/}"; }
+
+# Sort by priority (asc) then date (desc), dedupe by title
+sort -t $'\t' -k1,1n -k2,2r "$tmp_list" | awk -F '\t' '!seen[$4]++' | while IFS=$'\t' read -r prio_s d prio title story file; do
+  discovery_link="$(relpath "$file")"
   printf "## [%s] %s: %s\n" "$prio" "$d" "$title" >> "$body_tmp"
-  printf -- "- 目的: （discovery参照）\n" >> "$body_tmp"
-  printf -- "- 背景: （discovery参照）\n" >> "$body_tmp"
-  printf -- "- DoD: （discoveryの DoD候補を要約 or 後続で具体化）\n" >> "$body_tmp"
-  printf -- "- 参考/関連: Story: %s\n\n" "${story:-N/A}" >> "$body_tmp"
+  # Purpose
+  lines=$(extract_section "$file" "目的")
+  if [[ -n "$lines" ]]; then
+    while IFS= read -r L; do printf -- "%s\n" "$L"; done <<< "$lines" >> "$body_tmp"
+    if [[ "$(has_more_lines "$file" "目的")" == "yes" ]]; then printf "- ...\n" >> "$body_tmp"; fi
+  else
+    printf -- "- （本文なし）\n" >> "$body_tmp"
+  fi
+  printf -- "  （[→ Discovery](%s)）\n" "$discovery_link" >> "$body_tmp"
+  # Background
+  lines=$(extract_section "$file" "背景")
+  if [[ -n "$lines" ]]; then
+    while IFS= read -r L; do printf -- "%s\n" "$L"; done <<< "$lines" >> "$body_tmp"
+    if [[ "$(has_more_lines "$file" "背景")" == "yes" ]]; then printf "- ...\n" >> "$body_tmp"; fi
+  else
+    printf -- "- （本文なし）\n" >> "$body_tmp"
+  fi
+  printf -- "  （[→ Discovery](%s)）\n" "$discovery_link" >> "$body_tmp"
+  # DoD
+  lines=$(extract_section "$file" "DoD候補")
+  if [[ -n "$lines" ]]; then
+    while IFS= read -r L; do printf -- "%s\n" "$L"; done <<< "$lines" >> "$body_tmp"
+    if [[ "$(has_more_lines "$file" "DoD候補")" == "yes" ]]; then printf "- ...\n" >> "$body_tmp"; fi
+  else
+    printf -- "- （本文なし）\n" >> "$body_tmp"
+  fi
+  printf -- "  （[→ Discovery](%s)）\n" "$discovery_link" >> "$body_tmp"
+  printf -- "\n" >> "$body_tmp"
 done
 
 {

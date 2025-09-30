@@ -159,6 +159,10 @@ promote-discovery:
 decline-discovery:
 	@./scripts/decline_discovery.sh
 
+.PHONY: consume-discovery
+consume-discovery:
+	@./scripts/consume_discovery.sh
+
 .PHONY: backlog-index
 backlog-index:
 	@./scripts/gen_backlog.sh

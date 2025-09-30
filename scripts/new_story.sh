@@ -10,6 +10,7 @@ fi
 slug="$1"
 dateprefix="${2:-$(date +%Y%m%d)}"
 dir="stories/${dateprefix}-${slug}"
+from_discovery="${FROM_DISCOVERY:-}"
 
 if [[ -e "$dir" ]]; then
   echo "[new_story] already exists: $dir" >&2
@@ -61,3 +62,12 @@ cat >"$dir/README.md" <<EOF
 EOF
 
 echo "[new_story] created: $dir"
+
+# consume discovery if specified
+if [[ -n "$from_discovery" ]]; then
+  if [[ -f "$from_discovery" ]]; then
+    scripts/consume_discovery.sh "$from_discovery" "$dir" || true
+  else
+    echo "[new_story] FROM_DISCOVERY not found: $from_discovery" >&2
+  fi
+fi
