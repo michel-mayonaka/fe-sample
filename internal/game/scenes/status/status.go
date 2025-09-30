@@ -1,19 +1,19 @@
 package status
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"ui_sample/internal/game"
-	gdata "ui_sample/internal/game/data"
-	scenes "ui_sample/internal/game/scenes"
-	inventory "ui_sample/internal/game/scenes/inventory"
-	lvl "ui_sample/internal/game/service/levelup"
-	uicore "ui_sample/internal/game/service/ui"
-	uiwidgets "ui_sample/internal/game/service/ui/widgets"
-	uidraw "ui_sample/internal/game/ui/draw"
-	uinput "ui_sample/internal/game/ui/input"
-	uilayout "ui_sample/internal/game/ui/layout"
-	"ui_sample/pkg/game/geom"
+    "github.com/hajimehoshi/ebiten/v2"
+    "github.com/hajimehoshi/ebiten/v2/ebitenutil"
+    "ui_sample/internal/game"
+    gdata "ui_sample/internal/game/data"
+    scenes "ui_sample/internal/game/scenes"
+    inventory "ui_sample/internal/game/scenes/inventory"
+    lvl "ui_sample/internal/game/service/levelup"
+    uicore "ui_sample/internal/game/service/ui"
+    uiwidgets "ui_sample/internal/game/service/ui/widgets"
+    uidraw "ui_sample/internal/game/ui/draw"
+    uinput "ui_sample/internal/game/ui/input"
+    uilayout "ui_sample/internal/game/ui/layout"
+    "ui_sample/pkg/game/geom"
 )
 
 // Status はステータス画面の Scene 実装です。
@@ -85,18 +85,12 @@ func (s *Status) Update(ctx *game.Ctx) (game.Scene, error) {
 
 // Draw はステータス UI、戻る/レベルアップボタン、必要に応じてポップアップを描画します。
 func (s *Status) Draw(dst *ebiten.Image) {
-	// 本体（ステータス）
-	unit := s.E.Selected()
-	uidraw.DrawStatus(dst, unit)
-	// 戻るボタン
-	mx, my := ebiten.CursorPosition()
-	bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
-	s.backHovered = geom.RectContains(mx, my, bx, by, bw, bh)
-	uiwidgets.DrawBackButton(dst, s.backHovered)
-	// レベルアップボタン
-	lvx, lvy, lvw, lvh := uiwidgets.LevelUpButtonRect(s.sw, s.sh)
-	s.lvHovered = geom.RectContains(mx, my, lvx, lvy, lvw, lvh)
-	uiwidgets.DrawLevelUpButton(dst, s.lvHovered, unit.Level < game.LevelCap && !s.E.PopupActive)
+    // 本体（ステータス）
+    unit := s.E.Selected()
+    uidraw.DrawStatus(dst, unit)
+    // 戻る/レベルアップは scHandleInput で更新済みのホバー状態を使って描画
+    uiwidgets.DrawBackButton(dst, s.backHovered)
+    uiwidgets.DrawLevelUpButton(dst, s.lvHovered, unit.Level < game.LevelCap && !s.E.PopupActive)
 	if s.E.PopupActive {
 		uidraw.DrawLevelUpPopup(dst, unit, s.E.PopupGains)
 	}
@@ -107,8 +101,8 @@ func (s *Status) Draw(dst *ebiten.Image) {
 
 // scHandleInput は“入力→意図(Intent)”へ変換し、ホバー状態やポップアップの直後状態を更新します。
 func (s *Status) scHandleInput(ctx *game.Ctx) []scenes.Intent {
-	intents := make([]scenes.Intent, 0, 4)
-	mx, my := ebiten.CursorPosition()
+    intents := make([]scenes.Intent, 0, 4)
+    mx, my := ctx.CursorX, ctx.CursorY
 	wasPopup := s.E != nil && s.E.PopupActive
 	// 戻る/レベルアップ ホバー
 	bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)

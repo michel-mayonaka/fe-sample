@@ -1,29 +1,32 @@
 package app
 
 import (
-	"math/rand"
-	"time"
+    "math/rand"
+    "time"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"ui_sample/internal/config"
-	cuim "ui_sample/internal/config/uimetrics"
-	"ui_sample/internal/game"
-	gdata "ui_sample/internal/game/data"
-	"ui_sample/internal/game/scenes"
-	characterlist "ui_sample/internal/game/scenes/character_list"
-	gamesvc "ui_sample/internal/game/service"
-	uicore "ui_sample/internal/game/service/ui"
-	uinput "ui_sample/internal/game/ui/input"
-	"ui_sample/internal/repo"
-	"ui_sample/internal/usecase"
+    "github.com/hajimehoshi/ebiten/v2"
+    "ui_sample/internal/config"
+    cuim "ui_sample/internal/config/uimetrics"
+    "ui_sample/internal/game"
+    gdata "ui_sample/internal/game/data"
+    "ui_sample/internal/game/scenes"
+    characterlist "ui_sample/internal/game/scenes/character_list"
+    uicore "ui_sample/internal/game/service/ui"
+    ebiteninput "ui_sample/internal/game/provider/input/ebiten"
+    uinput "ui_sample/internal/game/ui/input"
+    "ui_sample/internal/repo"
+    "ui_sample/internal/usecase"
+    ginput "ui_sample/pkg/game/input"
 )
 
 // NewUIAppGame は UI サンプル用にポートを注入し SceneStack を構築した ebiten.Game を返します。
 func NewUIAppGame() *Game {
-	// 乱数と入力
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	in := gamesvc.NewInput()
-	in.BindKey(ebiten.KeyBackspace, gamesvc.Menu)
+    // 乱数と入力
+    rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+    layout := ginput.DefaultLayout()
+    // 互換: Backspace も Menu に割当
+    layout.Keyboard[ginput.KeyBackspace] = ginput.ActionMenu
+    src := ebiteninput.NewSource(layout)
 
 	// ユーザパス/テーブル
 	userPath := config.DefaultUserPath
@@ -124,8 +127,10 @@ func NewUIAppGame() *Game {
 		Session:  &scenes.Session{Units: units, SelIndex: 0},
 	}
 
-	// Game（Runner + AfterUpdate）
-	g := &Game{Runner: Runner{}, Input: in, InputR: uinput.WrapService(in), Env: env, prevTime: time.Now()}
+    // Game（Runner + AfterUpdate）
+    g := &Game{Runner: Runner{}, Env: env, prevTime: time.Now()}
+    g.InputSrc = src
+    g.InputR = uinput.WrapDomain(&g.Edge)
 	g.Runner.AfterUpdate = func(sc game.Scene) bool {
 		if p, ok := sc.(interface{ ShouldPop() bool }); ok {
 			return p.ShouldPop()

@@ -8,21 +8,21 @@
 package characterlist
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/vector"
-	"image/color"
-	"ui_sample/internal/game"
-	scenes "ui_sample/internal/game/scenes"
-	inventory "ui_sample/internal/game/scenes/inventory"
-	sim "ui_sample/internal/game/scenes/sim"
-	status "ui_sample/internal/game/scenes/status"
-	uicore "ui_sample/internal/game/service/ui"
-	uiwidgets "ui_sample/internal/game/service/ui/widgets"
-	uidraw "ui_sample/internal/game/ui/draw"
-	uinput "ui_sample/internal/game/ui/input"
-	uilayout "ui_sample/internal/game/ui/layout"
-	"ui_sample/pkg/game/geom"
+    "github.com/hajimehoshi/ebiten/v2"
+    "github.com/hajimehoshi/ebiten/v2/ebitenutil"
+    "github.com/hajimehoshi/ebiten/v2/vector"
+    "image/color"
+    "ui_sample/internal/game"
+    scenes "ui_sample/internal/game/scenes"
+    inventory "ui_sample/internal/game/scenes/inventory"
+    sim "ui_sample/internal/game/scenes/sim"
+    status "ui_sample/internal/game/scenes/status"
+    uicore "ui_sample/internal/game/service/ui"
+    uiwidgets "ui_sample/internal/game/service/ui/widgets"
+    uidraw "ui_sample/internal/game/ui/draw"
+    uinput "ui_sample/internal/game/ui/input"
+    uilayout "ui_sample/internal/game/ui/layout"
+    "ui_sample/pkg/game/geom"
 )
 
 // List はユニット一覧画面の Scene 実装です。
@@ -139,7 +139,7 @@ func (Intent) IsSceneIntent() {}
 func (s *List) scHandleInput(ctx *game.Ctx) []scenes.Intent {
 	intents := make([]scenes.Intent, 0, 3)
 	// マウス座標はフレーム先頭で固定し、結果をメンバへ保存
-	mx, my := ebiten.CursorPosition()
+    mx, my := ctx.CursorX, ctx.CursorY
 	// ホバー更新（一覧）
 	s.hoverIndex = -1
 	for i := range s.E.Units {

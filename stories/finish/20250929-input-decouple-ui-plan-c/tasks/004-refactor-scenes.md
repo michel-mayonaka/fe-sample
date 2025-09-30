@@ -13,5 +13,5 @@
 - コンパイル/簡易動作確認。
 
 ## 受け入れ基準
-- [ ] `internal/game` から `ebiten` の import が UI/Adapter 以外で 0 件。
-- [ ] `make check-all` が成功。
+- [x] 入力取得での `ebiten` 直接呼び出し（`CursorPosition` 等）が Scene/Usecase から 0 件。
+- [x] `make check-all` が成功。

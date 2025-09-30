@@ -16,7 +16,10 @@
 - `internal/game/ui/draw`: 描画関数（見た目）。レイアウトに依存、I/Oはしない。
 - `internal/game/ui/view`: 表示用データ構造（行モデル等）。画像は参照（`*ebiten.Image`）に留める。
 - `internal/game/ui/adapter`: view-model 生成（テーブル/ユーザデータ→view）。`PortraitLoader` 抽象で画像読込を疎結合化。
-- `internal/game/ui/input`: 抽象入力（`Action`）の公開と最小リーダAPI（`Press/Down`）。実装取得はアプリ層に残し、UIからは意図のみ参照。
+- 入力: 抽象入力はドメイン層へ移行（`pkg/game/input`）。Scenes は `Reader`（`Press/Down`）のみ参照し、取得はアダプタに委譲。
+  - Domain: `pkg/game/input`（`Action`, `Event`, `ControlState`, `Reader`, `Source`, `Pointer`）
+  - Adapter: `internal/game/provider/input/ebiten`（Ebiten API→Domain 変換: `Poll()`/`Position()`）
+  - UI シム: `internal/game/ui/input` は段階移行の薄い再公開（既存コードの互換用）。
 
 - Usecase（アプリケーションサービス）
   - ビジネスルールの調停・副作用の集約（保存・巻き戻し・整合）。
@@ -48,7 +51,7 @@
 
 - コマンド（更新）: Scenes → Usecase（Ports）→ Repo
 - クエリ（参照）  : Scenes → `gdata.Provider` → テーブル/在庫（例: `WeaponsTable`/`ItemsTable`/`UserWeapons`/`UserItems`）
-- Scenes は Repo/Assets/Model を直接インポートしない（Adapter/Provider 経由のみ）。
+- Scenes は Repo/Assets/Model を直接インポートしない（Adapter/Provider 経由のみ）。入力の取得も UI から直接呼ばず、`pkg/game/input.Reader` と `Ctx.CursorX/Y` を参照。
 - Scenes は必要に応じて `ui/layout|draw|view|adapter` を参照する（UI 内の責務分割）。
 - Usecase は UI 資産に触れない（画像キャッシュクリアは UI 側で実施）。
 

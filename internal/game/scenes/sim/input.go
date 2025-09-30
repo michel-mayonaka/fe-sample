@@ -1,13 +1,12 @@
 package sim
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	"ui_sample/internal/game"
-	scenes "ui_sample/internal/game/scenes"
-	uiwidgets "ui_sample/internal/game/service/ui/widgets"
-	uinput "ui_sample/internal/game/ui/input"
-	uilayout "ui_sample/internal/game/ui/layout"
-	"ui_sample/pkg/game/geom"
+    "ui_sample/internal/game"
+    scenes "ui_sample/internal/game/scenes"
+    uiwidgets "ui_sample/internal/game/service/ui/widgets"
+    uinput "ui_sample/internal/game/ui/input"
+    uilayout "ui_sample/internal/game/ui/layout"
+    "ui_sample/pkg/game/geom"
 )
 
 // scHandleInput は“入力→意図(Intent)”へ変換し、描画用のホバー状態を更新します。
@@ -16,7 +15,7 @@ func (s *Sim) scHandleInput(ctx *game.Ctx) []scenes.Intent {
 	if s.logPopup {
 		return intents
 	}
-	mx, my := ebiten.CursorPosition()
+    mx, my := ctx.CursorX, ctx.CursorY
 	// ホバー更新
 	bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
 	s.backHovered = geom.RectContains(mx, my, bx, by, bw, bh)

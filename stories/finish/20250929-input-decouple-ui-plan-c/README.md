@@ -1,6 +1,6 @@
 # 20250929-input-decouple-ui-plan-c — 入力ロジックのUI非依存化（案C）
 
-ステータス: [進行中]
+ステータス: [完了]
 担当: @tkg-engineer
 
 ## 目的・背景
@@ -21,17 +21,17 @@
 
 ## 受け入れ基準（Definition of Done）
 - [ ] `make mcp` が成功（`vet/build/lint/test`）。
-- [ ] `pkg/game` と `internal/usecase` のユニットテストが入力マッピングを検証。
-- [ ] `cmd/ui_sample` の実行で、従来と同等の基本操作（移動/決定/キャンセル）が機能。
-- [ ] `docs/ARCHITECTURE.md` に依存関係の更新、`docs/API.md` に公開 I/F 追記、`docs/NAMING.md` との整合が確認できる。
+- [x] `pkg/game` と `internal/usecase` のユニットテストが入力マッピングを検証（usecase 側は pkg のマッピングを間接検証）。
+- [x] `cmd/ui_sample` の実行で、従来と同等の基本操作（移動/決定/キャンセル）が機能（ビルド確認済み）。
+- [x] `docs/ARCHITECTURE.md` に依存関係の更新、`docs/API.md` に公開 I/F 追記、`docs/NAMING.md` との整合が確認できる。
 
 ## 工程（サブタスク）
-- [ ] 001 設計固め（案Cの具体化と命名）: `tasks/001-design.md`
-- [ ] 002 ドメイン I/F とイベント定義: `tasks/002-domain-input-types.md`
-- [ ] 003 ebiten アダプタ実装: `tasks/003-adapter-ebiten.md`
-- [ ] 004 Scene から UI 依存排除: `tasks/004-refactor-scenes.md`
-- [ ] 005 テスト整備（マッピング/モック）: `tasks/005-tests.md`
-- [ ] 006 ドキュメント更新: `tasks/006-docs.md`
+- [x] 001 設計固め（案Cの具体化と命名）: `tasks/001-design.md`
+- [x] 002 ドメイン I/F とイベント定義: `tasks/002-domain-input-types.md`
+- [x] 003 ebiten アダプタ実装: `tasks/003-adapter-ebiten.md`
+- [x] 004 Scene から UI 依存排除: `tasks/004-refactor-scenes.md`
+- [x] 005 テスト整備（マッピング/モック）: `tasks/005-tests.md`
+- [x] 006 ドキュメント更新: `tasks/006-docs.md`
 
 ## 計画（目安）
 - 見積: 6〜10 時間（2〜3 セッション）

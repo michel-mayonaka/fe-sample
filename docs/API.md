@@ -14,11 +14,9 @@
   地形切替 `TerrainAtt1..3/TerrainDef1..3` を提供。`Snapshot/Press/Down` に加え、
   テスト用の `SnapshotWith(func(ebiten.Key) bool)` を用意。
 
-- `package ui/input`: UI 層向けの最小API。
-  - `type Action`（`ui/input` 独自の列挙）
-  - `type Reader interface { Press(Action) bool; Down(Action) bool }`
-  - `type ServiceAdapter struct{ S *service.Input }` / `func WrapService(*service.Input) Reader`
-  - 目的: Scenes からは「入力の意味（Action/Press/Down）」のみ参照し、取得実装（Snapshot/マッピング）はアプリ層で隠蔽。
+- `package ui/input`: UI 層向けの最小API（段階移行の薄いシム）。
+  - 役割: `pkg/game/input` の `Action`/`Reader` を再公開し、既存コードの互換を維持。
+  - `func WrapDomain(ginput.Reader) Reader` を提供。旧 `WrapService` は互換のため残置。
 
 ## internal/model（マスタデータ / mst_）
 - `type Character`
@@ -114,6 +112,21 @@ Provider と Repository の役割の違い:
     - 地形なしの互換API。2RN・最小ダメ1・HP下限0。
   - `ResolveRoundAt(att, def Unit, attTile, defTile Terrain, rng *rand.Rand) (Unit, Unit, string)`
     - 予測値に基づき命中/クリティカル計算（0..100でクランプ）。
+
+### pkg/game/input（入力・UI非依存）
+- 型/定数
+  - `type Action int`（`ActionUnknown` を 0。`ActionUp/Down/Left/Right/Confirm/Cancel/...`）
+  - `type ControlState struct`（`Set/Get/Equal`）
+  - `type Reader interface { Press(Action) bool; Down(Action) bool }`
+  - `type EdgeReader struct`（`Step(ControlState)`）
+  - `type EventKind int`, `type Event struct { Kind, Code, Value, Mods }`, `type Modifier`
+  - `type Source interface { Poll() ControlState; Events() []Event }`
+  - `type Pointer interface { Position() (x, y int) }`
+  - `type Layout struct { Keyboard, Mouse map[int]Action }`, `func DefaultLayout() Layout`
+
+### internal/game/provider/input/ebiten（アダプタ）
+- `type Source struct`, `func NewSource(layout input.Layout) *Source`
+- 実装: `Poll()`（Ebiten キー/マウス→ControlState）, `Position()`（マウス座標）
 
 ## cmd/ui_sample（エントリ）
 - `const screenW = 1920`, `const screenH = 1080`: 論理解像度。

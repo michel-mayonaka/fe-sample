@@ -1,17 +1,17 @@
 package inventory
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/vector"
-	"image/color"
-	"ui_sample/internal/game"
-	gdata "ui_sample/internal/game/data"
-	scenes "ui_sample/internal/game/scenes"
-	uicore "ui_sample/internal/game/service/ui"
-	uiwidgets "ui_sample/internal/game/service/ui/widgets"
-	uinput "ui_sample/internal/game/ui/input"
-	"ui_sample/pkg/game/geom"
+    "github.com/hajimehoshi/ebiten/v2"
+    "github.com/hajimehoshi/ebiten/v2/ebitenutil"
+    "github.com/hajimehoshi/ebiten/v2/vector"
+    "image/color"
+    "ui_sample/internal/game"
+    gdata "ui_sample/internal/game/data"
+    scenes "ui_sample/internal/game/scenes"
+    uicore "ui_sample/internal/game/service/ui"
+    uiwidgets "ui_sample/internal/game/service/ui/widgets"
+    uinput "ui_sample/internal/game/ui/input"
+    "ui_sample/pkg/game/geom"
 )
 
 // Inventory は在庫画面の Scene 実装です。
@@ -121,10 +121,8 @@ func (s *Inventory) Draw(dst *ebiten.Image) {
 	vector.DrawFilledRect(dst, float32(tx2), float32(ty), float32(tabW), float32(tabH), baseI, false)
 	uicore.TextDraw(dst, "アイテム", uicore.FaceMain, tx2+uicore.S(34), ty+uicore.S(30), uicore.ColText)
 	// 戻る
-	bx, by, bw, bh := uiwidgets.BackButtonRect(s.sw, s.sh)
-	mx, my := ebiten.CursorPosition()
-	s.backHovered = geom.RectContains(mx, my, bx, by, bw, bh)
-	uiwidgets.DrawBackButton(dst, s.backHovered)
+    // backHovered は scHandleInput で更新済みの値を使用
+    uiwidgets.DrawBackButton(dst, s.backHovered)
 	if s.E.SelectingEquip {
 		ebitenutil.DebugPrintAt(dst, "クリックでスロットに装備", uicore.ListMarginPx()+uicore.S(20), uicore.ListMarginPx()+uicore.S(10))
 	}
@@ -159,7 +157,7 @@ func (s *Inventory) refreshUnitByID(id string) {
 // scHandleInput は“入力→意図(Intent)”へ変換し、ホバー状態を更新します。
 func (s *Inventory) scHandleInput(ctx *game.Ctx) []scenes.Intent {
 	intents := make([]scenes.Intent, 0, 3)
-	mx, my := ebiten.CursorPosition()
+    mx, my := ctx.CursorX, ctx.CursorY
 	// ホバー更新
 	s.tabHover = -1
 	tabW, tabH := uicore.S(160), uicore.S(44)

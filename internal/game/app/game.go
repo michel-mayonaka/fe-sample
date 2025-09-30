@@ -1,19 +1,19 @@
 package app
 
 import (
-	"image/color"
-	"time"
+    "image/color"
+    "time"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"ui_sample/internal/assets"
-	"ui_sample/internal/config"
-	cuim "ui_sample/internal/config/uimetrics"
-	"ui_sample/internal/game"
-	"ui_sample/internal/game/scenes"
-	gamesvc "ui_sample/internal/game/service"
-	uicore "ui_sample/internal/game/service/ui"
-	uinput "ui_sample/internal/game/ui/input"
+    "github.com/hajimehoshi/ebiten/v2"
+    "github.com/hajimehoshi/ebiten/v2/ebitenutil"
+    "ui_sample/internal/assets"
+    "ui_sample/internal/config"
+    cuim "ui_sample/internal/config/uimetrics"
+    "ui_sample/internal/game"
+    "ui_sample/internal/game/scenes"
+    uicore "ui_sample/internal/game/service/ui"
+    uinput "ui_sample/internal/game/ui/input"
+    ginput "ui_sample/pkg/game/input"
 )
 
 const (
@@ -23,22 +23,27 @@ const (
 
 // Game は ebiten.Game を実装し、SceneStack とコンテキスト更新、ウィンドウ管理を行います。
 type Game struct {
-	Runner     Runner
-	Input      *gamesvc.Input
-	InputR     uinput.Reader
-	Env        *scenes.Env
-	prevTime   time.Time
-	frame      uint64
-	showHelp   bool
+    Runner     Runner
+    InputSrc   ginput.Source
+    Edge       ginput.EdgeReader
+    InputR     uinput.Reader
+    Env        *scenes.Env
+    prevTime   time.Time
+    frame      uint64
+    showHelp   bool
 	reloadHold int
 }
 
 // Update は1フレーム更新します。
 func (g *Game) Update() error {
-	if g.Input != nil {
-		g.Input.Snapshot()
-	}
-	g.updateGlobalToggles()
+    var cx, cy int
+    if g.InputSrc != nil {
+        g.Edge.Step(g.InputSrc.Poll())
+        if p, ok := g.InputSrc.(interface{ Position() (int, int) }); ok {
+            cx, cy = p.Position()
+        }
+    }
+    g.updateGlobalToggles()
 
 	now := time.Now()
 	var dt float64
@@ -48,11 +53,11 @@ func (g *Game) Update() error {
 	g.prevTime = now
 	g.frame++
 	// Reader（UI向けインターフェース）をコンテキストへ供給
-	if g.InputR == nil && g.Input != nil {
-		g.InputR = uinput.WrapService(g.Input)
-	}
-	ctx := &game.Ctx{ScreenW: screenW, ScreenH: screenH, Input: g.InputR, DT: dt, Frame: g.frame}
-	return g.Runner.Update(ctx)
+    if g.InputR == nil {
+        g.InputR = uinput.WrapDomain(&g.Edge)
+    }
+    ctx := &game.Ctx{ScreenW: screenW, ScreenH: screenH, CursorX: cx, CursorY: cy, Input: g.InputR, DT: dt, Frame: g.frame}
+    return g.Runner.Update(ctx)
 }
 
 // Draw は現在の Scene を描画します。

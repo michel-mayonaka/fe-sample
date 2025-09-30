@@ -1,15 +1,15 @@
 package inventory
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	"ui_sample/internal/game"
-	gdata "ui_sample/internal/game/data"
-	"ui_sample/internal/game/scenes"
-	uiadapter "ui_sample/internal/game/ui/adapter"
-	uidraw "ui_sample/internal/game/ui/draw"
-	uinput "ui_sample/internal/game/ui/input"
-	uilayout "ui_sample/internal/game/ui/layout"
-	"ui_sample/pkg/game/geom"
+    "github.com/hajimehoshi/ebiten/v2"
+    "ui_sample/internal/game"
+    gdata "ui_sample/internal/game/data"
+    "ui_sample/internal/game/scenes"
+    uiadapter "ui_sample/internal/game/ui/adapter"
+    uidraw "ui_sample/internal/game/ui/draw"
+    uinput "ui_sample/internal/game/ui/input"
+    uilayout "ui_sample/internal/game/ui/layout"
+    "ui_sample/pkg/game/geom"
 )
 
 // WeaponRow はユーザ所持武器（耐久含む）+マスタ情報の結合行です（武器ビュー用）。
@@ -64,7 +64,7 @@ func (wvIntent) IsSceneIntent() {}
 
 func (v *WeaponView) scHandleInput(ctx *game.Ctx) []scenes.Intent {
 	intents := make([]scenes.Intent, 0, 1)
-	mx, my := ebiten.CursorPosition()
+    mx, my := ctx.CursorX, ctx.CursorY
 	// 行ホバー更新
 	v.hover = -1
 	count := 0

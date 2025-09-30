@@ -1,15 +1,15 @@
 package inventory
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	"ui_sample/internal/game"
-	gdata "ui_sample/internal/game/data"
-	"ui_sample/internal/game/scenes"
-	uiadapter "ui_sample/internal/game/ui/adapter"
-	uidraw "ui_sample/internal/game/ui/draw"
-	uinput "ui_sample/internal/game/ui/input"
-	uilayout "ui_sample/internal/game/ui/layout"
-	"ui_sample/pkg/game/geom"
+    "github.com/hajimehoshi/ebiten/v2"
+    "ui_sample/internal/game"
+    gdata "ui_sample/internal/game/data"
+    "ui_sample/internal/game/scenes"
+    uiadapter "ui_sample/internal/game/ui/adapter"
+    uidraw "ui_sample/internal/game/ui/draw"
+    uinput "ui_sample/internal/game/ui/input"
+    uilayout "ui_sample/internal/game/ui/layout"
+    "ui_sample/pkg/game/geom"
 )
 
 // ItemRow はユーザ所持アイテム（耐久）+マスタ情報の結合行です（アイテムビュー用）。
@@ -63,7 +63,7 @@ func (ivIntent) IsSceneIntent() {}
 
 func (v *ItemView) scHandleInput(ctx *game.Ctx) []scenes.Intent {
 	intents := make([]scenes.Intent, 0, 1)
-	mx, my := ebiten.CursorPosition()
+    mx, my := ctx.CursorX, ctx.CursorY
 	// 行ホバー更新
 	v.hover = -1
 	count := 0

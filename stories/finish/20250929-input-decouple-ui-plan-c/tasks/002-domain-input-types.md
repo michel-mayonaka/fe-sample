@@ -13,9 +13,9 @@
 - テスト: `pkg/game/input/..._test.go`。
 
 ## 受け入れ基準
-- [ ] `pkg/game` のビルドとテストが通る。
-- [ ] 外部パッケージへの UI 依存 import がゼロ。
-- [ ] `ControlState` の更新と等価性判定がテストで確認できる。
+- [x] `pkg/game` のビルドとテストが通る。
+- [x] 外部パッケージへの UI 依存 import がゼロ。
+- [x] `ControlState` の更新と等価性判定がテストで確認できる。
 
 ## 実装ヒント
 - `ControlState` は bool/float32 の組み合わせ（押下/アナログ軸）。
