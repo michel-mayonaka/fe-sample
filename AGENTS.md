@@ -24,6 +24,12 @@
   - サブタスクは 1 タスク=1 MD をストーリー配下 `tasks/` に作成（連番推奨）。詳細: docs/REF_STORIES.md
   - 完了/アーカイブ: `make finish-story SLUG=<slug>`（ステータスを自動で [完了] に更新）。
 
+### Discovery（Backlogコンフリクト回避）
+- 並列作業での課題発見は `stories/discovery/` に 1課題=1MD で起票。
+- コマンド: `make new-discovery SLUG=<slug> [TITLE=..] [PRIORITY=Px] [STORY=YYYYMMDD-slug]`
+- 採択時は `make promote-discovery FILE=...` で Backlog に昇格（discovery は accepted/ へ移動）。
+- 見送り時は `make decline-discovery FILE=...` で declined/ へ移動し、理由を記録。
+
 ## 命名・コーディング（要約）
 - ルール全文: docs/NAMING.md
 - コード: UpperCamel（export）/lowerCamel（internal）、初期ismは `ID/HTTP/URL` などを全大文字維持。

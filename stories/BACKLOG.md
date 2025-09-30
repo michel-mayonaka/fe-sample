@@ -17,6 +17,18 @@
 ```
 
 初期エントリ
+## [P0] 2025-09-30: provider-ui-decouple
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/accepted/20250930-183535-provider-ui-decouple.md, Story:  N/A
+
+## [P0] 2025-09-30: provider-ui-decouple
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/20250930-183535-provider-ui-decouple.md, Story:  N/A
+
 
 ## [P1] 2025-09-30: CI にストーリー検証/索引生成を統合
 - 目的: PR/Push 時に `make story-index` と最小の Story 検証（テンプレ必須項目の存在チェック）を自動実行し、索引とメタの整合性を常に維持する。

@@ -141,3 +141,16 @@ finish-story:
 .PHONY: story-index
 story-index:
 	@./scripts/gen_story_index.sh
+
+# --- Discovery ---
+.PHONY: new-discovery
+new-discovery:
+	@./scripts/new_discovery.sh
+
+.PHONY: promote-discovery
+promote-discovery:
+	@./scripts/promote_discovery.sh
+
+.PHONY: decline-discovery
+decline-discovery:
+	@./scripts/decline_discovery.sh

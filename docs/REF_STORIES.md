@@ -33,10 +33,21 @@
 - 移動時に `README.md` の先頭ステータスを `[完了]` に自動更新します（スクリプトが置換）。
 
 ## Backlog（将来のストーリー候補）運用
-- 置き場所: `stories/BACKLOG.md`（単一ファイル）。作業中に見つけた「別ストーリーにすべき改善/アイデア」を即時メモする。
+- 置き場所: `stories/BACKLOG.md`（単一ファイル）。
 - 記法: 1エントリ=1セクションで「目的/背景/DoD/関連」を簡潔に記す。重要度が高いものは上部へ。
 - 昇格フロー: 採択が決まったら `make new-story SLUG=<slug>` でストーリーを作成し、以後の管理はストーリー配下へ移す。Backlog の当該エントリは削除（必要ならストーリーREADMEの「進捗・決定事項」にリンク・経緯を移記）。
 - 見直し: セッション/週次の終わりに古い/不要エントリを整理（採否を確定し、採択済みは削除）。
+
+### Discovery（並行作業向けの衝突回避）
+- 目的: 複数ストーリーの並行作業で `stories/BACKLOG.md` への同時追記によるコンフリクトを避ける。
+- 置き場所: `stories/discovery/`（1課題=1 MD）。
+- 新規作成: `make new-discovery SLUG=<slug> [TITLE=..] [PRIORITY=P2] [STORY=YYYYMMDD-slug]`
+  - 生成物: `stories/discovery/YYYYMMDD-HHMMSS-<slug>.md`（秒精度の作成時刻を含む）
+- 採択（Backlogへ昇格）: `make promote-discovery FILE=<path> [PRIORITY=Px]`
+  - 挙動: BACKLOG にエントリを追加、`状態: [promoted]` へ更新し `stories/discovery/accepted/` へ移動。
+- 見送り（やらない判断）: `make decline-discovery FILE=<path> [REASON=..]`
+  - 挙動: `状態: [declined]` へ更新し、`stories/discovery/declined/` へ移動。理由をログに追記。
+※ Backlog 追記は「採択時のみ」とし、発見段階の共有は discovery ファイルで行う運用を推奨。
 
 ## テンプレート
 - 雛形は `stories/_TEMPLATE/README.md` に配置。
