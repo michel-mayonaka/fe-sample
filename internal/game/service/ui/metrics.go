@@ -1,3 +1,5 @@
+//go:build !headless
+
 package uicore
 
 import "github.com/hajimehoshi/ebiten/v2"

@@ -1,3 +1,5 @@
+//go:build !headless
+
 package uicore
 
 // Metrics は UI レイアウトに関わるメトリクスのセットです。

@@ -1,3 +1,5 @@
+//go:build !headless
+
 // Package uicore は UI の共通描画基盤（フォント/色/レイアウト等）を提供します。
 package uicore
 

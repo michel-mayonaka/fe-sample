@@ -15,7 +15,7 @@
 ## 受け入れ基準（Definition of Done）
 - [x] `internal/game/data.TableProvider` から `UserUnitByID` を撤去し、代替 Port/API が導入されている。
 - [x] UI 側でユーザモデルから `uicore.Unit` への変換が完結し、呼び出し元が新 API に移行している（`inventory.refreshUnitByID`）。
-- [ ] `make mcp` が成功し、影響範囲のテストがグリーン。
+- [x] `make mcp` が成功し、影響範囲のテストがグリーン（ヘッドレス環境では `TEST_TAGS=headless` を付与）。
 - [x] 必要に応じて `docs/API.md` / `docs/ARCHITECTURE.md` へ設計更新が反映されている。
 
 ## 工程（サブタスク）
@@ -30,6 +30,7 @@
 ## 進捗・決定事項（ログ）
 - 2025-09-30: ストーリー作成、Backlog から昇格。
 - 2025-09-30: Provider から `UserUnitByID` を削除。`inventory.refreshUnitByID` を `UserTable().Find` → `uicore.UnitFromUser` へ置換。関連テスト/ドキュメントを更新。
+- 2025-09-30: オフライン/ヘッドレス実行での `make mcp` 成功（`TEST_TAGS=headless` 追加、`uicore` に `headless` ビルドタグを導入）。
 
 ## リスク・懸念
 - Provider API 変更に伴う予期しない呼び出し漏れ。
