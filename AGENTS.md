@@ -20,6 +20,21 @@
  - Backlog生成: `make backlog-index`（discovery/accepted から自動生成）
  - Discovery索引: `make discovery-index`
 
+### CI/環境変数（UIビルドの扱い）
+- `MCP_STRICT`:
+  - `0`（既定/CIのmcpジョブ）: 環境依存の UI ビルド失敗（例: `X11/Xlib.h` 欠如）を検出したらスキップし、ロジック層の検証を継続。
+  - `1`（厳格）: 上記も失敗として扱う。Linux では X11/GL の開発パッケージ導入が必要。
+- `MCP_OFFLINE`: `1` で `-mod=vendor` を強制し、オフライン開発に最適化。
+
+ローカル検証の例:
+```sh
+# 非strict（既定）: mcp を通す
+make mcp
+
+# 厳格: UIも必ず検証（Linuxは依存導入後に）
+MCP_STRICT=1 make check-ui
+```
+
 ## ストーリー駆動の運用
 - 新規作成: `make new-story SLUG=<slug>` → `stories/YYYYMMDD-slug/README.md`
 - 作成フロー（要点）:
@@ -57,6 +72,10 @@
 ## Lint/テスト基準
 - Lint は `.golangci.yml` に準拠。ローカルは非必須扱いだが、可能な限り 0 issue を維持。
 - 変更時は `make mcp` を実施し、`pkg/...` と `internal/usecase` のユニットテストが通ること。
+
+### CI 方針（UI 依存）
+- `make mcp` は非strict（`MCP_STRICT=0`）で実行し、UI ビルドが環境依存で失敗する場合はスキップ。
+- 別ジョブ `ui-build-strict` で Linux に X11/GL 依存（例: `xorg-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev`）を導入し、`MCP_STRICT=1 make check-ui` を実行して UI を厳格検証。
 
 ## コミット規約（日本語・Conventional Commits）
 - 例: `feat(ui): ステータス画面にHPバーを追加`、`docs(naming): NAMING に詳細規則を追記`。

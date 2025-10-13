@@ -69,12 +69,16 @@ check-ui:
 	fi; \
 	MSG=$$(cat ._ui_build_err.log); \
 	rm -f ._ui_build_err.log; \
-	if echo "$$MSG" | grep -Eqi 'proxy\.golang\.org|Unable to locate a Java Runtime|operation not permitted'; then \
+	# 典型的な環境依存: プロキシ/Java/権限 に加え X11/GL 開発ヘッダ欠如も検出 \
+	# Linux(Ubuntu) での例: X11/Xlib.h や GL/gl.h が無い場合。 \
+	if echo "$$MSG" | grep -Eqi 'proxy\.golang\.org|Unable to locate a Java Runtime|operation not permitted|X11/Xlib\.h|GL/gl\.h|libX11|xorg|wayland|xcb|GLX|EGL'; then \
 		echo "[check-ui] 環境依存のためスキップ: $$MSG"; \
 		if [ "$$MCP_STRICT" = "1" ]; then \
 			echo "[check-ui] MCP_STRICT=1 のため失敗扱い"; \
+			echo "[check-ui] Linuxでの依存例: sudo apt-get install -y xorg-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev"; \
 			exit 1; \
 		else \
+			echo "[check-ui] 提案: 別ジョブ(ui-build-strict)で依存導入後に厳格ビルドを実行"; \
 			exit 0; \
 		fi; \
 	else \

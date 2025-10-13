@@ -46,7 +46,18 @@ make check
 CI（GitHub Actions）
 - 本リポジトリは `make mcp`（vet/build/lint）を CI で実行します。
 - Go 1.25.x を固定し、Go のビルドキャッシュ/モジュールキャッシュを保存します。
-- GUI 依存のビルドは CI 環境で失敗しうるため、既定でスキップ（`MCP_STRICT=0`）します。
+- GUI 依存の UI ビルドは環境差（特に Linux の X11/GL 開発ヘッダ不在）で失敗しうるため、既定ジョブではスキップ（`MCP_STRICT=0`）。
+- 併せて厳格ジョブ `ui-build-strict` を用意し、Linux に必要パッケージを導入して UI もビルド検証します。
+
+Linux で厳格に UI を検証したい場合（ローカル）
+```sh
+# 依存の導入（Debian/Ubuntu の例）
+sudo apt-get update && sudo apt-get install -y \
+  xorg-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev
+
+# 厳格チェック
+MCP_STRICT=1 make check-ui
+```
 
 ## 表示仕様（解像度）
 - 論理解像度: 1920×1080（`Layout`）
