@@ -11,3 +11,7 @@
 ## 成功条件（DoD）
 - 出力先の命名/階層/掃除手順が合意される。
 
+## 実装メモ（結果）
+- 出力先: `out/` に統一（`out/bin`, `out/logs`, `out/coverage`）。
+- クリーン: `make clean` を追加。
+- 無視設定: `.gitignore` に `out/` と `site/` を追加（WASM等の将来拡張に対応）。

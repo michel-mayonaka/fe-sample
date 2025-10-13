@@ -22,6 +22,23 @@ Codex へ:
 - 昇格してストーリー化したら FROM_DISCOVERY を使って `stories/discovery/consumed/` へ退避されます（Backlog からも自動で消えます）。
 - ※Codex に直接依頼して生成したストーリーはdiscoveryが存在しない形になります。
 
+## ローカル検証（codex-cloud/オフライン対応）
+- 最短スモーク（論理層のみ・vendor 前提）: `make smoke`
+- 包括検証（mcp をオフラインで実行）: `MCP_OFFLINE=1 make offline`
+- 通常（オンライン）: `make mcp`
+- UI 厳格検証（Linux で依存導入後）: `MCP_STRICT=1 make check-ui`
+
+出力は `out/` に集約（バイナリ: `out/bin/`, ログ: `out/logs/`, カバレッジ: `out/coverage/`）。詳細は `docs/CODEX_CLOUD.md`。
+
+## CI 構成（概要）
+- ジョブ: `smoke-offline` → `build-and-lint` → `ui-build-strict`
+- 目的:
+  - smoke: オフライン再現性の確認（vendor 必須）
+  - build: `make mcp`（非strict）でロジック検証＋lint
+  - ui-strict: 依存導入後の UI ビルド厳格チェック
+
+ワークフロー定義: `.github/workflows/ci.yml`
+
 ## Vibe‑kanban
 ### ストーリーの作業開始（Vibe‑kanban）
 - local で立ち上げている Vibe‑kanban にてストーリーの作業を行います（URL は環境により異なる例）。

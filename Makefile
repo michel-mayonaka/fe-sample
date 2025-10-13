@@ -4,6 +4,12 @@ SHELL := /bin/bash
 # 共通キャッシュとワークスペース設定
 GOENV_CACHE := GOMODCACHE=$(PWD)/.gomodcache GOCACHE=$(PWD)/.gocache GOWORK=off
 
+# 生成物の標準出力先を統一
+OUT_DIR ?= out
+BIN_DIR ?= $(OUT_DIR)/bin
+COVER_DIR ?= $(OUT_DIR)/coverage
+LOG_DIR ?= $(OUT_DIR)/logs
+
 # 既定は読み取り専用モード（ネットワークに出ない前提だが vendor は使わない）
 GOFLAGS_COMMON ?= -mod=readonly
 
@@ -16,12 +22,12 @@ endif
 # go/vet/build/test 実行時の共通環境
 GOENV := GOFLAGS='$(GOFLAGS_COMMON)' $(GOENV_CACHE)
 
-.PHONY: lint lint-ci fmt check check-all check-ui build run mcp test test-all
+.PHONY: lint lint-ci fmt check check-all check-ui build build-out run mcp test test-all smoke offline clean
 
 lint:
 	@mkdir -p .gocache .gomodcache
 	@if command -v golangci-lint >/dev/null 2>&1; then \
-		$(GOENV) golangci-lint run -c .golangci.yml ./... || echo "[lint] エラーがあります（CIは現状非必須）" ; \
+		$(GOENV) golangci-lint run -c .golangci.yml --build-tags "$(TEST_TAGS)" $(LINT_PKGS) || echo "[lint] エラーがあります（CIは現状非必須）" ; \
 	else \
 		echo "[lint] golangci-lint が見つからないためスキップ" ; \
 	fi
@@ -34,6 +40,7 @@ lint-ci:
 .PHONY: lint-list
 lint-list:
 	golangci-lint help linters || true
+
 
 fmt:
 	@command -v gofumpt >/dev/null 2>&1 && gofumpt -w . || true
@@ -62,14 +69,15 @@ check-ui:
 	@set -e; \
 	FAILED=0; \
 	MSG=""; \
-	$(GOENV) go build -o /dev/null ./cmd/ui_sample 2> ._ui_build_err.log || FAILED=1; \
+	mkdir -p $(LOG_DIR); \
+	$(GOENV) go build -o /dev/null ./cmd/ui_sample 2> $(LOG_DIR)/ui_build_err.log || FAILED=1; \
 	if [ $$FAILED -eq 0 ]; then \
 		echo "[check-ui] cmd/ui_sample build OK"; \
-		rm -f ._ui_build_err.log; \
+		rm -f $(LOG_DIR)/ui_build_err.log; \
 		exit 0; \
 	fi; \
-	MSG=$$(cat ._ui_build_err.log); \
-	rm -f ._ui_build_err.log; \
+	MSG=$$(cat $(LOG_DIR)/ui_build_err.log); \
+	rm -f $(LOG_DIR)/ui_build_err.log; \
 	# 典型的な環境依存: プロキシ/Java/権限 に加え X11/GL 開発ヘッダ欠如も検出 \
 	# Linux(Ubuntu) での例: X11/Xlib.h や GL/gl.h が無い場合。 \
 	if echo "$$MSG" | grep -Eqi 'proxy\.golang\.org|Unable to locate a Java Runtime|operation not permitted|X11/Xlib\.h|GL/gl\.h|libX11|xorg|wayland|xcb|GLX|EGL'; then \
@@ -88,15 +96,22 @@ check-ui:
 		exit 1; \
 	fi
 
+## --- Build & Run ----------------------------------------------------------
 # 明示ビルド（バイナリを生成）
 build:
 	go build -o bin/ui_sample ./cmd/ui_sample
+
+# 標準出力先にビルド（互換ターゲットを保ちつつ out/bin/ に集約）
+build-out:
+	@mkdir -p $(BIN_DIR)
+	$(GOENV) go build -o $(BIN_DIR)/ui_sample ./cmd/ui_sample
 
 # 実行（開発用）
 run:
 	go run ./cmd/ui_sample
 
 # ロジック層のみテスト（UI依存を避けるため pkg/... のみに限定）
+
 .PHONY: test
 test:
 	@mkdir -p .gocache .gomodcache
@@ -131,6 +146,25 @@ endif
 
 # MCP: 変更前チェック + Lint + ユニットテスト（pkg / usecase）
 mcp: check-all $(MCP_LINT_TARGET) test-all
+
+# 最小スモーク（オフライン前提の最短経路）
+smoke:
+	@echo "[smoke] offline vet/build/test (pkg + usecase)"
+	@mkdir -p .gocache .gomodcache $(OUT_DIR)
+	MCP_OFFLINE=1 $(MAKE) check
+	MCP_OFFLINE=1 $(MAKE) test
+	@echo "[smoke] OK"
+
+# オフライン開発の包括ターゲット（vendor 前提）
+offline:
+	@echo "[offline] vendor(-mod=vendor) + headless test"
+	@mkdir -p .gocache .gomodcache $(OUT_DIR)
+	MCP_OFFLINE=1 $(MAKE) mcp
+	@echo "[offline] OK"
+
+# 生成物クリーン
+clean:
+	rm -rf $(OUT_DIR) .gocache .gomodcache coverage.out coverage.* *.prof || true
 
 # 依存を vendor に同期
 .PHONY: vendor-sync

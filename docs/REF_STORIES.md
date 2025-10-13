@@ -58,7 +58,11 @@
 ## 運用ヒント
 - 1 セッション = 1〜数工程。差分は小さく、ロールバック容易に。
 - ストーリーは“目的と受け入れ基準”を先に固定。途中の仕様変更は「決定事項」に追記。
-- 実装前後で `make mcp`、必要に応じて `go test -race -cover` を実施。
+- 実装前後で検証を実施（優先度順）:
+  - `make smoke`（最短・vendor前提・論理層のみ）
+  - `MCP_OFFLINE=1 make offline`（包括・mcpをオフラインで実行）
+  - `make mcp`（オンライン通常）
+  - LinuxでUI厳格が必要な場合: `MCP_STRICT=1 make check-ui`
 
 ### 事例: UI 責務分割パターン（layout/draw/view/adapter）
 - 動機: `helper` 的な曖昧名を排し、探索性と再利用性を高める。
@@ -88,3 +92,11 @@
   - `開始: YYYY-MM-DD HH:MM:SS +0900`
   - `優先度: P0|P1|P2|P3`（Discovery で主に使用）
   - 必要に応じて `関連ストーリー:` を追記。
+
+## レビュー/マージ前チェックリスト（推奨）
+- [ ] ストーリーREADMEの DoD が満たされている
+- [ ] `make smoke` 成功（vendor 前提で再現可能）
+- [ ] `MCP_OFFLINE=1 make offline` 成功（必要な場合）
+- [ ] `make mcp` 成功（CIと同等）
+- [ ] UI 変更を含む場合は `MCP_STRICT=1 make check-ui` の結果を確認（Linux依存）
+- [ ] `docs/` への設計背景や手順の追記が行われている

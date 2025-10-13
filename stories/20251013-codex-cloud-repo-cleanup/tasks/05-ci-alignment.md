@@ -11,3 +11,7 @@
 ## 成功条件（DoD）
 - CI のフロー図（簡易）が README/Docs に反映される。
 
+## 実装メモ（結果）
+- GitHub Actions に `smoke-offline` ジョブを追加（`MCP_OFFLINE=1 make smoke`）。
+- 既存 `build-and-lint` は `smoke-offline` 依存に変更。`ui-build-strict` は従来どおり後続で厳格検証。
+- README に CI フロー（依存関係）を追記。

@@ -12,6 +12,13 @@ make vendor-sync   # go mod tidy && go mod vendor
 ## 実行（オフライン環境）
 - GOPROXY を無効化し、ベンダーモードで実行します。
 ```sh
+# 最短スモーク（論理層のみ）
+make smoke
+
+# 包括（mcp をオフラインで実行）
+MCP_OFFLINE=1 make offline
+
+# 直接 mcp を実行する場合（同等）
 GOPROXY=off MCP_OFFLINE=1 make mcp
 ```
 

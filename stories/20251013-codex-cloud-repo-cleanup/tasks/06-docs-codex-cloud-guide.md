@@ -11,3 +11,6 @@
 ## 成功条件（DoD）
 - README または `docs/CODEX_CLOUD.md` に必要情報がまとまっている。
 
+## 実装メモ（結果）
+- 新規: `docs/CODEX_CLOUD.md` を追加（環境変数、最短手順、出力/クリーン、トラブルシュート）。
+- README に `smoke/offline` の使い方と CI フロー追記。

@@ -10,6 +10,7 @@
 - ワークフロー: docs/WORKFLOW.md
 - DB メモ: docs/DB_NOTES.md
 - ルート概要: README.md
+ - codex-cloud 実行: docs/CODEX_CLOUD.md
 
 ## よく使うコマンド
 - 検証一式: `make mcp`（vet/build/lint/test を実行）
@@ -19,6 +20,9 @@
 - ビルド: `go build -o bin/ui_sample ./cmd/ui_sample`
  - Backlog生成: `make backlog-index`（discovery/accepted から自動生成）
  - Discovery索引: `make discovery-index`
+ - スモーク（最短）: `make smoke`
+ - オフライン包括: `MCP_OFFLINE=1 make offline`
+ - 生成物クリーン: `make clean`
 
 ### CI/環境変数（UIビルドの扱い）
 - `MCP_STRICT`:

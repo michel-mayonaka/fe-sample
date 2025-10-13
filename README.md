@@ -1,5 +1,8 @@
 # Ebiten UI Sample — FE風ステータス画面
 
+[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+※ GitHub へ公開後、`OWNER/REPO` を実リポジトリに置換してください。
+
 ファイアーエムブレムのステータス画面風 UI を Ebiten で描画する最小サンプルです。画像や外部フォントは使わず、`basicfont` とベクタ描画のみで構成しています。
 
 ## 要件
@@ -48,6 +51,18 @@ CI（GitHub Actions）
 - Go 1.25.x を固定し、Go のビルドキャッシュ/モジュールキャッシュを保存します。
 - GUI 依存の UI ビルドは環境差（特に Linux の X11/GL 開発ヘッダ不在）で失敗しうるため、既定ジョブではスキップ（`MCP_STRICT=0`）。
 - 併せて厳格ジョブ `ui-build-strict` を用意し、Linux に必要パッケージを導入して UI もビルド検証します。
+
+### CI フロー（概要）
+- `smoke-offline`（新規）: `MCP_OFFLINE=1 make smoke` を実行し、vendor 前提でのオフライン再現性を検証。
+- `build-and-lint`: `make mcp` を実行。非strictで UI 依存はスキップ検知、`golangci-lint` 実行。
+- `ui-build-strict`: Linux に依存導入後、`MCP_STRICT=1 make check-ui` で UI を厳格ビルド。
+
+依存関係: `smoke-offline` → `build-and-lint` → `ui-build-strict`
+
+```
+smoke-offline  -->  build-and-lint  -->  ui-build-strict
+    (vendor/検証)      (mcp/lint)             (UI厳格)
+```
 
 Linux で厳格に UI を検証したい場合（ローカル）
 ```sh
@@ -130,5 +145,14 @@ MCP_STRICT=1 make check-ui
 - 一度オンラインで `make vendor-sync` を実行して `vendor/` を更新し、コミットします。
 - 以降はオフラインで以下を実行できます。
 ```sh
+# 最短スモーク（論理層のみ）
+make smoke
+
+# 包括検証（mcp をオフラインで実行）
+MCP_OFFLINE=1 make offline
+
+# 直接 mcp を実行する場合（同等）
 GOPROXY=off MCP_OFFLINE=1 make mcp
 ```
+
+codex-cloud 環境の詳細手順は `docs/CODEX_CLOUD.md` を参照してください。

@@ -13,6 +13,8 @@ Thumbs.db
 bin/
 dist/
 build/
+out/
+site/
 coverage.out
 coverage.*
 *.prof

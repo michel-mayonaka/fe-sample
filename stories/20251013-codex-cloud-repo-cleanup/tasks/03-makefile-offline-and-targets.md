@@ -11,3 +11,7 @@
 ## 成功条件（DoD）
 - オフライン状態でも `make smoke` が成功する設計案が提示される。
 
+## 実装メモ（結果）
+- 追加: `make smoke`, `make offline`, `make clean`, `make build-out`（出力 `out/` 集約）。
+- `.gitignore` に `out/`/`site/` を追加。
+- 検証: `make smoke` と `MCP_OFFLINE=1 make offline` が成功（2025-10-13）。

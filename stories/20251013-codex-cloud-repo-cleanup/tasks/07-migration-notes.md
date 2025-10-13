@@ -11,3 +11,6 @@
 ## 成功条件（DoD）
 - 既存ブランチでの移行に詰まらないこと。
 
+## 実装メモ（結果）
+- 追加: `docs/MIGRATION_20251013_CODEX_CLOUD.md`（置き換え表・注意点）。
+- 参照: `docs/CODEX_CLOUD.md`, `docs/OFFLINE.md`, `.github/workflows/ci.yml`。
