@@ -30,5 +30,8 @@ go.work
 # Artifacts (検証/保存物など)
 artifacts/
 
+# WASM/Pages 出力（CI で生成し成果物として配布）
+site/
+
 # Local user DB override (任意運用)
 db/user/*_local.json

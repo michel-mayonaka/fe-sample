@@ -18,6 +18,18 @@
 
 初期エントリ
 
+## [P1] 2025-10-13: データ永続化のDB化（SQLite への移行）
+- 目的: JSON 直読みの構成を段階的に廃し、SQLite による一貫した読み書き・整合性・検索性を確保する（将来の拡張・整備容易性向上）。
+- 背景: 現状は `os.Open` による JSON I/O 前提で、WASM（ブラウザ）では直接読み込み不可。整合性/同時更新/検索性が弱く、将来的なデータ拡張に制約がある。
+- DoD:
+  - 内部実装に `internal/infra/sqlite` を新設し、`db/master`/`db/user` 相当のスキーマを SQLite へ定義（DDL/マイグレーション初期化）。
+  - 既存 JSON→SQLite 変換ユーティリティを追加（`make migrate-json-to-sqlite` など）。
+  - Repo 層を抽象化し、JSON バックエンド（`internal/infra/userfs`）と SQLite バックエンドの差し替えが可能。
+  - CI/ローカルで SQLite バックエンドを用いた `make test-all` がグリーン。
+  - Web（WASM）向けは第1段階として「読み取り専用」の代替手段（例: `embed`/HTTP fetch で JSON を供給 or wasm-sqlite）を方針化し README に明記（将来、wasm 対応 SQLite は別エントリで最適解を選定）。
+  - ドキュメント更新（`docs/DB_NOTES.md` にスキーマ/移行方針、`README.md` に実行方法）。
+- 参考/関連: `docs/DB_NOTES.md`、`internal/infra/userfs`（現行JSON I/F）、`stories/20251013-gh-pages-webgl-demo`（WASM における読み取り方式の検討）
+
 ## [P1] 2025-10-13: codex-cloud 環境対応のリポジトリ整理
 - 目的: codex-cloud 環境（GUIなし/ネットワーク制限ありでも可）で安定して作業・検証できるよう最小構成を整える。
 - 背景: 現状は UI ビルドや依存取得が環境依存となりやすく、`MCP_OFFLINE`/`headless` 運用や vendor 前提の手順が明文化/自動化されていない。
