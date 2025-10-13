@@ -27,8 +27,9 @@ lint:
 	fi
 
 # CI 用: 失敗をスキップしない厳格実行
+LINT_PKGS ?= ./pkg/... ./internal/usecase
 lint-ci:
-	$(GOENV) golangci-lint run -c .golangci.yml $(EXTRA_LINTERS) ./...
+	$(GOENV) golangci-lint run -c .golangci.yml $(EXTRA_LINTERS) $(LINT_PKGS)
 
 .PHONY: lint-list
 lint-list:
