@@ -61,6 +61,7 @@ check-ui:
 	@set -e; \
 	FAILED=0; \
 	MSG=""; \
+	HINT_X11="sudo apt-get update && sudo apt-get install -y xorg-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev"; \
 	$(GOENV) go build -o /dev/null ./cmd/ui_sample 2> ._ui_build_err.log || FAILED=1; \
 	if [ $$FAILED -eq 0 ]; then \
 		echo "[check-ui] cmd/ui_sample build OK"; \
@@ -69,12 +70,23 @@ check-ui:
 	fi; \
 	MSG=$$(cat ._ui_build_err.log); \
 	rm -f ._ui_build_err.log; \
-	if echo "$$MSG" | grep -Eqi 'proxy\.golang\.org|Unable to locate a Java Runtime|operation not permitted'; then \
+	if echo "$$MSG" | grep -Eqi 'X11/Xlib.h|GL/gl.h|libX11|xorg|wayland|xcb|GLX|EGL'; then \
 		echo "[check-ui] 環境依存のためスキップ: $$MSG"; \
+		echo "[check-ui] Linux での依存導入例: $$HINT_X11"; \
 		if [ "$$MCP_STRICT" = "1" ]; then \
-			echo "[check-ui] MCP_STRICT=1 のため失敗扱い"; \
+			echo "[check-ui] MCP_STRICT=1 のため失敗扱い（UI 依存のビルドを修正してください）"; \
 			exit 1; \
 		else \
+			echo "[check-ui] 提案: GitHub Actions の ui-build-strict ジョブで依存導入後のビルドを確認できます"; \
+			exit 0; \
+		fi; \
+	elif echo "$$MSG" | grep -Eqi 'proxy\.golang\.org|Unable to locate a Java Runtime|operation not permitted'; then \
+		echo "[check-ui] 環境依存のためスキップ: $$MSG"; \
+		if [ "$$MCP_STRICT" = "1" ]; then \
+			echo "[check-ui] MCP_STRICT=1 のため失敗扱い（ネットワークや依存を整備してから再実行してください）"; \
+			exit 1; \
+		else \
+			echo "[check-ui] 提案: ネットワークや依存を整えてから再実行してください"; \
 			exit 0; \
 		fi; \
 	else \
