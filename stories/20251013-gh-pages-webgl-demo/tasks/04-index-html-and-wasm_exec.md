@@ -1,5 +1,7 @@
 # 04 ローダ HTML と `wasm_exec.js`
 
+ステータス: [完了]
+
 ## 目的
 ブラウザで WASM を起動する最小の `index.html` と `wasm_exec.js` の取り扱いを確定する。
 
@@ -17,3 +19,6 @@
 - ローカル `site/index.html` で WASM 起動を確認できる。
 - GitHub Pages で同一構成がそのまま動作する。
 
+## 実装
+- `web/index.html` を追加し、`make site` 時に `site/index.html` として配置。
+- `instantiateStreaming` 不可時のフォールバック実装済み。

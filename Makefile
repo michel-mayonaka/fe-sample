@@ -161,8 +161,8 @@ site: wasm
 	@# ローダHTML（テンプレ）を配置
 	@[ -f web/index.html ] && cp web/index.html $(WASM_INDEX) || echo "[site] web/index.html が無いためスキップ"
 	@# 画像等のアセットを公開用にコピー
-	@mkdir -p $(WASM_OUT)/assets
-	@cp -R assets/* $(WASM_OUT)/assets/ 2>/dev/null || true
+	@rm -rf $(WASM_OUT)/assets && mkdir -p $(WASM_OUT)/assets
+	@if [ -f assets/01_iris.png ]; then cp assets/01_iris.png $(WASM_OUT)/assets/; else cp -R assets/* $(WASM_OUT)/assets/ 2>/dev/null || true; fi
 	@# GitHub Pages の Jekyll 無効化
 	touch $(WASM_OUT)/.nojekyll
 	@echo "[site] generated in $(WASM_OUT)"
