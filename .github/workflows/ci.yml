@@ -69,6 +69,7 @@ jobs:
         env:
           EXTRA_LINTERS: ${{ github.event.inputs.extra_linters }}
           GOFLAGS: -mod=readonly
+          TEST_TAGS: headless
         run: |
           # 追加の厳格ルールは必要時に有効化できます（例: funlen/gocognit/cyclop）
           # EXTRA_LINTERS='-E funlen -E gocognit -E cyclop' make mcp
