@@ -18,6 +18,18 @@
 
 初期エントリ
 
+## [P1] 2025-10-13: codex-cloud 環境対応のリポジトリ整理
+- 目的: codex-cloud 環境（GUIなし/ネットワーク制限ありでも可）で安定して作業・検証できるよう最小構成を整える。
+- 背景: 現状は UI ビルドや依存取得が環境依存となりやすく、`MCP_OFFLINE`/`headless` 運用や vendor 前提の手順が明文化/自動化されていない。
+- DoD: codex-cloud 上で `MCP_OFFLINE=1 make mcp` が成功（vendor 前提・headless タグで lint/test）。`AGENTS.md`/`README.md` に codex-cloud 手順（環境変数/スキップ条件/検証コマンド）を追記。スクリプトの入出力先はワークスペース配下のみを使用。
+- 参考/関連: `stories/20251013-ci-mcp-gha-mcp-fix`（CIのheadless/lint方針と整合）
+
+## [P1] 2025-10-13: GitHub Pages で WebGL デモを公開
+- 目的: ブラウザで動作確認できる公開デモを用意し、レビュー/共有を容易にする。
+- 背景: ローカル環境構築なしで UI を確認したい要望がある。Ebiten は WebAssembly + WebGL で動作可能。
+- DoD: CI で `GOOS=js GOARCH=wasm` ビルド（`ui_sample.wasm`）と `wasm_exec.js`/`index.html` を生成し、`gh-pages` ブランチへデプロイ。GitHub Pages を有効化し、`README.md` に確認用 URL と更新手順を追記。
+- 参考/関連: `.github/workflows/ci.yml`（デプロイ用ワークフロー追加）、`cmd/ui_sample`（Web向けエントリの最小調整が必要な場合あり）
+
 ## [P1] 2025-10-13: CI を事前依存込みのコンテナに統一（X11/GL 付き）
 - 目的: apt の都度インストールによるジョブ遅延を解消し、UI ビルドの再現性を強化する。
 - 背景: Ebiten/GLFW の Linux ビルドには X11/GL 開発パッケージが必要。現在は Actions 上で毎回 `apt-get install` を行っており 30–90 秒のオーバーヘッドが発生。
