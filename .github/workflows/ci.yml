@@ -53,10 +53,11 @@ jobs:
       - name: Tidy modules (ensure consistency)
         run: go mod tidy
 
-      - name: Install golangci-lint
+      - name: Install golangci-lint v2
         run: |
-          GOBIN="$PWD/bin" go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          GOBIN="$PWD/bin" go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
           echo "$PWD/bin" >> $GITHUB_PATH
+          "$PWD/bin/golangci-lint" version
 
       - name: Make MCP (vet/build/lint)
         env:
