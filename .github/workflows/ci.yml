@@ -66,3 +66,46 @@ jobs:
           # 追加の厳格ルールは必要時に有効化できます（例: funlen/gocognit/cyclop）
           # EXTRA_LINTERS='-E funlen -E gocognit -E cyclop' make mcp
           make mcp
+
+  ui-build-strict:
+    needs: build-and-lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GOCACHE: ${{ github.workspace }}/.gocache
+      GOMODCACHE: ${{ github.workspace }}/.gomodcache
+      GOWORK: off
+      MCP_STRICT: "1"
+      CI: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+          cache: true
+
+      - name: Install X11/GL build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xorg-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libasound2-dev
+
+      - name: Cache build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .gocache
+            .gomodcache
+          key: ${{ runner.os }}-go-ui-${{ hashFiles('**/go.mod') }}-${{ hashFiles('**/go.sum') }}-${{ hashFiles('.golangci.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-go-ui-
+
+      - name: Download modules
+        run: go mod download
+
+      - name: Strict UI build
+        env:
+          GOFLAGS: -mod=readonly
+        run: make check-ui
