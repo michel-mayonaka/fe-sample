@@ -36,6 +36,10 @@ make check
 
 ## Lint（golangci-lint）
 - インストール（macOS/Homebrew 例）: `brew install golangci-lint`
+- Go 公式バイナリから導入する場合: `go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest`
+- 古い golangci-lint バイナリで `the Go language version ... used to build golangci-lint is lower than the targeted Go version`
+  と表示された場合は、例として `GOBIN="$PWD/bin" go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest`
+  で再インストールしてください（`make lint` / `make lint-ci` でも同じ案内が表示されます）。
 - 実行: `make lint` または `golangci-lint run`
 - 整形: `make fmt`
 
@@ -46,7 +50,9 @@ make check
 CI（GitHub Actions）
 - 本リポジトリは `make mcp`（vet/build/lint）を CI で実行します。
 - Go 1.25.x を固定し、Go のビルドキャッシュ/モジュールキャッシュを保存します。
-- GUI 依存のビルドは CI 環境で失敗しうるため、既定でスキップ（`MCP_STRICT=0`）します。
+- GUI 依存のビルド/リンタは既定ジョブ（`build-and-lint`）では `MCP_STRICT=0` のため、環境依存エラーを検出した場合にスキップします。
+- UI ビルド用に X11/GL 依存パッケージを導入した `ui-build-strict` ジョブを追加し、`MCP_STRICT=1 make check-ui` と `make lint-ci` を実行して厳格に検証します。
+- ローカルでも同様に `MCP_STRICT=1 make check-ui` で厳格チェックを行えます（依存が無い場合はヘルプ付きで失敗します）。
 
 ## 表示仕様（解像度）
 - 論理解像度: 1920×1080（`Layout`）
@@ -85,7 +91,11 @@ CI（GitHub Actions）
   - 外部コントローラを一旦外して起動、改善後に接続
   - それでも改善しない場合: `go clean -modcache && go mod tidy`
 - Linux でビルド失敗
-  - 必要パッケージ例（Debian/Ubuntu）: `sudo apt-get install -y libx11-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev libasound2-dev`
+  - 再現手順（ヘッドレス Ubuntu など X11 開発ヘッダが無い環境）
+    1. `docker run --rm -it -v "$PWD":/work -w /work golang:1.25 bash`
+    2. `go build ./cmd/ui_sample`
+    3. `fatal error: X11/Xlib.h: No such file or directory` が表示されれば再現成功
+  - 必要パッケージ例（Debian/Ubuntu）: `sudo apt-get install -y xorg-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libasound2-dev`
 
 ## 画像の追加（ポートレート表示）
 - `assets/01_iris.png` を配置すると、左上のポートレート枠に表示されます。

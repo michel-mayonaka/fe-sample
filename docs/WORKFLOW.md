@@ -33,3 +33,13 @@ Codex へ:
 ```
 - 作業の中で新たな提案や分割して実行するタスクやストーリーが発生した場合はVibe‑kanban内で稼働しているCodexが `stories/discovery/` に自動的に内容を追加してくれます。
 - 作業が完了したらレビューを行い問題なければマージを行なってください。
+
+## CI と `make mcp`
+- GitHub Actions では `build-and-lint` ジョブが `make mcp` を実行します。
+  - `MCP_STRICT=0`（既定）で `make check-ui` と `make lint-ci` を呼び出し、X11/GL など環境依存エラーを検知した場合はスキップ扱いにします。
+  - オフライン対応が必要な場合は `MCP_OFFLINE=1` を指定し、`GOFLAGS=-mod=vendor` に切り替えます。
+- UI ビルド/リンタの品質担保のため、`ui-build-strict` ジョブで `sudo apt-get install -y xorg-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev` を導入し、`MCP_STRICT=1 make check-ui` と `make lint-ci` を厳格に実行します。
+- ローカルでも `MCP_STRICT=1 make check-ui` を使うと同じヘルプメッセージが出力されるため、依存導入の目安になります。
+- golangci-lint 実行時に `the Go language version ... used to build golangci-lint is lower than the targeted Go version`
+  と表示された場合は、`GOBIN="$PWD/bin" go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest`
+  などで新しいバイナリを導入してください（`make lint-ci` が検出した場合はヒント付きでスキップします）。
