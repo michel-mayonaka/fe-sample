@@ -4,6 +4,7 @@ run:
   go: "1.25"
   tests: true
   modules-download-mode: readonly
+  build-tags: headless
 
 linters:
   disable-all: true
