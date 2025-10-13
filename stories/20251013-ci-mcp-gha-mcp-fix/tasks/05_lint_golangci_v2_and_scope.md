@@ -15,6 +15,7 @@
 ## 変更内容
 - `.github/workflows/ci.yml`: `github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest` をインストール。
 - `Makefile`: `LINT_PKGS ?= ./pkg/... ./internal/usecase` を導入し、`lint-ci` に適用。
+- `.golangci.yml`: `run.build-tags: headless` を追加し、ヘッドレス型定義（`uicore`）で型チェック可能に。
 
 ## 作業ログ
 - 2025-10-13 21:18:30 +0900: v2 を明示インストールし、バージョン表示で確認（IOP=++）
@@ -23,4 +24,3 @@
 ## 成果物リンク
 - `.github/workflows/ci.yml`
 - `Makefile`
-
