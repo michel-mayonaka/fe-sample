@@ -37,6 +37,7 @@
 - 2025-10-13 21:07:35 +0900: 作業開始。Makefile の `check-ui` 拡張、CI ジョブ追加、Docs 更新を実施。（IOP=++）
 - 2025-10-13 21:15:00 +0900: `ui-build-strict` ジョブを追加（apt で X11/GL 依存導入→ `MCP_STRICT=1 make check-ui`）。README/AGENTS に CI 方針追記。（IOP=++）
 - 2025-10-13 21:20:00 +0900: `build-and-lint` 失敗を受け、golangci-lint v2 を明示インストール。さらに `lint-ci` 対象を `./pkg/... ./internal/usecase` に限定して UI 依存の型チェックを回避。（IOP=++）
+- 2025-10-13 21:30:00 +0900: `build-and-lint` に X11/GL 開発パッケージの apt 導入ステップを追加（libx11-dev ほか）。当面はこの形で運用、将来はコンテナ化へ（Backlog 登録）。（IOP=++）
 
 ## リスク・懸念
 - 例: 依存の変更、CI制約 など

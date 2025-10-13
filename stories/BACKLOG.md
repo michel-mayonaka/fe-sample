@@ -18,6 +18,12 @@
 
 初期エントリ
 
+## [P1] 2025-10-13: CI を事前依存込みのコンテナに統一（X11/GL 付き）
+- 目的: apt の都度インストールによるジョブ遅延を解消し、UI ビルドの再現性を強化する。
+- 背景: Ebiten/GLFW の Linux ビルドには X11/GL 開発パッケージが必要。現在は Actions 上で毎回 `apt-get install` を行っており 30–90 秒のオーバーヘッドが発生。
+- DoD: `build-and-lint`/`ui-build-strict` を `container.image: ghcr.io/<org>/<repo>/go1.25-x11:<tag>` に切替。ワークフローから apt ステップを撤去。README/AGENTS にコンテナ運用を追記。フォールバック手順（apt 直導入）も記載。
+- 参考/関連: `stories/20251013-ci-mcp-gha-mcp-fix`（暫定の apt インストールで回避中）
+
 ## [P0] 2025-09-30: Provider から UI 型依存を分離（Port/Adapter 再整理）
 - （簡潔に）
   （[→ Discovery](stories/discovery/accepted/20250930-183535-provider-ui-decouple.md)）
@@ -145,4 +151,3 @@
   （[→ Discovery](stories/discovery/accepted/2025-09-29-migrated-17.md)）
 - view-model を `PortraitPath` に寄せる設計案の比較と方針確定（採用/見送りの記録）\n- CI で `make test-all-ui` を追加ジョブとして実行\n
   （[→ Discovery](stories/discovery/accepted/2025-09-29-migrated-17.md)）
-
