@@ -1,6 +1,6 @@
 # 2025-10-13 — GitHub Pages で WebGL デモを公開（`20251013-gh-pages-webgl-demo`）
 
-- 状態: 準備完了
+- 状態: 進行中
 - 作成: 2025-10-13
 - オーナー: TBD
 - 関連: README.md, docs/ARCHITECTURE.md, docs/NAMING.md, docs/REF_STORIES.md, docs/WORKFLOW.md

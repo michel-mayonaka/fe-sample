@@ -138,6 +138,43 @@ vendor-sync:
 	go mod tidy
 	go mod vendor
 
+# --- WASM / Pages site ------------------------------------------------------
+WASM_OUT ?= site
+WASM_BIN := $(WASM_OUT)/ui_sample.wasm
+WASM_EXEC_JS := $(WASM_OUT)/wasm_exec.js
+WASM_INDEX := $(WASM_OUT)/index.html
+# Go 1.21+ では misc から lib に移動しているため両方を考慮
+WASM_EXEC_SRC := $(shell if [ -f "$$(go env GOROOT)/lib/wasm/wasm_exec.js" ]; then echo "$$(go env GOROOT)/lib/wasm/wasm_exec.js"; else echo "$$(go env GOROOT)/misc/wasm/wasm_exec.js"; fi)
+
+.PHONY: wasm site site-clean serve-site
+
+# WebAssembly ビルド（Ebitengine WebGL）
+wasm:
+	@mkdir -p $(WASM_OUT)
+	@echo "[wasm] building $(WASM_BIN)"
+	GOOS=js GOARCH=wasm $(GOENV) go build -ldflags "-s -w" -o $(WASM_BIN) ./cmd/ui_sample
+	@# wasm_exec.js を Go 付属から複製
+	cp $(WASM_EXEC_SRC) $(WASM_EXEC_JS)
+
+# サイト生成（ローダHTMLとアセットを含む）
+site: wasm
+	@# ローダHTML（テンプレ）を配置
+	@[ -f web/index.html ] && cp web/index.html $(WASM_INDEX) || echo "[site] web/index.html が無いためスキップ"
+	@# 画像等のアセットを公開用にコピー
+	@mkdir -p $(WASM_OUT)/assets
+	@cp -R assets/* $(WASM_OUT)/assets/ 2>/dev/null || true
+	@# GitHub Pages の Jekyll 無効化
+	touch $(WASM_OUT)/.nojekyll
+	@echo "[site] generated in $(WASM_OUT)"
+
+# 生成物クリア
+site-clean:
+	rm -rf $(WASM_OUT)
+
+# 簡易サーバ（ローカル確認用）
+serve-site: site
+	@echo "[serve-site] http://localhost:8000 で提供します (CTRL+C で停止)"
+	python3 -m http.server -d $(WASM_OUT) 8000
 # --- Stories ---
 .PHONY: new-story
 new-story:

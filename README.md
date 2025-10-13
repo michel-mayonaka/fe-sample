@@ -43,6 +43,12 @@ make check
 - 既定（ロジック/ユースケースのみ）: `make test-all`
 - UI 関連含む（adapter/levelup 等）: `make test-all-ui`
 
+## WebGL デモ（WASM / GitHub Pages）
+- ローカル生成: `make site`（`site/` に `ui_sample.wasm` と `wasm_exec.js`、ローダ `index.html` を出力。`assets/` もコピー）
+- ローカル確認: `make serve-site` → `http://localhost:8000` を開く
+- CI 配信: `main` へ push すると GitHub Pages 環境へ自動デプロイ（`.github/workflows/pages.yml`）
+- 公開URL: GitHub Actions の Pages 成果物 URL を参照（リポジトリの Pages 設定が有効であること）
+
 CI（GitHub Actions）
 - 本リポジトリは `make mcp`（vet/build/lint）を CI で実行します。
 - Go 1.25.x を固定し、Go のビルドキャッシュ/モジュールキャッシュを保存します。
