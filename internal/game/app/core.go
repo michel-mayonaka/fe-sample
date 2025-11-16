@@ -1,49 +1,61 @@
 package app
 
 import (
-    "math/rand"
-    "time"
+	"math/rand"
+	"time"
 
-    "github.com/hajimehoshi/ebiten/v2"
-    "ui_sample/internal/config"
-    cuim "ui_sample/internal/config/uimetrics"
-    "ui_sample/internal/game"
-    gdata "ui_sample/internal/game/data"
-    "ui_sample/internal/game/scenes"
-    characterlist "ui_sample/internal/game/scenes/character_list"
-    uicore "ui_sample/internal/game/service/ui"
-    uiadapter "ui_sample/internal/game/ui/adapter"
-    ebiteninput "ui_sample/internal/game/provider/input/ebiten"
-    uinput "ui_sample/internal/game/ui/input"
-    "ui_sample/internal/repo"
-    "ui_sample/internal/usecase"
-    ginput "ui_sample/pkg/game/input"
+	"github.com/hajimehoshi/ebiten/v2"
+	"ui_sample/internal/config"
+	cuim "ui_sample/internal/config/uimetrics"
+	"ui_sample/internal/game"
+	gdata "ui_sample/internal/game/data"
+	"ui_sample/internal/game/scenes"
+	characterlist "ui_sample/internal/game/scenes/character_list"
+	uicore "ui_sample/internal/game/service/ui"
+	uiadapter "ui_sample/internal/game/ui/adapter"
+	ebiteninput "ui_sample/internal/game/provider/input/ebiten"
+	uinput "ui_sample/internal/game/ui/input"
+	"ui_sample/internal/repo"
+	"ui_sample/internal/usecase"
+	ginput "ui_sample/pkg/game/input"
 )
 
 // NewUIAppGame は UI サンプル用にポートを注入し SceneStack を構築した ebiten.Game を返します。
 func NewUIAppGame() *Game {
-    // 乱数と入力
-    rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-    layout := ginput.DefaultLayout()
-    // 互換: Backspace も Menu に割当
-    layout.Keyboard[ginput.KeyBackspace] = ginput.ActionMenu
-    src := ebiteninput.NewSource(layout)
+	// 乱数と入力
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	layout := ginput.DefaultLayout()
+	// 互換: Backspace も Menu に割当
+	layout.Keyboard[ginput.KeyBackspace] = ginput.ActionMenu
+	src := ebiteninput.NewSource(layout)
 
-    // ユーザパス
-    userPath := config.DefaultUserPath
+	// ユーザパス
+	userPath := config.DefaultUserPath
 
 	// Ports（JSON）を注入して App を生成
-	urepo, _ := repo.NewJSONUserRepo(userPath)
-	wrepo, _ := repo.NewJSONWeaponsRepo(config.DefaultWeaponsPath)
-	inv, _ := repo.NewJSONInventoryRepo(config.DefaultUserWeaponsPath, config.DefaultUserItemsPath, config.DefaultWeaponsPath, "db/master/mst_items.json")
-    a := usecase.New(urepo, wrepo, inv, rng)
-    // Provider を App に差し替え
-    gdata.SetProvider(a)
-    // 一覧（Provider 経由で構築）
-    units := uiadapter.BuildUnitsFromProvider(uiadapter.AssetsPortraitLoader{})
-    if len(units) == 0 {
-        units = []uicore.Unit{uicore.SampleUnit()}
-    }
+	// NOTE: JSON ロードに失敗した場合（例: WebGL 環境）でも panic しないように、
+	// エラー時はインターフェースを nil にしてデモ用ユニットで動作させる。
+	var urepo repo.UserRepo
+	if r, err := repo.NewJSONUserRepo(userPath); err == nil {
+		urepo = r
+	}
+	var wrepo repo.WeaponsRepo
+	if r, err := repo.NewJSONWeaponsRepo(config.DefaultWeaponsPath); err == nil {
+		wrepo = r
+	}
+	var inv repo.InventoryRepo
+	if r, err := repo.NewJSONInventoryRepo(config.DefaultUserWeaponsPath, config.DefaultUserItemsPath, config.DefaultWeaponsPath, "db/master/mst_items.json"); err == nil {
+		inv = r
+	}
+	a := usecase.New(urepo, wrepo, inv, rng)
+	// Provider を App に差し替え
+	gdata.SetProvider(a)
+	// 一覧（Provider 経由で構築）
+	units := uiadapter.BuildUnitsFromProvider(uiadapter.AssetsPortraitLoader{})
+	if len(units) == 0 {
+		// ユーザデータが取得できない環境（例: WebGL デモ版）ではサンプルユニットのみで起動する。
+		units = []uicore.Unit{uicore.SampleUnit()}
+	}
 
 	// 画面メトリクス初期化（基準解像度 + 外部メトリクス適用）
 	uicore.SetBaseResolution(screenW, screenH)

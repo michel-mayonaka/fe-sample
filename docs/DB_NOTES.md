@@ -11,3 +11,14 @@
 - 合成方針: `masters_characters` をベースに `users_*` で上書き（LEFT JOIN）。
 - マイグレーション: 初回起動時にテーブル作成→マスタJSONをロード→ユーザJSONをインポート。
 - 将来タスク: DAO層（`internal/repo`）追加、トランザクション境界設計、自動保存/スナップショット。
+
+## プラットフォーム別の扱い（デスクトップ / WebGL）
+
+- デスクトップ（Windows/macOS 等）:
+  - 現状: マスタ/ユーザともに JSON バックエンド（`db/master/*.json`, `db/user/*.json`）を `JSON*Repo` 経由で読み書き。
+  - 将来方針: 上記スキーマに沿って SQLite へ移行し、`SQLiteUserRepo`/`SQLiteMasterRepo` のような実装を `internal/repo` に追加する。
+- WebGL（wasm）:
+  - 現状: ユーザデータの永続化は行わず、「デモ版」としてサンプルデータのみで起動する（ユーザRepo初期化に失敗しても panic せず、サンプルユニットで動作）。
+  - 将来候補:
+    - 簡易セーブが欲しくなった場合は、`BrowserUserRepo` のようなインターフェース実装を追加し、`localStorage`/`IndexedDB` 上に JSON を保存する案を検討する。
+    - WebGL で SQLite を使う場合は、メモリDB＋ブラウザストレージへのスナップショット保存など、専用 Story/Discovery で別途検討する。
