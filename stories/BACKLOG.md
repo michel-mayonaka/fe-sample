@@ -17,17 +17,23 @@
 ```
 
 初期エントリ
+## [P2] 2025-11-17: db/userをリポジトリ管理外にする
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/20251117-014940-db-user-untracked.md, Story:  20251117-webgl-dark-screen
+
+## [P2] 2025-11-17: WebGL用のサンプルデータ追加
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/20251117-014752-webgl-sample-data.md, Story:  20251117-webgl-dark-screen
+
 ## [P2] 2025-11-17: 画面仕様の新規作成（タイトル/編成/バトルマップ）
 - 目的: （discovery参照）
 - 背景: （discovery参照）
 - DoD: （discoveryの DoD候補を要約 or 後続で具体化）
 - 参考/関連: stories/discovery/20251117-010944-ui-spec-new-screens.md, Story:  N/A
-
-## [P1] 2025-11-17: WebGLビルドが暗転したままになる不具合調査
-- 目的: （discovery参照）
-- 背景: （discovery参照）
-- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
-- 参考/関連: stories/discovery/20251117-010944-webgl-dark-screen.md, Story:  N/A
 
 ## [P1] 2025-11-17: workflowからスクリプト化候補を洗い出す workflow
 - 目的: （discovery参照）
@@ -46,22 +52,6 @@
 - 背景: （discovery参照）
 - DoD: （discoveryの DoD候補を要約 or 後続で具体化）
 - 参考/関連: stories/discovery/20251117-010034-spec-impl-diff-workflow.md, Story:  N/A
-
-## [P1] 2025-09-30: CI にストーリー検証/索引生成を統合
-- 〜〜を改善/実現する\n- PR/Push 時に `make story-index` と最小の Story 検証（テンプレ必須項目の存在チェック）を自動実行し、索引とメタの整合性を常に維持する。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-01.md)）
-- 〜〜が散在/重複/不明確 など\n- 手動更新だと漏れや古い一覧が残る可能性があるため。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-01.md)）
-- 〜〜が達成（例: mcp グリーン、rg 残存 0）\n- GitHub Actions（または将来のCI）で `make story-index` を実行し、成果物 `stories/finish/INDEX.md` を更新/検証。検証スクリプト（軽量）で `ステータス/担当/開始` の必須チェックを行い、エラー時に失敗。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-01.md)）
-
-## [P1] 2025-09-30: PR テンプレ/Story 参照の必須化（軽量）
-- PR/コミットに対象ストーリーの識別子（`YYYYMMDD-slug`）と DoD/検証手順を含め、追跡性を上げる。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-02.md)）
-- レビュー時に関連ストーリーの特定に時間がかかる問題。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-02.md)）
-- `.github/PULL_REQUEST_TEMPLATE.md` を追加し、`Story: 20xxxxxx-slug` と DoD チェック、検証手順テンプレを含める。将来のCI導入時に軽い静的チェックを追加。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-02.md)）
 
 ## [P1] 2025-09-29: `internal/game/service/ui/apply.go` の分割検討
 - UI メトリクス適用処理を責務単位で分割し、可読性・変更容易性・テスト容易性を向上する。\n
