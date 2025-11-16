@@ -19,7 +19,7 @@
   - DB や永続化に関するメモ・移行方針。
 - `docs/AI_OPERATIONS.md`
   - Codex/Vibe など AI 連携や自動化の内部メモ。
-- `docs/workflow/`
+- `docs/workflows/`
   - ストーリー運用/ローカル開発/CI など、開発プロセス・ワークフロー。
 - `docs/specs/`
   - 実装に直結する仕様（system/ui 等）を集約する「仕様ハブ」。
@@ -53,7 +53,7 @@
 - ドキュメントの重複を避ける:
   - 設計思想やレイヤ構造は `ARCHITECTURE.md`。
   - 実装に直結する振る舞いは `specs/`。
-  - ワークフローやストーリー運用は `docs/workflow/`。
+  - ワークフローやストーリー運用は `docs/workflows/`。
 - 大きな構成変更を行う場合は、ストーリーを切り、本ドキュメントと関連する specs/README/AGENTS をセットで更新する。
 
 ## 6. 今後の拡張

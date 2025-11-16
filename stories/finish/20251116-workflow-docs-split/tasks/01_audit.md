@@ -49,5 +49,5 @@
 
 ## 分割時の注意点メモ
 - `docs/REF_STORIES.md` と「Codex/ストーリー作成」の説明が重複気味なので、ストーリー運用の詳細は workflow/stories 側に集約し、WORKFLOW の「Codex」節は入口程度にとどめる方向が良さそう。
-- ローカル検証と CI の説明は、将来的に `docs/workflow/local-dev.md` と `docs/workflow/ci.md` 等に分ける候補。
+- ローカル検証と CI の説明は、将来的に `docs/workflows/local-dev.md` と `docs/workflows/ci.md` 等に分ける候補。
 - Vibe‑kanban の説明はツール/運用寄りで、ストーリー運用やローカル開発と横断するため、どのファイルからリンクするかを 03_policy で整理する必要がある。

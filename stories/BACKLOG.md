@@ -65,12 +65,12 @@
   （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-11.md)）
 
 ## [P2] 2025-11-16: docs/WORKFLOW.md をディレクトリ化して細分化を行う
-- `docs/WORKFLOW.md` を章単位に分割し、`docs/workflow/` 配下へ整理して参照性・更新性を高める。
+- `docs/WORKFLOW.md` を章単位に分割し、`docs/workflows/` 配下へ整理して参照性・更新性を高める。
   （[→ Discovery](stories/discovery/accepted/2025-11-16-workflow-docs-split.md)）
 - 単一ファイルに多くの内容が集約され肥大化しており、章内リンクや関連ドキュメントとの整合が取りづらい。
   （[→ Discovery](stories/discovery/accepted/2025-11-16-workflow-docs-split.md)）
-- `docs/workflow/` ディレクトリを新設し、主要章（概要/ローカル検証/CI方針/変数運用/MCP_STRICT・MCP_OFFLINE/ストーリー運用フロー など）に分割。
-- 目次（索引）ファイル `docs/workflow/README.md` を用意し、分割先へのリンクを集約。
+- `docs/workflows/` ディレクトリを新設し、主要章（概要/ローカル検証/CI方針/変数運用/MCP_STRICT・MCP_OFFLINE/ストーリー運用フロー など）に分割。
+- 目次（索引）ファイル `docs/workflows/README.md` を用意し、分割先へのリンクを集約。
 - 既存参照（`AGENTS.md`/`README.md`/`docs/REF_STORIES.md`）のリンクを新構成へ更新。
 - ...
   （[→ Discovery](stories/discovery/accepted/2025-11-16-workflow-docs-split.md)）

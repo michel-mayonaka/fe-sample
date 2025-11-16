@@ -52,11 +52,11 @@
 - `docs/specs/ui/_TEMPLATE.md`: 画面仕様のテンプレート。まだ具体仕様は未作成。
 
 ### workflow/
-- `docs/workflow/overview.md`: 開発ワークフロー全体の概要。ストーリー/CI/ローカル開発との関係。
-- `docs/workflow/stories.md`: ストーリー/タスク運用の詳細ルール。
-- `docs/workflow/local-dev.md`: ローカル開発環境構築と日常的なコマンド運用。
-- `docs/workflow/ci.md`: CI ジョブ構成と方針のメモ。
-- `docs/workflow/vibe-kanban.md`: Vibe カンバン運用のメモ。開発プロセス寄り。
+- `docs/workflows/overview.md`: 開発ワークフロー全体の概要。ストーリー/CI/ローカル開発との関係。
+- `docs/workflows/stories.md`: ストーリー/タスク運用の詳細ルール。
+- `docs/workflows/local-dev.md`: ローカル開発環境構築と日常的なコマンド運用。
+- `docs/workflows/ci.md`: CI ジョブ構成と方針のメモ。
+- `docs/workflows/vibe-kanban.md`: Vibe カンバン運用のメモ。開発プロセス寄り。
 
 ## 問題点・不足の仮メモ
 - system/ui 向けの実際の仕様（例: ステータス画面の仕様、戦闘ロジックの仕様）がまだ `docs/specs/` に書かれていない。

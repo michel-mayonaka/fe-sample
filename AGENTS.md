@@ -8,8 +8,8 @@
 - 命名規約: docs/NAMING.md
 - コメント記法: docs/COMMENT_STYLE.md
 - アーキテクチャ: docs/ARCHITECTURE.md
-- ストーリー運用: docs/workflow/stories.md
-- ワークフロー: docs/workflow/overview.md
+- ストーリー運用: docs/workflows/stories.md
+- ワークフロー: docs/workflows/overview.md
 - DB メモ: docs/DB_NOTES.md
 - ルート概要: README.md
  - codex-cloud 実行: docs/CODEX_CLOUD.md
@@ -45,7 +45,7 @@ MCP_STRICT=1 make check-ui
 - 新規作成: `make new-story SLUG=<slug>` → `stories/YYYYMMDD-slug/README.md`
 - 作成フロー（要点）:
   - README を先に作成し、目的/スコープ/DoD を確定（制作者レビュー必須）。
-  - サブタスクは 1 タスク=1 MD をストーリー配下 `tasks/` に作成（連番推奨）。詳細: docs/workflow/stories.md
+  - サブタスクは 1 タスク=1 MD をストーリー配下 `tasks/` に作成（連番推奨）。詳細: docs/workflows/stories.md
   - 完了/アーカイブ: `make finish-story SLUG=<slug>`（ステータスを自動で [完了] に更新）。
 
 ### Discovery（Backlogコンフリクト回避）

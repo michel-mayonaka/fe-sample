@@ -10,23 +10,23 @@
 - BACKLOG「2025-11-16: docs/WORKFLOW.md をディレクトリ化して細分化を行う」を具体化する。
 
 ## スコープ（成果）
-- `docs/workflow/` ディレクトリの新設と、そこに配置するファイル構成（役割と命名）の定義。
-- `docs/REF_STORIES.md` を `docs/workflow/stories.md` 等として統合し、WORKFLOW 系ドキュメントと README との重複を整理する（必要に応じて旧ファイルは入口 stub として残す）。
+- `docs/workflows/` ディレクトリの新設と、そこに配置するファイル構成（役割と命名）の定義。
+- `docs/REF_STORIES.md` を `docs/workflows/stories.md` 等として統合し、WORKFLOW 系ドキュメントと README との重複を整理する（必要に応じて旧ファイルは入口 stub として残す）。
 - 現行 `docs/WORKFLOW.md` の内容を棚卸しし、論点ごとに適切なファイルへ再配置する方針の決定と反映。
 - 必要に応じたセクション単位での分割・統合・軽微な表現調整。
 - `README.md` を含む既存ドキュメントからのリンク更新（リンク切れがない状態）。
 
 ## 受け入れ基準（Definition of Done）
-- [x] `docs/workflow/` 配下に、主要なワークフロー論点（概要/ストーリー運用/CI 方針/ローカル開発など）がファイルとして整理されている。
+- [x] `docs/workflows/` 配下に、主要なワークフロー論点（概要/ストーリー運用/CI 方針/ローカル開発など）がファイルとして整理されている。
 - [x] `docs/WORKFLOW.md` を入口とする読者が、新しい構成でも迷わず必要な情報に辿り着ける（必要なら案内のみ残す）。
 - [x] `README.md` および関連ドキュメントのリンクが新しい構成に追従している。
-- [x] `docs/REF_STORIES.md` が `docs/workflow/stories.md` 等に統合されているか、入口 stub として新構成を案内している。
+- [x] `docs/REF_STORIES.md` が `docs/workflows/stories.md` 等に統合されているか、入口 stub として新構成を案内している。
 - [ ] `make mcp` が成功し、Lint/ビルド/テスト/ドキュメント整合に問題がない。
 - [ ] レビューで「今後も拡張しやすい構成」として合意されている。
 
 ## 工程（サブタスク）
 - [x] 現行 `docs/WORKFLOW.md` の構成と論点を棚卸しする — `tasks/01_audit.md`
-- [x] `docs/workflow/` のディレクトリ/ファイル構成案を作成し、レビューを通す — `tasks/02_design.md`
+- [x] `docs/workflows/` のディレクトリ/ファイル構成案を作成し、レビューを通す — `tasks/02_design.md`
 - [x] 分割ポリシー（どの単位でファイルを分けるか・命名規約との整合）を決める — `tasks/03_policy.md`
 - [x] 実際に `docs/WORKFLOW.md` を分割し、新しいファイルへ内容を移行・調整する — `tasks/04_split.md`
 - [x] `README.md` や他ドキュメントのリンクを更新し、リンク切れを確認する — `tasks/05_links.md`
@@ -35,7 +35,7 @@
 ## 計画（目安）
 - 見積: 4〜6 時間（レビュー含まず） / 複数セッション想定。
 - マイルストン:
-  - M1: 棚卸しと `docs/workflow/` 構成案がレビュー合意済み。
+  - M1: 棚卸しと `docs/workflows/` 構成案がレビュー合意済み。
   - M2: 分割・移行とリンク更新が完了し、`make mcp` が通る。
   - M3: レビュー完了・ストーリー DoD 満たし。
 
@@ -52,6 +52,6 @@
 ## 関連
 - PR: #
 - Issue: #
-- Docs: `docs/workflow/overview.md`, `docs/workflow/stories.md`, `README.md`
+- Docs: `docs/workflows/overview.md`, `docs/workflows/stories.md`, `README.md`
 
 - 2025-11-16 20:23:36 +0900: アーカイブ（finish へ移動）
