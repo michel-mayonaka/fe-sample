@@ -44,3 +44,5 @@
 ## 関連
 - Discovery: `stories/discovery/consumed/2025-09-30-migrated-03.md`
 - 実装箇所: `internal/game/data/provider.go`, `internal/game/ui/adapter/`, `docs/ARCHITECTURE.md`
+
+- 2025-11-17 00:48:21 +0900: アーカイブ（finish へ移動）
