@@ -17,21 +17,6 @@
 ```
 
 初期エントリ
-## [P2] 2025-11-16: docsディレクトリ内の整理
-- 目的: （discovery参照）
-- 背景: （discovery参照）
-- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
-- 参考/関連: stories/discovery/20251116-192658-docs-dir-structure.md, Story:  N/A
-
-
-## [P0] 2025-09-30: Provider から UI 型依存を分離（Port/Adapter 再整理）
-- （簡潔に）
-  （[→ Discovery](stories/discovery/accepted/20250930-183535-provider-ui-decouple.md)）
-- （補足があれば）
-  （[→ Discovery](stories/discovery/accepted/20250930-183535-provider-ui-decouple.md)）
-- [ ] （採用時に Backlog へ転記）
-  （[→ Discovery](stories/discovery/accepted/20250930-183535-provider-ui-decouple.md)）
-
 ## [P1] 2025-09-30: CI にストーリー検証/索引生成を統合
 - 〜〜を改善/実現する\n- PR/Push 時に `make story-index` と最小の Story 検証（テンプレ必須項目の存在チェック）を自動実行し、索引とメタの整合性を常に維持する。\n
   （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-01.md)）
@@ -63,17 +48,6 @@
   （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-11.md)）
 - `main` の入力/状態遷移ロジックを `internal/app` へ移譲、UI直I/O撤去、`config` にパス統一、`make mcp` グリーン。\n
   （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-11.md)）
-
-## [P2] 2025-11-16: docs/WORKFLOW.md をディレクトリ化して細分化を行う
-- `docs/WORKFLOW.md` を章単位に分割し、`docs/workflows/` 配下へ整理して参照性・更新性を高める。
-  （[→ Discovery](stories/discovery/accepted/2025-11-16-workflow-docs-split.md)）
-- 単一ファイルに多くの内容が集約され肥大化しており、章内リンクや関連ドキュメントとの整合が取りづらい。
-  （[→ Discovery](stories/discovery/accepted/2025-11-16-workflow-docs-split.md)）
-- `docs/workflows/` ディレクトリを新設し、主要章（概要/ローカル検証/CI方針/変数運用/MCP_STRICT・MCP_OFFLINE/ストーリー運用フロー など）に分割。
-- 目次（索引）ファイル `docs/workflows/README.md` を用意し、分割先へのリンクを集約。
-- 既存参照（`AGENTS.md`/`README.md`/`docs/REF_STORIES.md`）のリンクを新構成へ更新。
-- ...
-  （[→ Discovery](stories/discovery/accepted/2025-11-16-workflow-docs-split.md)）
 
 ## [P2] 2025-09-30: `internal/game/util` の撤去または責務特化サブパッケージ化
 - 命名規約（util/helpers禁止）に沿い、汎用名の温床を除去する。\n

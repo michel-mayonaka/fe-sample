@@ -1,11 +1,11 @@
 # discovery: docs/WORKFLOW.md をディレクトリ化して細分化を行う
 
-ステータス: [promoted]
+ステータス: [consumed]
 担当: @tkg-engineer
 作成: 2025-11-16 00:00:00 +0900
 優先度: P2
 提案元: backlog-request
-関連ストーリー: N/A
+関連ストーリー: 20251116-workflow-docs-split
 
 ## 目的
 - `docs/WORKFLOW.md` を章単位に分割し、`docs/workflows/` 配下へ整理して参照性・更新性を高める。
@@ -26,3 +26,5 @@
 ## 進捗ログ
 - 2025-11-16 00:00:00 +0900: Backlog へ追加（docs/WORKFLOW.md の分割・ディレクトリ化の提案）。
 
+
+- 2025-11-17 00:51:18 +0900: ストーリー化（20251116-workflow-docs-split）
