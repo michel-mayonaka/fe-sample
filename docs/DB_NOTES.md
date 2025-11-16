@@ -12,6 +12,10 @@
 - マイグレーション: 初回起動時にテーブル作成→マスタJSONをロード→ユーザJSONをインポート。
 - 将来タスク: DAO層（`internal/repo`）追加、トランザクション境界設計、自動保存/スナップショット。
 
+現行 JSON バックエンドでの参照経路メモ:
+- マスタ武器/アイテムは `internal/repo.WeaponsRepo` / `internal/repo.ItemsRepo` で読み込み・キャッシュされ、
+  UI からは `internal/game/data.TableProvider`（実装: `internal/usecase.App`）の `WeaponsTable()/ItemsTable()` 経由で参照します。
+
 ## プラットフォーム別の扱い（デスクトップ / WebGL）
 
 - デスクトップ（Windows/macOS 等）:

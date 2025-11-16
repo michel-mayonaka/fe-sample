@@ -8,7 +8,6 @@
 - `internal/game/scenes/inventory/popup_item.go`（Provider 経由を維持しつつ、背後がRepo化されていることを確認）。
 
 ## 手順
-- [ ] `usecase.App.ItemsTable()` を `a.Items.Table()` に切替。
-- [ ] `rg -n 'LoadItemsJSON|ItemsTable\(\)'` で残存確認。
-- [ ] 主要画面で表示/動作確認（一覧/装備選択）。
-
+- [x] `usecase.App.ItemsTable()` を `a.Items.Table()` に切替。
+- [x] `rg -n 'LoadItemsJSON|ItemsTable\(\)'` で残存確認。
+- [x] 主要画面で表示/動作確認（一覧/装備選択）。

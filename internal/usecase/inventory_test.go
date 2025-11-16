@@ -55,7 +55,7 @@ func TestEquipWeapon_TransfersOwnership(t *testing.T) {
 		{ID: "u2", Name: "B", Equip: []usr.EquipRef{{UserWeaponsID: "uw_1"}}},
 	})
 	ur := &fakeUserRepo{t: ut}
-	a := New(ur, nil, fakeInvRepo{}, nil)
+	a := New(ur, nil, nil, fakeInvRepo{}, nil)
 
 	if err := a.EquipWeapon("u1", 0, "uw_1"); err != nil {
 		t.Fatalf("equip weapon: %v", err)
@@ -80,7 +80,7 @@ func TestEquipItem_TransfersOwnership(t *testing.T) {
 		{ID: "u2", Name: "B", Equip: []usr.EquipRef{{}, {UserItemsID: "ui_1"}}},
 	})
 	ur := &fakeUserRepo{t: ut}
-	a := New(ur, nil, fakeInvRepo{}, nil)
+	a := New(ur, nil, nil, fakeInvRepo{}, nil)
 
 	if err := a.EquipItem("u1", 1, "ui_1"); err != nil {
 		t.Fatalf("equip item: %v", err)

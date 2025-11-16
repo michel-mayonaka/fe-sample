@@ -20,6 +20,11 @@ func (f *fakeWeaponsRepo) Find(string) (model.Weapon, bool) { return model.Weapo
 func (f *fakeWeaponsRepo) Table() *model.WeaponTable        { return nil }
 func (f *fakeWeaponsRepo) Reload() error                    { f.reloaded++; return nil }
 
+type fakeItemsRepo struct{ reloaded int }
+
+func (f *fakeItemsRepo) Table() *model.ItemDefTable { return nil }
+func (f *fakeItemsRepo) Reload() error              { f.reloaded++; return nil }
+
 type fakeInvRepo2 struct{ reloaded int }
 
 func (f *fakeInvRepo2) Consume(string, int) error { return nil }
@@ -61,8 +66,9 @@ func newUserTableForTest2(t *testing.T, rows []usr.Character) *usr.Table {
 
 func TestReloadData_InvokesRepos(t *testing.T) {
 	wr := &fakeWeaponsRepo{}
-	ir := &fakeInvRepo2{}
-	a := &App{Weapons: wr, Inv: ir}
+	ir := &fakeItemsRepo{}
+	inv := &fakeInvRepo2{}
+	a := &App{Weapons: wr, Items: ir, Inv: inv}
 	if err := a.ReloadData(); err != nil {
 		t.Fatalf("ReloadData error: %v", err)
 	}
@@ -70,7 +76,10 @@ func TestReloadData_InvokesRepos(t *testing.T) {
 		t.Fatalf("weapons Reload not called: %d", wr.reloaded)
 	}
 	if ir.reloaded != 1 {
-		t.Fatalf("inventory Reload not called: %d", ir.reloaded)
+		t.Fatalf("items Reload not called: %d", ir.reloaded)
+	}
+	if inv.reloaded != 1 {
+		t.Fatalf("inventory Reload not called: %d", inv.reloaded)
 	}
 }
 

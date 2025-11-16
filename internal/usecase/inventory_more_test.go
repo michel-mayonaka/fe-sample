@@ -9,7 +9,7 @@ import (
 func TestEquipWeapon_SlotExpand_NoOwner(t *testing.T) {
 	ut := newUserTableForTest2(t, []usr.Character{{ID: "u1", Name: "A"}})
 	ur := &fakeUserRepo{t: ut}
-	a := New(ur, nil, fakeInvRepo{}, nil)
+	a := New(ur, nil, nil, fakeInvRepo{}, nil)
 	if err := a.EquipWeapon("u1", 3, "uw_x"); err != nil {
 		t.Fatalf("EquipWeapon: %v", err)
 	}
@@ -25,7 +25,7 @@ func TestEquipWeapon_SlotExpand_NoOwner(t *testing.T) {
 func TestEquipItem_SlotExpand_NoOwner(t *testing.T) {
 	ut := newUserTableForTest2(t, []usr.Character{{ID: "u1", Name: "A"}})
 	ur := &fakeUserRepo{t: ut}
-	a := New(ur, nil, fakeInvRepo{}, nil)
+	a := New(ur, nil, nil, fakeInvRepo{}, nil)
 	if err := a.EquipItem("u1", 2, "ui_x"); err != nil {
 		t.Fatalf("EquipItem: %v", err)
 	}

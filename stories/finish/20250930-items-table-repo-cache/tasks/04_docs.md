@@ -8,6 +8,5 @@
 - `docs/API.md` の `TableProvider` 説明を現行化。
 
 ## 完了条件
-- [ ] 差分レビュー済み。
-- [ ] `make mcp` グリーン。
-
+- [x] 差分レビュー済み。
+- [x] `make mcp` グリーン。

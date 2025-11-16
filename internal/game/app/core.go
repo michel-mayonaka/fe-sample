@@ -43,11 +43,20 @@ func NewUIAppGame() *Game {
 	if r, err := repo.NewJSONWeaponsRepo(config.DefaultWeaponsPath); err == nil {
 		wrepo = r
 	}
+	var irepo repo.ItemsRepo
+	if r, err := repo.NewJSONItemsRepo(config.DefaultItemsPath); err == nil {
+		irepo = r
+	}
 	var inv repo.InventoryRepo
-	if r, err := repo.NewJSONInventoryRepo(config.DefaultUserWeaponsPath, config.DefaultUserItemsPath, config.DefaultWeaponsPath, "db/master/mst_items.json"); err == nil {
+	if r, err := repo.NewJSONInventoryRepo(
+		config.DefaultUserWeaponsPath,
+		config.DefaultUserItemsPath,
+		config.DefaultWeaponsPath,
+		config.DefaultItemsPath,
+	); err == nil {
 		inv = r
 	}
-	a := usecase.New(urepo, wrepo, inv, rng)
+	a := usecase.New(urepo, wrepo, irepo, inv, rng)
 	// Provider を App に差し替え
 	gdata.SetProvider(a)
 	// 一覧（Provider 経由で構築）
@@ -139,10 +148,10 @@ func NewUIAppGame() *Game {
 		Session:  &scenes.Session{Units: units, SelIndex: 0},
 	}
 
-    // Game（Runner + AfterUpdate）
-    g := &Game{Runner: Runner{}, Env: env, prevTime: time.Now()}
-    g.InputSrc = src
-    g.InputR = uinput.WrapDomain(&g.Edge)
+	// Game（Runner + AfterUpdate）
+	g := &Game{Runner: Runner{}, Env: env, prevTime: time.Now()}
+	g.InputSrc = src
+	g.InputR = uinput.WrapDomain(&g.Edge)
 	g.Runner.AfterUpdate = func(sc game.Scene) bool {
 		if p, ok := sc.(interface{ ShouldPop() bool }); ok {
 			return p.ShouldPop()

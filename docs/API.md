@@ -81,6 +81,9 @@
 - `func SetProvider(p TableProvider)`: アプリ側実装を注入（推奨ルート）。
 - `func Provider() TableProvider`: 現在のプロバイダ取得。
 
+実装メモ:
+- 既定実装は `internal/usecase.App` で、`WeaponsTable()/ItemsTable()` はそれぞれ `WeaponsRepo`/`ItemsRepo` のキャッシュを参照します（Scene 層からの JSON 直読みは禁止）。
+
 利用指針（Provider=参照専用）:
 - Scene は `data.Provider().WeaponsTable()/ItemsTable()/UserWeapons()/UserItems()` 経由で参照。
 - 旧 `scenes.SetWeaponTable/WeaponTable` は廃止。JSON直読みフォールバックは開発ツール用途のみ。
@@ -88,7 +91,7 @@
 
 Provider と Repository の役割の違い:
 - Provider: 読み取り専用の参照提供（Query）。追加/更新/保存はしない。
-- Repository: 追加・更新・保存（Command）を扱う。例: `UserRepo.Update/Save`, `InventoryRepo.Consume/Save/Reload`。
+- Repository: 追加・更新・保存（Command）を扱う。例: `UserRepo.Update/Save`, `WeaponsRepo.Reload`, `ItemsRepo.Reload`, `InventoryRepo.Consume/Save/Reload`。
 
 ## internal/game/scenes/sim（模擬戦シーン）
 - `type Sim`: シーン本体。`NewSim(env, atk, def)`で生成。

@@ -9,6 +9,5 @@
 - `internal/repo/weapons.go` のキャッシュ/Reload 実装。
 
 ## 検証
-- [ ] `go build ./...` が通る。
-- [ ] `make mcp` がグリーン。
-
+- [x] `go build ./...` が通る。
+- [x] `make mcp` がグリーン。

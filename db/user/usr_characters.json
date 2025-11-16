@@ -46,7 +46,7 @@
     },
     "equip": [
       {
-        "usr_weapons_id": "uw_iris_w1"
+        "usr_weapons_id": "uw_iris_w2"
       },
       {
         "usr_weapons_id": "uw_charlie_w1"
@@ -209,7 +209,7 @@
     },
     "equip": [
       {
-        "usr_weapons_id": "uw_iris_w2"
+        "usr_weapons_id": "uw_iris_w1"
       },
       {
         "usr_items_id": "ui_mac_i1"
