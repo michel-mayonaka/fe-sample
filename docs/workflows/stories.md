@@ -37,6 +37,8 @@
   - 挙動: BACKLOG にエントリを追加、`状態: [promoted]` へ更新し `stories/discovery/accepted/` へ移動。
 - 見送り（やらない判断）: `make decline-discovery FILE=<path> [REASON=..]`
   - 挙動: `状態: [declined]` へ更新し、`stories/discovery/declined/` へ移動。理由をログに追記。
+- ストーリー化済みの消化: `make consume-discovery FILE=<accepted.md> STORY_DIR=stories/YYYYMMDD-slug`
+  - 挙動: `状態: [consumed]` へ更新し `stories/discovery/consumed/` へ移動、関連ストーリーを追記（次回 `make backlog-index` 時に BACKLOG から自動で消える）。
 - 索引: `make discovery-index` で一覧を生成（`stories/discovery/INDEX.md`）。
 
 Backlog（将来のストーリー候補）:

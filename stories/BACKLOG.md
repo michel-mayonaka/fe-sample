@@ -17,6 +17,24 @@
 ```
 
 初期エントリ
+## [P1] 2025-11-17: workflowからスクリプト化候補を洗い出す workflow
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/20251117-010253-workflow-script-suggestion.md, Story:  N/A
+
+## [P1] 2025-11-17: アーキテクチャ設計と実装の差分チェック workflow
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/20251117-010035-arch-impl-diff-workflow.md, Story:  N/A
+
+## [P1] 2025-11-17: specと実装の差分チェック workflow
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/20251117-010034-spec-impl-diff-workflow.md, Story:  N/A
+
 ## [P1] 2025-09-30: CI にストーリー検証/索引生成を統合
 - 〜〜を改善/実現する\n- PR/Push 時に `make story-index` と最小の Story 検証（テンプレ必須項目の存在チェック）を自動実行し、索引とメタの整合性を常に維持する。\n
   （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-01.md)）
