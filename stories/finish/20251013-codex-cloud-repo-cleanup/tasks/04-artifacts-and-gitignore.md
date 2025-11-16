@@ -15,3 +15,4 @@
 - 出力先: `out/` に統一（`out/bin`, `out/logs`, `out/coverage`）。
 - クリーン: `make clean` を追加。
 - 無視設定: `.gitignore` に `out/` と `site/` を追加（WASM等の将来拡張に対応）。
+- 整理: `.gitignore` の `site/` 重複エントリを削除（2025-11-16）。

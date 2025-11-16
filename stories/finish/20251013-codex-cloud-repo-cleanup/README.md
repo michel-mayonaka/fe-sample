@@ -1,6 +1,6 @@
 # 2025-10-13 — codex-cloud 環境対応のリポジトリ整理（`20251013-codex-cloud-repo-cleanup`）
 
-- 状態: 進行中（2025-10-13 開始）
+ステータス: [完了]
 - 作成: 2025-10-13
 - オーナー: TBD
 - 関連: README.md, docs/WORKFLOW.md, docs/NAMING.md, docs/REF_STORIES.md
@@ -38,6 +38,12 @@ codex-cloud（ワークスペース書込のみ・ネットワーク制限・承
 - Docs: `docs/CODEX_CLOUD.md` 追加、`README`/`AGENTS` 更新。
 - CI: `smoke-offline` ジョブ追加、README にフロー追記。
 
+## 進捗メモ（2025-11-16）
+- codex-cloud 実行環境で `make smoke` を実行し成功（vet/build/test すべてOK）。
+- `MCP_OFFLINE=1 make offline` を実行し成功（`check-all`/`lint(自動スキップ可)`/`test-all`）。
+- 生成物出力の統一を確認（`out/` 配下）。`.gitignore` の `site/` 重複記載を整理。
+- DoD のうち「ワンコマンドでの検証」「出力先/クリーン統一」「README整備」を満たすことを確認。
+
 ## リスクと対策
 - ローカル/CI/クラウドでの挙動差: フラグ既定値整理（例: `MCP_STRICT=0`）と明記。
 - ベンダリングのメンテコスト: 更新手順を明記し、定期的に検証。
@@ -59,3 +65,5 @@ codex-cloud（ワークスペース書込のみ・ネットワーク制限・承
 実装開始時は、以下のように明示してください。
 
 > 20251013-codex-cloud-repo-cleanup を開始
+
+- 2025-11-16 18:14:32 +0900: アーカイブ（finish へ移動）
