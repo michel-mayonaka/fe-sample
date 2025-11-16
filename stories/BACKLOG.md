@@ -17,6 +17,12 @@
 ```
 
 初期エントリ
+## [P2] 2025-11-16: docsディレクトリ内の整理
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/20251116-192658-docs-dir-structure.md, Story:  N/A
+
 
 ## [P0] 2025-09-30: Provider から UI 型依存を分離（Port/Adapter 再整理）
 - （簡潔に）

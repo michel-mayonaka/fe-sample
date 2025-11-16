@@ -7,10 +7,9 @@
 - ストーリー/Discovery 自動化（scripts/*, Make ターゲット）の連携図。
 
 ## 参考リンク
-- 実務ガイド: `docs/WORKFLOW.md`（開発者向け最小ガイド）
-- ストーリー運用: `docs/REF_STORIES.md`
+- 実務ガイド: `docs/workflow/overview.md`（開発者向けワークフロー概要）
+- ストーリー運用: `docs/workflow/stories.md`
 - エージェントガイド: `AGENTS.md`
 - コマンド一覧: `Makefile` / `scripts/`
 
 （詳細は必要になった時点で追記）
-

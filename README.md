@@ -137,8 +137,8 @@ MCP_STRICT=1 make check-ui
 - 命名規約: `docs/NAMING.md`
 - コメント記法: `docs/COMMENT_STYLE.md`
 - アーキテクチャ: `docs/ARCHITECTURE.md`
-- ストーリー運用: `docs/REF_STORIES.md`
-- ワークフロー: `docs/WORKFLOW.md`
+- ストーリー運用: `docs/workflow/stories.md`
+- ワークフロー: `docs/workflow/overview.md`
 - DB メモ: `docs/DB_NOTES.md`
 
 ## 戦闘画面（簡易）
