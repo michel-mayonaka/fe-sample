@@ -3,6 +3,8 @@
 このリポジトリで作業する人間/エージェント向けの最小実務ガイドです。詳細は各ドキュメントへリンクします（クリックで開けます）。
 
 ## クイックリンク
+- 仕様ハブ: docs/specs/README.md
+- エージェント向け仕様ガイド: docs/specs/AGENTS.md
 - 命名規約: docs/NAMING.md
 - コメント記法: docs/COMMENT_STYLE.md
 - アーキテクチャ: docs/ARCHITECTURE.md
@@ -69,6 +71,7 @@ MCP_STRICT=1 make check-ui
 - 汎用名は避ける: `util`/`helpers` 等は禁止。例: 乱数→`internal/game/rng`、矩形判定→`rect*_`。
 
 ## コメント・ドキュメント
+- 仕様全体の構成方針は docs/DOCS_STRUCTURE.md を参照。
 - エクスポート識別子は 1 行 GoDoc 必須（revive の exported を満たす）。
 - 詳述は Markdown に集約（コード内は最小限）。
 - 新規/変更 API は docs/API.md に追記。設計背景は docs/ARCHITECTURE.md、命名/表記は docs/NAMING.md に整合。

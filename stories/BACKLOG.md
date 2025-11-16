@@ -168,3 +168,15 @@
 - 目的: `uicore` のフォールバック撤去、`ui/widgets` 互換APIの整理、回帰テスト拡充。
   （[→ Discovery](stories/discovery/accepted/2025-11-16-ui-adapter-cleanups.md)）
 - DoD: 旧API削除・テスト追加・`make mcp` グリーン。
+
+## [P2] 2025-11-16: specs/system ディレクトリの細分化
+- 目的: `docs/specs/system/` をユースケース/ドメイン単位などで整理し、システム仕様を見通しよく分割する。
+- 背景: system 配下に仕様が増えた際に、一箇所に集約しすぎると参照性が下がるため。
+- DoD: `docs/specs/system/` のサブディレクトリ/命名方針が決まり、最初のいくつかの仕様が新構成に沿って配置されている（`make mcp` グリーン）。
+- 参考/関連: docs/specs/README.md, docs/DOCS_STRUCTURE.md
+
+## [P2] 2025-11-16: specs/ui ディレクトリの細分化
+- 目的: `docs/specs/ui/` を画面種別やフロー単位で整理し、画面仕様を見つけやすくする。
+- 背景: UI 画面数や状態が増えたときに、単一階層だとどの spec がどの画面か判別しづらくなるため。
+- DoD: `docs/specs/ui/` のサブディレクトリ/命名方針が決まり、ステータス画面など代表的な画面仕様が新構成に沿って配置されている（`make mcp` グリーン）。
+- 参考/関連: docs/specs/README.md, docs/DOCS_STRUCTURE.md

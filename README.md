@@ -134,6 +134,8 @@ MCP_STRICT=1 make check-ui
 将来: SQLite へ移行予定（`docs/DB_NOTES.md` 参照）
 
 ## ドキュメント
+- 仕様ハブ: `docs/specs/README.md`
+- エージェント向け仕様ガイド: `docs/specs/AGENTS.md`
 - 命名規約: `docs/NAMING.md`
 - コメント記法: `docs/COMMENT_STYLE.md`
 - アーキテクチャ: `docs/ARCHITECTURE.md`
