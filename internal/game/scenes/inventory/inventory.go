@@ -9,6 +9,7 @@ import (
     gdata "ui_sample/internal/game/data"
     scenes "ui_sample/internal/game/scenes"
     uicore "ui_sample/internal/game/service/ui"
+    uiadapter "ui_sample/internal/game/ui/adapter"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     uinput "ui_sample/internal/game/ui/input"
     "ui_sample/pkg/game/geom"
@@ -142,7 +143,7 @@ func (s *Inventory) refreshUnitByID(id string) {
     if p := gdata.Provider(); p != nil {
         if ut := p.UserTable(); ut != nil {
             if c, found := ut.Find(id); found {
-                u, ok = uicore.UnitFromUser(c), true
+                u, ok = uiadapter.UnitFromUser(c, uiadapter.AssetsPortraitLoader{}), true
             }
         }
     }

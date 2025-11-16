@@ -63,11 +63,18 @@
   - `ListMarginPx`, `S`, `LineHSmallPx` などメトリクス計算。
   - `MaybeUpdateFontFaces` などフォント管理。
 
+注意（非推奨）:
+- `UnitFromUser`, `LoadUnitsFromUser` は互換目的で残置。実装は `ui/adapter` へ委譲され、
+  `internal/game/ui/adapter.UnitFromUser` / `BuildUnitsFromProvider` をブリッジ経由で呼び出します。
+  新規コードは直接 adapter 側の API を利用してください。
+
 補足: 画面描画は各 Scene に配置（例: ステータス/戦闘プレビュー）。本パッケージは汎用ウィジェットを提供します。
 
 ## internal/adapter（UI<->ロジック変換）
 - `func UIToGame(wt *model.WeaponTable, u ui.Unit) gcore.Unit`: UIユニットから戦闘用`gcore.Unit`へ変換（先頭装備）。
 - `func AttackSpeedOf(wt *model.WeaponTable, u ui.Unit) int`: 攻撃速度（武器重量考慮、未設定時は速さ）。
+  - `internal/game/ui/adapter.UnitFromUser(c usr.Character, pl PortraitLoader) ui.Unit`: Provider参照に基づくUI化。
+  - `internal/game/ui/adapter.BuildUnitsFromProvider(pl PortraitLoader) []ui.Unit`: Provider→一覧生成。
 
 ## internal/game/data（テーブル/在庫のDIプロバイダ）
 - `type TableProvider interface { WeaponsTable() *model.WeaponTable; ItemsTable() *model.ItemDefTable; UserWeapons() []user.OwnWeapon; UserItems() []user.OwnItem; UserTable() *user.Table; EquipKindAt(unitID string, slot int) (bool,bool) }`
@@ -77,7 +84,7 @@
 利用指針（Provider=参照専用）:
 - Scene は `data.Provider().WeaponsTable()/ItemsTable()/UserWeapons()/UserItems()` 経由で参照。
 - 旧 `scenes.SetWeaponTable/WeaponTable` は廃止。JSON直読みフォールバックは開発ツール用途のみ。
- - UI 用の `uicore.Unit` 変換は Provider では行わず、`uicore.UnitFromUser` 等 UI 層に集約する。
+ - UI 用の `uicore.Unit` 変換は Provider では行わず、`internal/game/ui/adapter.UnitFromUser` に集約する。
 
 Provider と Repository の役割の違い:
 - Provider: 読み取り専用の参照提供（Query）。追加/更新/保存はしない。

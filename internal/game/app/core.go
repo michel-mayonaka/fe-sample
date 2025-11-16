@@ -12,6 +12,7 @@ import (
     "ui_sample/internal/game/scenes"
     characterlist "ui_sample/internal/game/scenes/character_list"
     uicore "ui_sample/internal/game/service/ui"
+    uiadapter "ui_sample/internal/game/ui/adapter"
     ebiteninput "ui_sample/internal/game/provider/input/ebiten"
     uinput "ui_sample/internal/game/ui/input"
     "ui_sample/internal/repo"
@@ -28,22 +29,21 @@ func NewUIAppGame() *Game {
     layout.Keyboard[ginput.KeyBackspace] = ginput.ActionMenu
     src := ebiteninput.NewSource(layout)
 
-	// ユーザパス/テーブル
-	userPath := config.DefaultUserPath
-	// 一覧
-	units, _ := uicore.LoadUnitsFromUser(userPath)
-	if len(units) == 0 {
-		units = []uicore.Unit{uicore.SampleUnit()}
-	}
+    // ユーザパス
+    userPath := config.DefaultUserPath
 
 	// Ports（JSON）を注入して App を生成
 	urepo, _ := repo.NewJSONUserRepo(userPath)
 	wrepo, _ := repo.NewJSONWeaponsRepo(config.DefaultWeaponsPath)
 	inv, _ := repo.NewJSONInventoryRepo(config.DefaultUserWeaponsPath, config.DefaultUserItemsPath, config.DefaultWeaponsPath, "db/master/mst_items.json")
-	a := usecase.New(urepo, wrepo, inv, rng)
-	// 推奨: プロバイダ経由でテーブルをDI
-	gdata.SetProvider(a)
-	// 互換呼び出しは不要になったため省略（Provider経由で参照）
+    a := usecase.New(urepo, wrepo, inv, rng)
+    // Provider を App に差し替え
+    gdata.SetProvider(a)
+    // 一覧（Provider 経由で構築）
+    units := uiadapter.BuildUnitsFromProvider(uiadapter.AssetsPortraitLoader{})
+    if len(units) == 0 {
+        units = []uicore.Unit{uicore.SampleUnit()}
+    }
 
 	// 画面メトリクス初期化（基準解像度 + 外部メトリクス適用）
 	uicore.SetBaseResolution(screenW, screenH)

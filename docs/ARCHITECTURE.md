@@ -15,7 +15,7 @@
 - `internal/game/ui/layout`: レイアウト計算（矩形/サイズ）。副作用なし。
 - `internal/game/ui/draw`: 描画関数（見た目）。レイアウトに依存、I/Oはしない。
 - `internal/game/ui/view`: 表示用データ構造（行モデル等）。画像は参照（`*ebiten.Image`）に留める。
-- `internal/game/ui/adapter`: view-model 生成（テーブル/ユーザデータ→view）。`PortraitLoader` 抽象で画像読込を疎結合化。
+- `internal/game/ui/adapter`: view-model 生成（テーブル/ユーザデータ→view）。`PortraitLoader` 抽象で画像読込を疎結合化。`UnitFromUser` / `BuildUnitsFromProvider` などの UI 変換も本層に集約。`uicore` からは関数ブリッジ（init登録）で委譲。
 - 入力: 抽象入力はドメイン層へ移行（`pkg/game/input`）。Scenes は `Reader`（`Press/Down`）のみ参照し、取得はアダプタに委譲。
   - Domain: `pkg/game/input`（`Action`, `Event`, `ControlState`, `Reader`, `Source`, `Pointer`）
   - Adapter: `internal/game/provider/input/ebiten`（Ebiten API→Domain 変換: `Poll()`/`Position()`）
@@ -190,7 +190,7 @@ Session（UI 状態）:
 1) グローバルトグル（Backspace 長押し等）で発火
 2) `DataPort.ReloadData()` → Repo 側のキャッシュ再読込
 3) UI で `assets.Clear()`（画像キャッシュ等の UI 資産クリア）
-4) `uicore.LoadUnitsFromUser` で UI 用ユニットを再構築
+4) `ui/adapter.BuildUnitsFromProvider` で UI 用ユニットを再構築
 5) `gdata.SetProvider(usecaseApp)` により参照テーブルを最新化
 
 ### 6.3 戦闘解決（本番）

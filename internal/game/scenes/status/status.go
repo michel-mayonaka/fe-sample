@@ -110,10 +110,14 @@ func (s *Status) scHandleInput(ctx *game.Ctx) []scenes.Intent {
 	lvx, lvy, lvw, lvh := uiwidgets.LevelUpButtonRect(s.sw, s.sh)
 	s.lvHovered = geom.RectContains(mx, my, lvx, lvy, lvw, lvh)
 
-	if ctx != nil && ctx.Input != nil {
-		if ctx.Input.Press(uinput.Cancel) {
-			intents = append(intents, Intent{Kind: intentBack})
-		}
+    if ctx != nil && ctx.Input != nil {
+        if ctx.Input.Press(uinput.Cancel) {
+            intents = append(intents, Intent{Kind: intentBack})
+        }
+        // クリック/決定で「＜ 一覧へ」を有効化（戻る）
+        if !s.E.PopupActive && s.backHovered && ctx.Input.Press(uinput.Confirm) {
+            intents = append(intents, Intent{Kind: intentBack})
+        }
 
 		// ポップアップ中の操作
 		if s.E.PopupActive {

@@ -88,7 +88,7 @@ sort -t $'\t' -k1,1n -k2,2r "$tmp_list" | awk -F '\t' '!seen[$4]++' | while IFS=
   lines=$(extract_section "$file" "目的")
   if [[ -n "$lines" ]]; then
     while IFS= read -r L; do printf -- "%s\n" "$L"; done <<< "$lines" >> "$body_tmp"
-    if [[ "$(has_more_lines "$file" "目的")" == "yes" ]]; then printf "- ...\n" >> "$body_tmp"; fi
+    if [[ "$(has_more_lines "$file" "目的")" == "yes" ]]; then printf -- "- ...\n" >> "$body_tmp"; fi
   else
     printf -- "- （本文なし）\n" >> "$body_tmp"
   fi
@@ -97,7 +97,7 @@ sort -t $'\t' -k1,1n -k2,2r "$tmp_list" | awk -F '\t' '!seen[$4]++' | while IFS=
   lines=$(extract_section "$file" "背景")
   if [[ -n "$lines" ]]; then
     while IFS= read -r L; do printf -- "%s\n" "$L"; done <<< "$lines" >> "$body_tmp"
-    if [[ "$(has_more_lines "$file" "背景")" == "yes" ]]; then printf "- ...\n" >> "$body_tmp"; fi
+    if [[ "$(has_more_lines "$file" "背景")" == "yes" ]]; then printf -- "- ...\n" >> "$body_tmp"; fi
   else
     printf -- "- （本文なし）\n" >> "$body_tmp"
   fi
@@ -106,7 +106,7 @@ sort -t $'\t' -k1,1n -k2,2r "$tmp_list" | awk -F '\t' '!seen[$4]++' | while IFS=
   lines=$(extract_section "$file" "DoD候補")
   if [[ -n "$lines" ]]; then
     while IFS= read -r L; do printf -- "%s\n" "$L"; done <<< "$lines" >> "$body_tmp"
-    if [[ "$(has_more_lines "$file" "DoD候補")" == "yes" ]]; then printf "- ...\n" >> "$body_tmp"; fi
+    if [[ "$(has_more_lines "$file" "DoD候補")" == "yes" ]]; then printf -- "- ...\n" >> "$body_tmp"; fi
   else
     printf -- "- （本文なし）\n" >> "$body_tmp"
   fi

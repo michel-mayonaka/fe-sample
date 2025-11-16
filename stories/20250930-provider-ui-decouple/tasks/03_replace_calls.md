@@ -8,7 +8,6 @@
 - 旧来の `UserUnitByID` 相当を期待していたコード（存在すれば）。
 
 ## 手順
-- [ ] Provider 参照箇所を確認し、UI 型生成は Adapter へ移動。
-- [ ] `rg -n "uicore\.|UserUnitByID"` で再チェック。
+- [x] Provider 参照箇所を確認し、UI 型生成は Adapter へ移動。
+- [x] `rg -n "uicore\.|UserUnitByID"` で再チェック。
 - [ ] 表示/シミュ/ステータスで動作確認。
-

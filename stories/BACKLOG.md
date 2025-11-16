@@ -18,36 +18,6 @@
 
 初期エントリ
 
-## [P1] 2025-10-13: データ永続化のDB化（SQLite への移行）
-- 目的: JSON 直読みの構成を段階的に廃し、SQLite による一貫した読み書き・整合性・検索性を確保する（将来の拡張・整備容易性向上）。
-- 背景: 現状は `os.Open` による JSON I/O 前提で、WASM（ブラウザ）では直接読み込み不可。整合性/同時更新/検索性が弱く、将来的なデータ拡張に制約がある。
-- DoD:
-  - 内部実装に `internal/infra/sqlite` を新設し、`db/master`/`db/user` 相当のスキーマを SQLite へ定義（DDL/マイグレーション初期化）。
-  - 既存 JSON→SQLite 変換ユーティリティを追加（`make migrate-json-to-sqlite` など）。
-  - Repo 層を抽象化し、JSON バックエンド（`internal/infra/userfs`）と SQLite バックエンドの差し替えが可能。
-  - CI/ローカルで SQLite バックエンドを用いた `make test-all` がグリーン。
-  - Web（WASM）向けは第1段階として「読み取り専用」の代替手段（例: `embed`/HTTP fetch で JSON を供給 or wasm-sqlite）を方針化し README に明記（将来、wasm 対応 SQLite は別エントリで最適解を選定）。
-  - ドキュメント更新（`docs/DB_NOTES.md` にスキーマ/移行方針、`README.md` に実行方法）。
-- 参考/関連: `docs/DB_NOTES.md`、`internal/infra/userfs`（現行JSON I/F）、`stories/20251013-gh-pages-webgl-demo`（WASM における読み取り方式の検討）
-
-## [P1] 2025-10-13: codex-cloud 環境対応のリポジトリ整理
-- 目的: codex-cloud 環境（GUIなし/ネットワーク制限ありでも可）で安定して作業・検証できるよう最小構成を整える。
-- 背景: 現状は UI ビルドや依存取得が環境依存となりやすく、`MCP_OFFLINE`/`headless` 運用や vendor 前提の手順が明文化/自動化されていない。
-- DoD: codex-cloud 上で `MCP_OFFLINE=1 make mcp` が成功（vendor 前提・headless タグで lint/test）。`AGENTS.md`/`README.md` に codex-cloud 手順（環境変数/スキップ条件/検証コマンド）を追記。スクリプトの入出力先はワークスペース配下のみを使用。
-- 参考/関連: `stories/20251013-ci-mcp-gha-mcp-fix`（CIのheadless/lint方針と整合）
-
-## [P1] 2025-10-13: GitHub Pages で WebGL デモを公開
-- 目的: ブラウザで動作確認できる公開デモを用意し、レビュー/共有を容易にする。
-- 背景: ローカル環境構築なしで UI を確認したい要望がある。Ebiten は WebAssembly + WebGL で動作可能。
-- DoD: CI で `GOOS=js GOARCH=wasm` ビルド（`ui_sample.wasm`）と `wasm_exec.js`/`index.html` を生成し、`gh-pages` ブランチへデプロイ。GitHub Pages を有効化し、`README.md` に確認用 URL と更新手順を追記。
-- 参考/関連: `.github/workflows/ci.yml`（デプロイ用ワークフロー追加）、`cmd/ui_sample`（Web向けエントリの最小調整が必要な場合あり）
-
-## [P1] 2025-10-13: CI を事前依存込みのコンテナに統一（X11/GL 付き）
-- 目的: apt の都度インストールによるジョブ遅延を解消し、UI ビルドの再現性を強化する。
-- 背景: Ebiten/GLFW の Linux ビルドには X11/GL 開発パッケージが必要。現在は Actions 上で毎回 `apt-get install` を行っており 30–90 秒のオーバーヘッドが発生。
-- DoD: `build-and-lint`/`ui-build-strict` を `container.image: ghcr.io/<org>/<repo>/go1.25-x11:<tag>` に切替。ワークフローから apt ステップを撤去。README/AGENTS にコンテナ運用を追記。フォールバック手順（apt 直導入）も記載。
-- 参考/関連: `stories/20251013-ci-mcp-gha-mcp-fix`（暫定の apt インストールで回避中）
-
 ## [P0] 2025-09-30: Provider から UI 型依存を分離（Port/Adapter 再整理）
 - （簡潔に）
   （[→ Discovery](stories/discovery/accepted/20250930-183535-provider-ui-decouple.md)）
@@ -87,6 +57,17 @@
   （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-11.md)）
 - `main` の入力/状態遷移ロジックを `internal/app` へ移譲、UI直I/O撤去、`config` にパス統一、`make mcp` グリーン。\n
   （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-11.md)）
+
+## [P2] 2025-11-16: docs/WORKFLOW.md をディレクトリ化して細分化を行う
+- `docs/WORKFLOW.md` を章単位に分割し、`docs/workflow/` 配下へ整理して参照性・更新性を高める。
+  （[→ Discovery](stories/discovery/accepted/2025-11-16-workflow-docs-split.md)）
+- 単一ファイルに多くの内容が集約され肥大化しており、章内リンクや関連ドキュメントとの整合が取りづらい。
+  （[→ Discovery](stories/discovery/accepted/2025-11-16-workflow-docs-split.md)）
+- `docs/workflow/` ディレクトリを新設し、主要章（概要/ローカル検証/CI方針/変数運用/MCP_STRICT・MCP_OFFLINE/ストーリー運用フロー など）に分割。
+- 目次（索引）ファイル `docs/workflow/README.md` を用意し、分割先へのリンクを集約。
+- 既存参照（`AGENTS.md`/`README.md`/`docs/REF_STORIES.md`）のリンクを新構成へ更新。
+- ...
+  （[→ Discovery](stories/discovery/accepted/2025-11-16-workflow-docs-split.md)）
 
 ## [P2] 2025-09-30: `internal/game/util` の撤去または責務特化サブパッケージ化
 - 命名規約（util/helpers禁止）に沿い、汎用名の温床を除去する。\n
@@ -175,3 +156,9 @@
   （[→ Discovery](stories/discovery/accepted/2025-09-29-migrated-17.md)）
 - view-model を `PortraitPath` に寄せる設計案の比較と方針確定（採用/見送りの記録）\n- CI で `make test-all-ui` を追加ジョブとして実行\n
   （[→ Discovery](stories/discovery/accepted/2025-09-29-migrated-17.md)）
+
+
+## [P2] 2025-11-16: UI adapter/bridge 後続クリーンアップ
+- 目的: `uicore` のフォールバック撤去、`ui/widgets` 互換APIの整理、回帰テスト拡充。
+  （[→ Discovery](stories/discovery/accepted/2025-11-16-ui-adapter-cleanups.md)）
+- DoD: 旧API削除・テスト追加・`make mcp` グリーン。

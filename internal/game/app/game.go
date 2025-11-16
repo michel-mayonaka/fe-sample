@@ -12,6 +12,7 @@ import (
     "ui_sample/internal/game"
     "ui_sample/internal/game/scenes"
     uicore "ui_sample/internal/game/service/ui"
+    uiadapter "ui_sample/internal/game/ui/adapter"
     uinput "ui_sample/internal/game/ui/input"
     ginput "ui_sample/pkg/game/input"
 )
@@ -154,15 +155,13 @@ func (g *Game) updateGlobalToggles() {
 					uicore.SetBaseResolution(m.Base.W, m.Base.H)
 				}
 			}
-			// UIユニット再構築
-			if g.Env != nil && g.Env.UserPath != "" {
-				if us, err := uicore.LoadUnitsFromUser(g.Env.UserPath); err == nil && len(us) > 0 {
-					g.Env.Units = us
-					if g.Env.SelIndex >= len(us) {
-						g.Env.SelIndex = 0
-					}
-				}
-			}
+            // UIユニット再構築（Provider 経由）
+            if g.Env != nil {
+                if us := uiadapter.BuildUnitsFromProvider(uiadapter.AssetsPortraitLoader{}); len(us) > 0 {
+                    g.Env.Units = us
+                    if g.Env.SelIndex >= len(us) { g.Env.SelIndex = 0 }
+                }
+            }
 		}
 	} else {
 		g.reloadHold = 0

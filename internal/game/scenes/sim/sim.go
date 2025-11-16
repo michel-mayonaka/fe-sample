@@ -8,6 +8,7 @@ import (
     uicore "ui_sample/internal/game/service/ui"
     uiwidgets "ui_sample/internal/game/service/ui/widgets"
     uidraw "ui_sample/internal/game/ui/draw"
+    uilayout "ui_sample/internal/game/ui/layout"
     gcore "ui_sample/pkg/game"
 )
 
@@ -76,7 +77,8 @@ func (s *Sim) Draw(dst *ebiten.Image) {
     uidraw.DrawBattleWithTerrain(dst, s.simAtk, s.simDef, s.attTerrain, s.defTerrain, canStart)
     uiwidgets.DrawTerrainButtons(dst, s.attSel, s.defSel)
     // ホバー状態は scHandleInput 側で更新済みの値を利用
-    uiwidgets.DrawAutoRunButton(dst, s.autoHovered, s.auto)
+    ax, ay, aw, ah := uilayout.AutoRunButtonRect(s.sw, s.sh)
+    uiwidgets.DrawAutoRunButtonAt(dst, ax, ay, aw, ah, s.autoHovered, s.auto)
     if s.logPopup && s.lv != nil {
         s.lv.Draw(dst)
     }

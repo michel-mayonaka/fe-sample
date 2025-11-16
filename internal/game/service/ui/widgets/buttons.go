@@ -124,23 +124,27 @@ func DrawAutoRunButton(dst *ebiten.Image, hovered bool, running bool) {
 	// ただし、この関数単体では矩形を計算しないため、実プロジェクトでは Draw* と Rect を揃えるのが望ましいです。
 	// 互換のため、開始ボタンの右隣（AutoRunButtonRect）を前提に、そこへ描画します。
 	// Rect の再計算
-	bx, by, bw, bh := uicore.S(0), uicore.S(0), uicore.SimStartBtnWPx(), uicore.SimStartBtnHPx()
-	if startX, startY, startW, startH := BattleStartButtonRectCompat(sw, sh); startW > 0 {
-		bx, by, bw, bh = startX+startW+uicore.SimAutoRunGapPx(), startY, startW, startH
-	}
-	uicore.DrawFramedRect(dst, float32(bx), float32(by), float32(bw), float32(bh))
-	base := color.RGBA{110, 90, 40, 255}
-	if running {
-		base = color.RGBA{150, 60, 60, 255}
-	} else if hovered {
-		base = color.RGBA{140, 110, 50, 255}
-	}
-	vector.DrawFilledRect(dst, float32(bx), float32(by), float32(bw), float32(bh), base, false)
-	label := "自動実行"
-	if running {
-		label = "停止"
-	}
-	uicore.TextDraw(dst, label, uicore.FaceMain, bx+uicore.WidgetsToBattleLabelXPx(), by+uicore.WidgetsToBattleLabelYPx()+uicore.S(2), uicore.ColText)
+    // 後方互換: 旧関数はレイアウトに依存せず描画していたが、実座標との不一致を避けるため
+    // ここでは開始ボタン互換Rectが提供されていない場合は左上に描かず、何もしない。
+    if startX, startY, startW, startH := BattleStartButtonRectCompat(sw, sh); startW > 0 {
+        bx, by, bw, bh := startX+uicore.SimAutoRunGapPx()+startW, startY, startW, startH
+        DrawAutoRunButtonAt(dst, bx, by, bw, bh, hovered, running)
+    }
+}
+
+// DrawAutoRunButtonAt は与えられた矩形に「自動実行/停止」ボタンを描画します。
+func DrawAutoRunButtonAt(dst *ebiten.Image, x, y, w, h int, hovered bool, running bool) {
+    uicore.DrawFramedRect(dst, float32(x), float32(y), float32(w), float32(h))
+    base := color.RGBA{110, 90, 40, 255}
+    if running {
+        base = color.RGBA{150, 60, 60, 255}
+    } else if hovered {
+        base = color.RGBA{140, 110, 50, 255}
+    }
+    vector.DrawFilledRect(dst, float32(x), float32(y), float32(w), float32(h), base, false)
+    label := "自動実行"
+    if running { label = "停止" }
+    uicore.TextDraw(dst, label, uicore.FaceMain, x+uicore.WidgetsToBattleLabelXPx(), y+uicore.WidgetsToBattleLabelYPx()+uicore.S(2), uicore.ColText)
 }
 
 // BattleStartButtonRectCompat は widgets から開始ボタン位置へアクセスするための薄い互換関数です。

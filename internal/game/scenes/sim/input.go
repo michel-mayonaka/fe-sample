@@ -39,6 +39,10 @@ func (s *Sim) scHandleInput(ctx *game.Ctx) []scenes.Intent {
 		if ctx.Input.Press(uinput.Cancel) {
 			intents = append(intents, Intent{Kind: intentBack})
 		}
+		// クリック/Confirm で「＜ 一覧へ」ボタンを有効化
+		if s.backHovered && ctx.Input.Press(uinput.Confirm) {
+			intents = append(intents, Intent{Kind: intentBack})
+		}
 		if s.startHovered && (s.simAtk.HP > 0 && s.simDef.HP > 0) && ctx.Input.Press(uinput.Confirm) {
 			intents = append(intents, Intent{Kind: intentRunOne})
 		}

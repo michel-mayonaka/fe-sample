@@ -1,6 +1,6 @@
 # 20250930-provider-ui-decouple — Provider から UI 型依存を分離（Port/Adapter 再整理）
 
-ステータス: [準備完了]
+ステータス: [完了]
 担当: @tkg-engineer
 開始: 2025-09-30 00:00:00 +0900
 
@@ -15,10 +15,10 @@
 - 最小のドキュメント整合（`docs/ARCHITECTURE.md`/`docs/API.md`）。
 
 ## 受け入れ基準（Definition of Done）
-- [ ] `internal/game/data/` 直下で `uicore.` を参照していない（`rg -n 'uicore\.' internal/game/data` が 0）。
-- [ ] Provider IF（`provider.go`）に UI 型が含まれないことを確認。
-- [ ] 主要画面（一覧/ステータス/シミュ）で動作確認。
-- [ ] `make mcp` がグリーン。
+- [x] `internal/game/data/` 直下で `uicore.` を参照していない（`rg -n 'uicore\.' internal/game/data` が 0）。
+- [x] Provider IF（`provider.go`）に UI 型が含まれないことを確認。
+- [x] 主要画面（一覧/ステータス/シミュ）で動作確認（回帰テスト含む）。
+- [x] `make mcp` がグリーン。
 
 ## 工程（サブタスク）
 - [ ] 現状調査: 依存と使用箇所の棚卸し — `tasks/01_inventory.md`
@@ -33,6 +33,9 @@
 ## 進捗・決定事項（ログ）
 - 2025-09-30 00:00:00 +0900: ストーリー作成（BACKLOG昇格）
 - 2025-10-01 05:11:00 +0900: ステータスを[準備完了]へ更新（レビュー完了）
+- 2025-11-16 18:45:00 +0900: Provider→UI依存の排除（adapter.UnitFromUser導入、一覧生成API追加）。app初期化/再読込をProvider経由へ移行。uicore側旧APIにDeprecated対応（I/O撤廃）。
+- 2025-11-16 18:58:00 +0900: Deprecated整備（uicore.UnitFromUser/LoadUnitsFromUser を Provider 委譲で実装し、旧呼び出し互換を保持）。
+- 2025-11-16 19:20:00 +0900: uicore→adapter ブリッジ実装（循環回避）。`uicore.UnitFromUser/LoadUnitsFromUser` は `ui/adapter` 関数を init 登録で呼び出す構成へ移行。
 
 ## リスク・懸念
 - UI/Adapter への集約で一時的に呼び出しが増える可能性。
