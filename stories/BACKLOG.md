@@ -17,6 +17,18 @@
 ```
 
 初期エントリ
+## [P2] 2025-11-17: ストーリー管理をGitHub Issueに移行するか検討
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/20251117-022029-story-gh-issues.md, Story:  N/A
+
+## [P2] 2025-11-17: ストーリー/BACKLOG用の作業分類タグの追加
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/20251117-022029-story-tags.md, Story:  N/A
+
 ## [P2] 2025-11-17: db/userをリポジトリ管理外にする
 - 目的: （discovery参照）
 - 背景: （discovery参照）
@@ -52,14 +64,6 @@
 - 背景: （discovery参照）
 - DoD: （discoveryの DoD候補を要約 or 後続で具体化）
 - 参考/関連: stories/discovery/20251117-010034-spec-impl-diff-workflow.md, Story:  N/A
-
-## [P1] 2025-09-29: `internal/game/service/ui/apply.go` の分割検討
-- UI メトリクス適用処理を責務単位で分割し、可読性・変更容易性・テスト容易性を向上する。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-29-migrated-05.md)）
-- 現在の `apply.go` は複数ドメイン（List/Status/Sim/Popup/Widgets）への一括適用を担っており、変更差分の把握や衝突が起きやすい。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-29-migrated-05.md)）
-- 機能等価のまま `apply_list.go`/`apply_status.go`/`apply_sim.go`/`apply_popup.go`/`apply_widgets.go` 等へ分割、外部 API を不変に維持、`make mcp` グリーン。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-29-migrated-05.md)）
 
 ## [P1] 2025-09-27: レイヤリング/依存の整理（main→app 移譲）
 - 入力処理・状態遷移を `internal/app` に集約し、UI 側は描画＋イベント通知に限定。\n
