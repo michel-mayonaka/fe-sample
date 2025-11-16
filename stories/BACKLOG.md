@@ -17,6 +17,18 @@
 ```
 
 初期エントリ
+## [P2] 2025-11-17: 画面仕様の新規作成（タイトル/編成/バトルマップ）
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/20251117-010944-ui-spec-new-screens.md, Story:  N/A
+
+## [P1] 2025-11-17: WebGLビルドが暗転したままになる不具合調査
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/20251117-010944-webgl-dark-screen.md, Story:  N/A
+
 ## [P1] 2025-11-17: workflowからスクリプト化候補を洗い出す workflow
 - 目的: （discovery参照）
 - 背景: （discovery参照）
