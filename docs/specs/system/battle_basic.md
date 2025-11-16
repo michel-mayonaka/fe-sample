@@ -1,5 +1,9 @@
 # 戦闘基本仕様（system spec）
 
+状態: impl-tested
+主な実装: internal/usecase/battle.go, internal/game/scenes/ports_battle.go, pkg/game/resolve.go
+最新ストーリー: 20251117-spec-status-metadata
+
 ## 1. 概要
 - 機能名: 戦闘基本解決（1ラウンド）
 - 目的: ステータス画面から遷移した戦闘画面で、攻撃→反撃の1ラウンドを解決し、その結果をユーザデータに永続化する。

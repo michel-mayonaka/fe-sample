@@ -1,5 +1,9 @@
 # ステータス画面仕様（ui spec）
 
+状態: impl-done
+主な実装: internal/game/scenes/status, internal/game/ui/draw/status.go, internal/game/ui/layout/status.go
+最新ストーリー: 20251117-spec-status-metadata
+
 ## 1. 画面概要
 - 画面名: ステータス画面
 - 目的: 選択中のユニットの詳細ステータス（基本能力・成長率・武器/魔法ランク・装備・ポートレート）を一覧し、戦闘画面への入り口を提供する。
