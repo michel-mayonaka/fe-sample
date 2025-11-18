@@ -1,6 +1,6 @@
 # 20251119-ui-apply-refactor — `internal/game/service/ui/apply.go` の分割実装
 
-ステータス: [準備中]
+ステータス: [完了]
 担当: @tkg-engineer
 開始: 2025-11-19 01:36:42 +0900
 元ストーリー: 20251117-ui-apply-split（調査/設計）
@@ -17,18 +17,20 @@
 - ドキュメント（`docs/API.md`, `docs/ARCHITECTURE.md`）が新構成に追随し、`make mcp` が通っている。
 
 ## 受け入れ基準（Definition of Done）
-- [ ] `ApplyMetrics` 本体がセクション別の内部関数呼び出しのみになっている。
-- [ ] `metricsTargets` を介した単体テストが追加され、List/Status/Sim/Popup/Widgets ごとに適用を検証できる。
-- [ ] ドキュメントの参照が `apply.go` 単体ではなく分割構成に更新されている。
-- [ ] `make mcp` が成功し、UI ホットリロード経路（`internal/game/app/game.go`, `core.go`）で動作確認済み。
+- [x] `ApplyMetrics` 本体がセクション別の内部関数呼び出しのみになっている。
+- [x] `metricsTargets` を介した単体テストが追加され、List/Status/Sim/Popup/Widgets ごとに適用を検証できる。
+- [x] ドキュメントの参照が `apply.go` 単体ではなく分割構成に更新されている。
+- [x] `make mcp` が成功し、UI ホットリロード経路（`internal/game/app/game.go`, `core.go`）で動作確認済み。
 
 ## 工程（サブタスク）
-- [ ] 01_ヘルパ導入と準備 — `apply_helpers.go` と `metricsTargets` の追加
-- [ ] 02_ドメイン別ファイル分割 — List/Status/Sim/Popup/Widgets の移行
-- [ ] 03_テスト＆ドキュメント／CI 検証 — `apply_test.go` 拡張 + docs 更新 + `make mcp`
+- [x] 01_ヘルパ導入と準備 — `apply_helpers.go` と `metricsTargets` の追加
+- [x] 02_ドメイン別ファイル分割 — List/Status/Sim/Popup/Widgets の移行
+- [x] 03_テスト＆ドキュメント／CI 検証 — `apply_test.go` 拡張 + docs 更新 + `make mcp`
 
 ## 進捗・決定事項（ログ）
 - 2025-11-19 01:36:42 +0900: ストーリー起票。Backlog `[P1] 2025-11-19: ApplyMetrics 分割実装` から昇格。
+- 2025-11-19 10:05:00 +0900: Task01/02 を連続実施し、`metricsTargets` + `apply_*.go` へ分割完了。`go test ./internal/game/service/ui` で回帰なしを確認。
+- 2025-11-19 10:45:00 +0900: Task03 で `apply_test.go` 拡張・`docs/API.md`/`docs/ARCHITECTURE.md` 更新・`make mcp` まで完了し、ストーリーを DoD 充足としてクローズ。
 
 ## リスク・懸念
 - `metricsTargets` へのフィールド追加漏れでビルドエラーにならずランタイム不具合となる可能性 → テストで各ドメインのフィールドを網羅。

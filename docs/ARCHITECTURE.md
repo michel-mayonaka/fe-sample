@@ -373,7 +373,7 @@ Update(*game.Ctx) bool; Draw(*ebiten.Image); Layer() int
 - 目的: 解像度差/画面改修をデータドリブンに調整可能にする。
 - 構成:
   - ローダ: `internal/config/uimetrics/metrics.go`（JSON 読み込み、`Default`/`LoadOrDefault`）
-  - 適用: `internal/game/service/ui/apply.go`（`ApplyMetrics` で `uicore` 変数へ反映）
+  - 適用: `internal/game/service/ui/apply.go`（`ApplyMetrics` が `metricsTargets` を介して `apply_*.go` へ委譲し、各ドメインの `uicore` 変数を更新）
   - 既定: `db/master/mst_ui_metrics.json`（ユーザ上書きは `db/user/usr_ui_metrics.json`）
   - 反映タイミング: アプリ起動時（`internal/game/app/core.go`）、再読込（Backspace 長押し、`internal/game/app/game.go`）
 - スケール: 論理解像度（`SetBaseResolution`）と実ウィンドウサイズから算出（`UpdateMetricsFromWindow`）。

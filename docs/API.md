@@ -151,7 +151,7 @@ Provider と Repository の役割の違い:
 
 ## UI メトリクス（uicore）
 - 読込: `internal/config/uimetrics` にて JSON をロード（ユーザ→マスタ→既定）。
-- 適用: `internal/game/service/ui.ApplyMetrics` で `uicore` の変数へ反映。
+- 適用: `internal/game/service/ui.ApplyMetrics` が `metricsTargets` を生成し、`apply_list.go`/`apply_status.go`/`apply_sim.go`/`apply_popup.go`/`apply_widgets.go`（ヘルパは `apply_helpers.go`）経由で `uicore` の変数へ反映。
 - 代表キー（list.*）例:
   - `margin`, `itemH`, `itemGap`, `titleOffset`, `portraitSize`
   - 固定オフセット: `headerTopGap`, `itemsTopGap`, `panelInnerPaddingX`, `titleXOffset`, `headerBaseX`,
