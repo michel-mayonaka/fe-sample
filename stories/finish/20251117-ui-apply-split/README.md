@@ -42,3 +42,7 @@
 - PR: #
 - Issue: #
 - Docs: `docs/NAMING.md`, `docs/ARCHITECTURE.md`
+
+- 2025-11-19 01:42:14 +0900: アーカイブ（finish へ移動）
+
+- 2025-11-19 01:42:55 +0900: アーカイブ（finish へ移動）

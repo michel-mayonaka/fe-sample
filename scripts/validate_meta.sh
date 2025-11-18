@@ -6,7 +6,17 @@ set -euo pipefail
 
 paths=("$@")
 if [[ ${#paths[@]} -eq 0 ]]; then
-  mapfile -t paths < <(git ls-files 'stories/**/*.md')
+  # Git が使える場合は tracked な stories 配下のみを対象にする
+  if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    while IFS= read -r p; do
+      paths+=("$p")
+    done < <(git ls-files 'stories/**/*.md')
+  else
+    # Git が使えない環境向けのフォールバック（未追跡ファイルも含める）
+    while IFS= read -r p; do
+      paths+=("$p")
+    done < <(find stories -type f -name '*.md')
+  fi
 fi
 
 missing=0
@@ -26,4 +36,3 @@ for f in "${paths[@]}"; do
 done
 
 exit $missing
-

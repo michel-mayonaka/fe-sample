@@ -105,6 +105,15 @@ jobs:
           # EXTRA_LINTERS='-E funlen -E gocognit -E cyclop' make mcp
           make mcp
 
+      - name: Story index & meta validation
+        run: |
+          # 完了ストーリー索引の再生成（stories/finish/INDEX.md）
+          make story-index
+          # Story/Discovery メタデータの軽量検証（非strict: 欠落は警告ログのみ）
+          if ! ./scripts/validate_meta.sh; then
+            echo "::warning::stories meta validation reported missing keys (CI 非strict: fail にはしません)"
+          fi
+
   ui-build-strict:
     runs-on: ubuntu-latest
     needs: [build-and-lint]

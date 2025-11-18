@@ -1,6 +1,6 @@
 # 20251117-ci-story-index — CI にストーリー検証/索引生成を統合
 
-ステータス: [準備完了]
+ステータス: [完了]
 担当: @tkg-engineer
 開始: 2025-11-17 01:58:08 +0900
 
@@ -14,9 +14,9 @@
 - エラー時の挙動（必須メタ欠落などで CI を fail にする条件）が明文化されている。
 
 ## 受け入れ基準（Definition of Done）
-- [ ] CI ワークフローに Story 検証/索引生成ステップを追加する案が docs/workflows/ci.md 等に記載されている。
-- [ ] `make story-index`/`make validate-meta` をローカルで実行したときの期待する使い方が簡潔に説明されている。
-- [ ] Backlog 上の discovery `CI にストーリー検証/索引生成を統合` が consumed になり、本ストーリーと相互リンクされている。
+- [x] CI ワークフローに Story 検証/索引生成ステップを追加する案が docs/workflows/ci.md 等に記載されている。
+- [x] `make story-index`/`make validate-meta` をローカルで実行したときの期待する使い方が簡潔に説明されている。
+- [x] Backlog 上の discovery `CI にストーリー検証/索引生成を統合` が consumed になり、本ストーリーと相互リンクされている。
 
 ## 工程（サブタスク）
 - [ ] 現状の `scripts/gen_story_index.sh` / `scripts/validate_meta.sh` の挙動確認と要件整理 — `stories/20251117-ci-story-index/tasks/01_tools-audit.md`
@@ -30,6 +30,8 @@
 ## 進捗・決定事項（ログ）
 - 2025-11-17 01:58:08 +0900: ストーリー作成（discovery: 2025-09-30-migrated-01 から昇格）
  - 2025-11-17 02:04:12 +0900: README とサブタスクの内容をレビューし、CI への統合方針に問題がないことを確認したためステータスを[準備完了]へ更新。
+ - 2025-11-19 01:46:49 +0900: 作業開始につきステータスを[進行中]へ更新。
+ - 2025-11-19 01:52:18 +0900: Story 索引生成/メタ検証ツールの棚卸し・CI ワークフロー更新・docs/backlog 整理を完了し、受け入れ基準を満たしたためステータスを[完了]へ更新。
 
 ## リスク・懸念
 - CI 実行時間の増加や、ストーリー未整備時に PR が詰まりすぎるリスク。
@@ -38,3 +40,6 @@
 - PR: #
 - Issue: #
 - Docs: `docs/workflows/stories.md`, `docs/workflows/ci.md`, `scripts/gen_story_index.sh`, `scripts/validate_meta.sh`
+- Discovery: `stories/discovery/consumed/2025-09-30-migrated-01.md`
+
+- 2025-11-19 01:58:43 +0900: アーカイブ（finish へ移動）
