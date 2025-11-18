@@ -71,14 +71,6 @@
 - DoD: （discoveryの DoD候補を要約 or 後続で具体化）
 - 参考/関連: stories/discovery/20251117-010034-spec-impl-diff-workflow.md, Story:  N/A
 
-## [P2] 2025-09-30: `internal/game/util` の撤去または責務特化サブパッケージ化
-- 命名規約（util/helpers禁止）に沿い、汎用名の温床を除去する。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-07.md)）
-- 現状空ディレクトリが存在。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-07.md)）
-- 不要なら削除。必要なら用途別に `rng`/`rect`/`debug` 等へ再配置。README へ根拠追記、`make mcp` グリーン。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-07.md)）
-
 ## [P2] 2025-09-30: 入力レイアウト設定の外部化（config 駆動）
 - キー/マウス割当を設定ファイルで差し替え可能にし、`provider/input/ebiten` のレイアウト注入を標準化する。\n
   （[→ Discovery](stories/discovery/accepted/2025-09-30-migrated-06.md)）

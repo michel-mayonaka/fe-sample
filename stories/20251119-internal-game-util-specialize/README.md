@@ -1,6 +1,6 @@
 # 20251119-internal-game-util-specialize — `internal/game/util` の撤去または責務特化サブパッケージ化
 
-ステータス: [準備完了]
+ステータス: [完了]
 担当: @tkg-engineer
 開始: 2025-11-19 00:28:16 +0900
 
@@ -14,14 +14,14 @@
 - docs/NAMING.md や docs/ARCHITECTURE.md と整合する形で、util 系ディレクトリの扱い方針を整理する。
 
 ## 受け入れ基準（Definition of Done）
-- [ ] `internal/game/util` の現状と利用状況が整理されたメモがある。
-- [ ] 削除または責務特化サブパッケージ化の方針（どの機能をどこへ移すか）が決まっている。
-- [ ] README や関連ドキュメントに、util 名を避ける方針と今回の整理の位置付けが明文化されている。
+- [x] `internal/game/util` の現状と利用状況が整理されたメモがある。
+- [x] 削除または責務特化サブパッケージ化の方針（どの機能をどこへ移すか）が決まっている。
+- [x] README や関連ドキュメントに、util 名を避ける方針と今回の整理の位置付けが明文化されている。
 
 ## 工程（サブタスク）
-- [ ] 現状調査: `internal/game/util` 配下と利用箇所の棚卸し — `stories/20251119-internal-game-util-specialize/tasks/01_audit-util-usage.md`
-- [ ] 再配置/削除方針の検討: 責務特化サブパッケージ案の作成 — `stories/20251119-internal-game-util-specialize/tasks/02_design-specialized-packages.md`
-- [ ] ドキュメント更新と後続タスク（実装ストーリー/Backlog）の整理 — `stories/20251119-internal-game-util-specialize/tasks/03_docs-and-followups.md`
+- [x] 現状調査: `internal/game/util` 配下と利用箇所の棚卸し — `stories/20251119-internal-game-util-specialize/tasks/01_audit-util-usage.md`
+- [x] 再配置/削除方針の検討: 責務特化サブパッケージ案の作成 — `stories/20251119-internal-game-util-specialize/tasks/02_design-specialized-packages.md`
+- [x] ドキュメント更新と後続タスク（実装ストーリー/Backlog）の整理 — `stories/20251119-internal-game-util-specialize/tasks/03_docs-and-followups.md`
 
 ## 計画（目安）
 - 見積: 1 セッション程度
@@ -30,6 +30,8 @@
 ## 進捗・決定事項（ログ）
 - 2025-11-19 00:28:16 +0900: ストーリー作成（discovery: 2025-09-30-migrated-07 から昇格）
  - 2025-11-19 00:33:53 +0900: README とサブタスクを整備し、`internal/game/util` の整理方針検討の下準備が整ったためステータスを[準備完了]へ更新。
+- 2025-11-18 22:55 JST: 現状調査を実施し、`internal/game/util` が削除済であること、`internal/game/rng` へ機能移設済であることを確認。
+- 2025-11-18 23:05 JST: 再配置方針・命名ガイド追記・Backlog 整理を完了。util 系ディレクトリの再導入禁止方針を docs/NAMING.md へ明文化し、本ストーリーを完了へ移行。
 
 ## リスク・懸念
 - 既存コードが util 配下のヘルパーに依存している場合、移動に伴う import 調整やテスト修正が必要になる可能性。

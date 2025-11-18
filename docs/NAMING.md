@@ -125,6 +125,11 @@ CREATE TABLE Characters (CharacterId TEXT PRIMARY KEY, CreatedAt TEXT);
   - 変更: `internal/game/util` → `internal/game/rng`（RNG 専用に特化）。
   - 目的特化: `helpers.go` → `rect_helpers.go`（矩形関連へ限定。将来 `rect.go` 等へ再集約）。
 
+### ケーススタディ: `internal/game/util` 撤去（2025-11）
+- 2025-09-29 の暫定改称で RNG ラッパを `internal/game/rng` へ切り出し、そのまま util ディレクトリは空のまま残置していた。
+- 2025-11-19 ストーリー `20251119-internal-game-util-specialize` で最終確認し、ディレクトリを完全削除。`math/rand` の利用箇所は段階的に `rng` サブパッケージへ寄せる方針を残し、空の util や曖昧名を再導入しないことを明示した。
+- 以降、新たな共有ヘルパーが必要になった場合は Discovery → Story を経て、`rng`/`rect`/`debug` 等のように目的語で命名したサブパッケージを起こすこと。暫定集約でも `*_helpers.go` のようにスコープを限定し、完了後すぐに分割計画を残す。
+
 ## コミット / PR
 - 形式: Conventional Commits。種別例 `feat`, `fix`, `docs`, `refactor`, `test`, `chore`。
 - 例（コミット）:
