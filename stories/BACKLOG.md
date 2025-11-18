@@ -17,6 +17,12 @@
 ```
 
 初期エントリ
+## [P2] 2025-11-19: claudecodeのsubagents的な機能をcodexで実現のためのナレッジ追加
+- 目的: （discovery参照）
+- 背景: （discovery参照）
+- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
+- 参考/関連: stories/discovery/20251119-003515-codex-subagents-knowledge.md, Story:  N/A
+
 ## [P2] 2025-11-17: ストーリー管理をGitHub Issueに移行するか検討
 - 目的: （discovery参照）
 - 背景: （discovery参照）
@@ -64,14 +70,6 @@
 - 背景: （discovery参照）
 - DoD: （discoveryの DoD候補を要約 or 後続で具体化）
 - 参考/関連: stories/discovery/20251117-010034-spec-impl-diff-workflow.md, Story:  N/A
-
-## [P1] 2025-09-27: レイヤリング/依存の整理（main→app 移譲）
-- 入力処理・状態遷移を `internal/app` に集約し、UI 側は描画＋イベント通知に限定。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-11.md)）
-- `main` に処理が残存し責務が曖昧。UI からの直接I/Oも点在。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-11.md)）
-- `main` の入力/状態遷移ロジックを `internal/app` へ移譲、UI直I/O撤去、`config` にパス統一、`make mcp` グリーン。\n
-  （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-11.md)）
 
 ## [P2] 2025-09-30: `internal/game/util` の撤去または責務特化サブパッケージ化
 - 命名規約（util/helpers禁止）に沿い、汎用名の温床を除去する。\n
