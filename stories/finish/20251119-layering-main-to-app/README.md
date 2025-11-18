@@ -1,6 +1,6 @@
 # 20251119-layering-main-to-app — レイヤリング/依存の整理（main→app 移譲）
 
-ステータス: [準備完了]
+ステータス: [完了]
 担当: @tkg-engineer
 開始: 2025-11-19 00:22:47 +0900
 
@@ -14,14 +14,14 @@
 - `config` や Repo、Usecase との依存関係を見直し、パスや初期化処理の統一方針を検討する。
 
 ## 受け入れ基準（Definition of Done）
-- [ ] 現状の main/app レイヤリングと依存関係が整理されたメモがある。
-- [ ] 入力処理・状態遷移を `internal/app` へ移譲する際の方針と、おおまかな分担（責務一覧）が決まっている。
-- [ ] 実装フェーズに向けた移行ステップ（フェーズ分割や影響範囲）が文章として明文化されている（実装自体は別ストーリーで対応してもよい）。
+- [x] 現状の main/app レイヤリングと依存関係が整理されたメモがある。
+- [x] 入力処理・状態遷移を `internal/app` へ移譲する際の方針と、おおまかな分担（責務一覧）が決まっている。
+- [x] 実装フェーズに向けた移行ステップ（フェーズ分割や影響範囲）が文章として明文化されている（実装自体は別ストーリーで対応してもよい）。
 
 ## 工程（サブタスク）
-- [ ] 現状調査: main と internal/app の責務/依存の棚卸し — `stories/20251119-layering-main-to-app/tasks/01_audit-main-app.md`
-- [ ] レイヤリング方針の整理: 望ましい責務分担と依存方向の設計 — `stories/20251119-layering-main-to-app/tasks/02_design-layering.md`
-- [ ] 移行ステップ案と後続タスク（実装ストーリー/Backlog）の整理 — `stories/20251119-layering-main-to-app/tasks/03_migration-plan-and-backlog.md`
+- [x] 現状調査: main と internal/app の責務/依存の棚卸し — `stories/20251119-layering-main-to-app/tasks/01_audit-main-app.md`
+- [x] レイヤリング方針の整理: 望ましい責務分担と依存方向の設計 — `stories/20251119-layering-main-to-app/tasks/02_design-layering.md`
+- [x] 移行ステップ案と後続タスク（実装ストーリー/Backlog）の整理 — `stories/20251119-layering-main-to-app/tasks/03_migration-plan-and-backlog.md`
 
 ## 計画（目安）
 - 見積: 1〜2 セッション
@@ -30,6 +30,8 @@
 ## 進捗・決定事項（ログ）
 - 2025-11-19 00:22:47 +0900: ストーリー作成（discovery: 2025-09-27-migrated-11 から昇格）
 - 2025-11-19 00:27:54 +0900: README とサブタスクを整備し、main→app 移譲の方針検討の下準備が整ったためステータスを[準備完了]へ更新。
+- 2025-11-19 01:47:16 +0900: 作業開始指示を受け、ステータスを[進行中]へ更新。Task 01（main と app の責務棚卸し）を着手。
+- 2025-11-19 02:12:30 +0900: Task 01〜03 の成果をまとめ、DoD を満たしたためステータスを[完了]へ更新。
 
 ## リスク・懸念
 - レイヤリング変更に伴う一時的なコンパイルエラーやテスト修正コスト。
@@ -39,3 +41,5 @@
 - PR: #
 - Issue: #
 - Docs: `docs/ARCHITECTURE.md`, `docs/workflows/stories.md`
+
+- 2025-11-19 02:13:10 +0900: アーカイブ（finish へ移動）
