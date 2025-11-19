@@ -40,3 +40,7 @@
 - Backlog: stories/BACKLOG.md
 - Docs: `docs/API.md`, `docs/ARCHITECTURE.md`
 - 参照ストーリー: `stories/20251117-ui-apply-split`
+
+- 2025-11-19 02:44:09 +0900: アーカイブ（finish へ移動）
+
+- 2025-11-19 02:44:28 +0900: アーカイブ（finish へ移動）

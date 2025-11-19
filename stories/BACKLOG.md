@@ -17,6 +17,12 @@
 ```
 
 初期エントリ
+## [P1] 2025-11-19: ストーリー運用について再整理
+- 目的: ストーリー駆動開発と Codex 連携を前提に、実際の運用ルールとツール群を整理し、開発体験を安定・高速化する。
+- 背景: 現状のストーリー運用には、ナレッジやスクリプトに落とし切れていない暗黙のフローが残っており、Codex と人間が協調する際に手作業や判断の揺れが発生している。
+- DoD: `stories/AGENTS.md` や `docs/workflows/stories.md` などに最新の運用ルール/パターンが反映され、主要フロー（ストーリー起票〜完了、Discovery 取り込み、Codex との分担など）がスクリプト/テンプレートで再現可能になっている（`make story-index` 等のツールも更新済み、`make mcp` グリーン）。
+- 参考/関連: docs/workflows/stories.md, AGENTS.md, docs/CODEX_CLOUD.md, stories/BACKLOG.md
+
 ## [P2] 2025-11-19: claudecodeのsubagents的な機能をcodexで実現のためのナレッジ追加
 - 目的: （discovery参照）
 - 背景: （discovery参照）
@@ -34,18 +40,6 @@
 - 背景: （discovery参照）
 - DoD: （discoveryの DoD候補を要約 or 後続で具体化）
 - 参考/関連: stories/discovery/20251117-022029-story-tags.md, Story:  N/A
-
-## [P2] 2025-11-17: db/userをリポジトリ管理外にする
-- 目的: （discovery参照）
-- 背景: （discovery参照）
-- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
-- 参考/関連: stories/discovery/20251117-014940-db-user-untracked.md, Story:  20251117-webgl-dark-screen
-
-## [P2] 2025-11-17: WebGL用のサンプルデータ追加
-- 目的: （discovery参照）
-- 背景: （discovery参照）
-- DoD: （discoveryの DoD候補を要約 or 後続で具体化）
-- 参考/関連: stories/discovery/20251117-014752-webgl-sample-data.md, Story:  20251117-webgl-dark-screen
 
 ## [P2] 2025-11-17: 画面仕様の新規作成（タイトル/編成/バトルマップ）
 - 目的: （discovery参照）
