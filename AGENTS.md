@@ -11,7 +11,8 @@
 - コメント記法: docs/KNOWLEDGE/engineering/comment-style.md
 - アーキテクチャ: docs/architecture/README.md
 - ストーリー運用: docs/KNOWLEDGE/workflows/stories.md
-- ワークフロー: docs/KNOWLEDGE/workflows/overview.md
+- ワークフロー概要: docs/KNOWLEDGE/workflows/overview.md
+- Vibe‑kanban 運用: docs/KNOWLEDGE/workflows/vibe-kanban.md
 - DB メモ: docs/KNOWLEDGE/data/db-notes.md
 - ルート概要: README.md
 - codex-cloud 実行: docs/KNOWLEDGE/ops/codex-cloud.md
