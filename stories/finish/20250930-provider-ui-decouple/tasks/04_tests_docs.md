@@ -12,4 +12,4 @@
 - [x] 模擬戦画面の「自動実行」/「＜ 一覧へ」ボタンクリック回帰テストを追加。
 
 ## 文書
-- [x] `docs/ARCHITECTURE.md`/`docs/API.md` の差分更新。
+- [x] `docs/architecture/README.md`/`docs/SPECS/reference/api.md` の差分更新。

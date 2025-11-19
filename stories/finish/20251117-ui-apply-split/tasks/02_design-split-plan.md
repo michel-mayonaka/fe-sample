@@ -14,7 +14,7 @@
 
 ## 作業手順（概略）
 - `01_現状調査` の結果を元に、自然な責務の切れ目（画面単位/メトリクス種別など）を検討する。
-- 命名規約（docs/NAMING.md）とアーキテクチャ方針（docs/ARCHITECTURE.md）を確認し、それに沿ったファイル名・レイヤ分割を考える。
+- 命名規約（docs/KNOWLEDGE/engineering/naming.md）とアーキテクチャ方針（docs/architecture/README.md）を確認し、それに沿ったファイル名・レイヤ分割を考える。
 - 複数案がある場合は Pros/Cons を列挙し、推奨案を1つ選ぶ。
 
 ## 進捗ログ
@@ -39,7 +39,7 @@
 | 案 | 概要 | Pros | Cons |
 | --- | --- | --- | --- |
 | A: ドメイン別 `apply_*.go` | `apply.go` は API ラッパーのみ残し、`apply_list.go` などに `func applyList(dst *metricsTargets, src Metrics)` を配置。 | 既存ファイルを段階的に縮小でき、責務単位でレビューしやすい。`go test` への影響も軽微。 | 小さなファイルが5+個に増え、`ApplyMetrics` 内からの呼び順管理が必要。 |
-| B: サブパッケージ化 | `internal/game/service/ui/apply` 配下にサブパッケージを作り、`uicore.ApplyMetrics` がそこへ委譲。 | メトリクス適用コードをパッケージとして独立させられる。 | `uicore` 直下の公開 API を動かす必要があり、`docs/API.md` などの参照修正が大きくなる。 |
+| B: サブパッケージ化 | `internal/game/service/ui/apply` 配下にサブパッケージを作り、`uicore.ApplyMetrics` がそこへ委譲。 | メトリクス適用コードをパッケージとして独立させられる。 | `uicore` 直下の公開 API を動かす必要があり、`docs/SPECS/reference/api.md` などの参照修正が大きくなる。 |
 
 → **推奨: 案A**（現行 API を保ったままファイル分割のみ実施）。
 
@@ -79,7 +79,7 @@
 1. `apply.go` に `metricsTargets` とヘルパ関数を追加し、既存ロジックを段階的に移行。初期コミットでは機能変更なしを担保。
 2. ドメイン別に `apply_*.go` を新規作成。`ApplyMetrics` 内の該当部分を `applyList(&targets, m)` などに置換。
 3. `apply_test.go` を拡張し、`metricsTargets` を使った単体テストを追加（例: List 部分のみ差し替えて動作確認）。
-4. `docs/API.md`/`docs/ARCHITECTURE.md` のパスを `apply.go` → `apply_*.go` へ更新（必要に応じて「内部的には分割」と注記）。
+4. `docs/SPECS/reference/api.md`/`docs/architecture/README.md` のパスを `apply.go` → `apply_*.go` へ更新（必要に応じて「内部的には分割」と注記）。
 
 ### 保留・追加検討事項
 - 非ゼロ判定仕様を見直すか（例: `*int` を使って「0でも適用」の意思表示を可能にする）。現ストーリーでは方針のみ記載し、実装ストーリーで扱う。

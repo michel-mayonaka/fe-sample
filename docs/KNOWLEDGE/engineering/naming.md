@@ -22,7 +22,7 @@
 - [ ] コミット / PR タイトル（Conventional Commits 整合）
 
 ## 原則
-- 一貫性: 既存規約と衝突しない（README / ARCHITECTURE / COMMENT_STYLE に準拠）。
+- 一貫性: 既存規約と衝突しない（README / docs/architecture/README.md / docs/KNOWLEDGE/engineering/comment-style.md に準拠）。
 - 可読性: 省略は一般的な初期ismのみ（例: `ID`, `HTTP`, `URL`）。
 - 正規化: コード（CamelCase）とデータ（snake_case）を明確に分離。
 - 互換性: データ移行を考慮（JSON→SQLite 予定）。
@@ -190,6 +190,6 @@ const (
 - ブランチ命名規則（必要なら別途策定）。
 
 ## 関連
-- `docs/ARCHITECTURE.md`（命名・スタイル補足）
-- `docs/COMMENT_STYLE.md`（GoDoc 記法）
-- `docs/DB_NOTES.md`（移行方針）
+- `docs/architecture/README.md`（命名・スタイル補足）
+- `docs/KNOWLEDGE/engineering/comment-style.md`（GoDoc 記法）
+- `docs/KNOWLEDGE/data/db-notes.md`（移行方針）

@@ -7,7 +7,7 @@
 
 ## 設計方針
 - 既定の基準解像度は 1920x1080（`uicore.SetBaseResolution` に整合）。
-- キーは `snake_case` ではなくコンフィグは `lowerCamel` も可だが、命名規約に従い明確な名前を採用（docs/NAMING.md）。
+- キーは `snake_case` ではなくコンフィグは `lowerCamel` も可だが、命名規約に従い明確な名前を採用（docs/KNOWLEDGE/engineering/naming.md）。
 - ファイル配置案: `db/master/mst_ui_metrics.json`（既定）／`db/user/usr_ui_metrics.json`（上書き）。
 
 ## 型スケッチ（Go 側）

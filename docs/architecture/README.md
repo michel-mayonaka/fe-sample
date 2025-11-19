@@ -4,6 +4,12 @@
 
 最終更新: 2025-09-29
 
+## 0. ディレクトリ案内と関連リンク
+- `docs/architecture/` : 本 README と ADR 群（`adr/*.md`）を格納する。決定が増えたら ADR を追加し、README から参照する。
+- `docs/ops-overview.md`: ストーリー駆動・仕様・テスト導線の 1 枚絵。アーキテクチャの役割も併記している。
+- `docs/SPECS/README.md`: 実装に直結する仕様（world/gameplay/ui/reference）の入口。各 Scene/Usecase の振る舞いを確認する。
+- `docs/KNOWLEDGE/engineering/naming.md`, `docs/KNOWLEDGE/engineering/comment-style.md`: 命名・コメント規約。Architecture と矛盾する場合はストーリーで方針決定後に両方を更新する。
+
 ## 1. レイヤと役割
 
 - UI（Scenes）
@@ -269,7 +275,7 @@ Provider と Repository の違い（明確化）:
 
 ## 10. 命名・スタイル（補足）
 
-詳細な命名規約は `docs/NAMING.md` を参照してください。本節は抜粋と背景説明のみを記載します。
+詳細な命名規約は `docs/KNOWLEDGE/engineering/naming.md` を参照してください。本節は抜粋と背景説明のみを記載します。
 
 - ファイル名
   - Port 定義: `ports_data.go`, `ports_battle.go`, `ports_inventory.go`
@@ -367,7 +373,7 @@ Update(*game.Ctx) bool; Draw(*ebiten.Image); Layer() int
 
 ## 14. 運用・適用
 
-- 本ドキュメントを唯一の設計指針とする。既存の `docs/architecture.md`（小文字版）は重複のため後続で削除またはリンク集約を検討。
+- `docs/architecture/`（本 README + ADR）を唯一の設計指針とし、更新時は `docs/ops-overview.md` と `docs/KNOWLEDGE/meta/docs-structure.md` からも参照できるようリンクを整える。
 - 運用: 本アーキテクチャに沿って、複数セッションに分けて段階的に現行コードを整備（Port 分割→依存差し替え→Provider 拡張→テスト強化）。
 ### UI メトリクスの外部化
 - 目的: 解像度差/画面改修をデータドリブンに調整可能にする。

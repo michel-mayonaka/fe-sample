@@ -27,7 +27,7 @@
   - 各工程の前後で `make mcp` を実行（`check-all`＋`lint`）。
   - 可能なら `go test ./...` も併走（ロジック層中心）。
   - 影響が UI 表示に及ぶ場合は簡易動作確認（起動・対象画面の操作）を実施。
-  - 変更がドキュメント/コメント/API に及ぶ場合は `docs/` と `docs/API.md` を同セッションで更新。
+  - 変更がドキュメント/コメント/API に及ぶ場合は `docs/` と `docs/SPECS/reference/api.md` を同セッションで更新。
 - コミット/PR
   - Conventional Commits（日本語サマリ）。1 工程 1 PR を基本。差分は小さく保つ。
   - PR には目的/影響範囲/検証手順を記載し、関連ドキュメントへのリンクを添付。
@@ -83,7 +83,7 @@
     - 完了条件: ビルド成功、影響画面の動作確認。
 
 11. 11_docs_sync（ドキュメント同期） [完了]
-    - 目的: `docs/API.md`/`README.md` の更新（Port/Provider 方針、利用例、依存図）。
+    - 目的: `docs/SPECS/reference/api.md`/`README.md` の更新（Port/Provider 方針、利用例、依存図）。
     - 完了条件: ドキュメントにコンパイル可能なサンプル・参照が掲載されている。
 
 12. 12_cleanup_legacy_docs（重複ドキュメント整理） [完了]
@@ -104,7 +104,7 @@
 
 16. 16_comment_style_guidelines（コメント記法の統一方針） [完了]
     - 目的: GoDoc の書式（日本語一行要約「X は …」/パッケージコメント必須/最小限）を明文化し、コードと docs の役割分担を固定。
-    - 完了条件: `docs/COMMENT_STYLE.md` 追加、主要パッケージにパッケージコメントを付与（最低限）。
+    - 完了条件: `docs/KNOWLEDGE/engineering/comment-style.md` 追加、主要パッケージにパッケージコメントを付与（最低限）。
 
 ## 各工程の成果物と完了報告フォーマット
 - 各工程の md に以下を記載（テンプレートは最初の工程作成時に提示）

@@ -52,12 +52,12 @@
 
 4. **Phase 4 — Env/Session と設定境界の整理**
    - 目的: `Env` が抱えている `UserPath` や `RNG` を `internal/app` が保持し、Scene には必要な値だけを渡す。初期 Scene の指定もコンフィグ駆動にする。
-   - 主な変更ファイル: `internal/game/scenes/env.go`, `internal/game/app/core.go`, 新規 `internal/app/options.go`, `docs/ARCHITECTURE.md`.
+   - 主な変更ファイル: `internal/game/scenes/env.go`, `internal/game/app/core.go`, 新規 `internal/app/options.go`, `docs/architecture/README.md`.
    - ゴール: Scene 側が app 固有情報に直接依存しない構造を作り、将来的な CLI/テストランナーでも `internal/app` を再利用可能にする。
    - リスク/備考: `scenes.Env` を変更する場合は関連シーンのフィールドアクセスを一括アップデートする必要あり。段階移行のために `EnvMeta` などのサブ構造体追加を検討。
 
 5. **Phase 5 — 仕上げ（ドキュメントとテレメトリ）**
-   - 目的: `docs/ARCHITECTURE.md`, `docs/CODEX_CLOUD.md` 等に新しいレイヤリングを反映し、`make mcp` を通して回帰を確認。
+   - 目的: `docs/architecture/README.md`, `docs/KNOWLEDGE/ops/codex-cloud.md` 等に新しいレイヤリングを反映し、`make mcp` を通して回帰を確認。
    - 主な変更ファイル: docs 系、`Makefile`（必要なら `MCP_STRICT` の扱い明記）。
    - リスク/備考: ここで Backlog との突合を行い、実装完了後に該当エントリをクローズ。
 

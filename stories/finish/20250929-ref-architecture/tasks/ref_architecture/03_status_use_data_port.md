@@ -33,4 +33,4 @@
 - 2025-09-28: 切替完了・mcp通過（Status→DataPort）
 
 ## 関連
-- `docs/ARCHITECTURE.md` 3章/6.2/12.3
+- `docs/architecture/README.md` 3章/6.2/12.3

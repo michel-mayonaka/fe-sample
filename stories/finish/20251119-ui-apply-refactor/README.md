@@ -14,7 +14,7 @@
 - `apply.go` に公開 API（`Metrics`/`DefaultMetrics`/`ApplyMetrics`）だけを残し、実処理は `apply_helpers.go`、`apply_list.go`、`apply_status.go`、`apply_sim.go`、`apply_popup.go`、`apply_widgets.go` へ分割されている。
 - 新設ヘルパ `metricsTargets` や `assignPositive` 等で非ゼロ判定・スライスコピーを共通化し、テストで差し替え可能な構造になっている。
 - `apply_test.go` にドメイン別テストが追加され、部分適用の回帰が担保されている。
-- ドキュメント（`docs/API.md`, `docs/ARCHITECTURE.md`）が新構成に追随し、`make mcp` が通っている。
+- ドキュメント（`docs/SPECS/reference/api.md`, `docs/architecture/README.md`）が新構成に追随し、`make mcp` が通っている。
 
 ## 受け入れ基準（Definition of Done）
 - [x] `ApplyMetrics` 本体がセクション別の内部関数呼び出しのみになっている。
@@ -30,7 +30,7 @@
 ## 進捗・決定事項（ログ）
 - 2025-11-19 01:36:42 +0900: ストーリー起票。Backlog `[P1] 2025-11-19: ApplyMetrics 分割実装` から昇格。
 - 2025-11-19 10:05:00 +0900: Task01/02 を連続実施し、`metricsTargets` + `apply_*.go` へ分割完了。`go test ./internal/game/service/ui` で回帰なしを確認。
-- 2025-11-19 10:45:00 +0900: Task03 で `apply_test.go` 拡張・`docs/API.md`/`docs/ARCHITECTURE.md` 更新・`make mcp` まで完了し、ストーリーを DoD 充足としてクローズ。
+- 2025-11-19 10:45:00 +0900: Task03 で `apply_test.go` 拡張・`docs/SPECS/reference/api.md`/`docs/architecture/README.md` 更新・`make mcp` まで完了し、ストーリーを DoD 充足としてクローズ。
 
 ## リスク・懸念
 - `metricsTargets` へのフィールド追加漏れでビルドエラーにならずランタイム不具合となる可能性 → テストで各ドメインのフィールドを網羅。
@@ -38,7 +38,7 @@
 
 ## 関連
 - Backlog: stories/BACKLOG.md
-- Docs: `docs/API.md`, `docs/ARCHITECTURE.md`
+- Docs: `docs/SPECS/reference/api.md`, `docs/architecture/README.md`
 - 参照ストーリー: `stories/20251117-ui-apply-split`
 
 - 2025-11-19 02:44:09 +0900: アーカイブ（finish へ移動）

@@ -33,4 +33,4 @@
 - 2025-09-28: 追加・mcp通過（sqlite/{user,weapons,inventory}.go を追加）
 
 ## 関連
-- `docs/ARCHITECTURE.md` 9章
+- `docs/architecture/README.md` 9章

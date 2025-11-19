@@ -5,10 +5,10 @@
 開始: 2025-11-17 02:02:11 +0900
 
 ## 目的
-- 合意した PR テンプレ/運用ルールを AGENTS.md や docs/workflows/stories.md に反映し、関連する Backlog/Discovery の状態を整える。
+- 合意した PR テンプレ/運用ルールを AGENTS.md や docs/KNOWLEDGE/workflows/stories.md に反映し、関連する Backlog/Discovery の状態を整える。
 
 ## 完了条件（DoD）
-- [ ] AGENTS.md または docs/workflows/stories.md に、PR/コミットとストーリーの紐づけルールが追記されている。
+- [ ] AGENTS.md または docs/KNOWLEDGE/workflows/stories.md に、PR/コミットとストーリーの紐づけルールが追記されている。
 - [ ] Backlog 上の discovery `PR テンプレ/Story 参照の必須化（軽量）` が consumed として整理され、本ストーリーと相互リンクされていることを確認している。
 - [ ] 必要であれば、将来の CI 検証ステップに関するメモや、追加の Backlog 項目が整理されている。
 
@@ -24,5 +24,5 @@
 - `02_PRテンプレ案と運用ルールのドラフト` の完了。
 
 ## 成果物リンク
-- 更新した AGENTS.md / docs/workflows/stories.md
+- 更新した AGENTS.md / docs/KNOWLEDGE/workflows/stories.md
 

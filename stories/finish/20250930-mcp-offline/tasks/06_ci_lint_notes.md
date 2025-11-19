@@ -121,8 +121,8 @@
 - 手順:
   - `exported`/`package-comments` 未対応箇所にGoDocを追加。
   - `unused-parameter` 指摘は関数シグネチャ見直しまたは `_` で明示。
-  - `docs/API.md` を更新（新規/変更関数の説明を追記）。
-- 受入条件: revive 0件、`docs/API.md` 反映済み。
+  - `docs/SPECS/reference/api.md` を更新（新規/変更関数の説明を追記）。
+- 受入条件: revive 0件、`docs/SPECS/reference/api.md` 反映済み。
 
 4) CI 強化（段階）
 - 目的: 変更の早期検知と安定化。

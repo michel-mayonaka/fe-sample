@@ -5,7 +5,7 @@
 開始: 2025-11-17 00:35:00 +0900
 
 ## 目的
-- `docs/specs/` 配下の各 spec に共通して付与するメタキー（例: `状態`, `主な実装`, `最新ストーリー`）と、その値のバリエーションを設計する。
+- `docs/SPECS/` 配下の各 spec に共通して付与するメタキー（例: `状態`, `主な実装`, `最新ストーリー`）と、その値のバリエーションを設計する。
 - 「更新コストを上げすぎない最小限の粒度」で、仕様と実装・テストの反映状況を表現できるようにする。
 
 ## 完了条件（DoD）
@@ -20,10 +20,10 @@
 
 ## 進捗ログ
 - 2025-11-17 00:35:00 +0900: タスク作成。
-- 2025-11-17 00:37:30 +0900: `状態/主な実装/最新ストーリー` の3メタキーと4段階の状態（spec-only/impl-partial/impl-done/impl-tested）を定義し、docs/specs/AGENTS.md に反映。
+- 2025-11-17 00:37:30 +0900: `状態/主な実装/最新ストーリー` の3メタキーと4段階の状態（spec-only/impl-partial/impl-done/impl-tested）を定義し、docs/SPECS/AGENTS.md に反映。
 
 ## 依存／ブロッカー
-- 特になし（既存の docs/specs/* と docs/workflows/stories.md を前提とする）。
+- 特になし（既存の docs/SPECS/* と docs/KNOWLEDGE/workflows/stories.md を前提とする）。
 
 ## 成果物リンク
-- `docs/specs/AGENTS.md` への追記案（テキスト）
+- `docs/SPECS/AGENTS.md` への追記案（テキスト）

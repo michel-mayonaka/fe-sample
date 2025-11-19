@@ -9,7 +9,7 @@
 
 ## 完了条件（DoD）
 - [x] `apply_test.go` もしくは追加の `_test.go` に、`metricsTargets` を使ったドメイン別単体テストが追加されている。
-- [x] `docs/API.md` と `docs/ARCHITECTURE.md` が分割後の構成を説明している。
+- [x] `docs/SPECS/reference/api.md` と `docs/architecture/README.md` が分割後の構成を説明している。
 - [x] `make mcp` が成功し、結果ログがタスクに記録されている。
 
 ## 作業手順（概略）
@@ -20,12 +20,12 @@
 ## 進捗ログ
 - 2025-11-19 01:36:42 +0900: タスク作成。
 - 2025-11-19 10:30:00 +0900: `apply_test.go` に `capture*Targets` ヘルパと List/Status/Sim/Popup/Widgets の個別テスト、`assertSliceCopied` を追加し `go test ./internal/game/service/ui` で通過。
-- 2025-11-19 10:45:00 +0900: `docs/API.md`/`docs/ARCHITECTURE.md` を新構成へ更新し、`make mcp` を完走（`check-ui` 含む）したログを取得。
+- 2025-11-19 10:45:00 +0900: `docs/SPECS/reference/api.md`/`docs/architecture/README.md` を新構成へ更新し、`make mcp` を完走（`check-ui` 含む）したログを取得。
 
 ## 依存／ブロッカー
 - Task 02（ドメイン分割）完了後にテスト/ドキュメントを更新する。
 
 ## 成果物リンク
 - テスト: `internal/game/service/ui/apply_test.go`
-- ドキュメント: `docs/API.md`, `docs/ARCHITECTURE.md`
+- ドキュメント: `docs/SPECS/reference/api.md`, `docs/architecture/README.md`
 - `make mcp` ログ/証跡: 2025-11-19 10:45 +0900 実行分（ローカル `make mcp` 成功）

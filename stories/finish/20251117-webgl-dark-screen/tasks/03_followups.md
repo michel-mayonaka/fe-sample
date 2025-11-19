@@ -19,7 +19,7 @@
 
 ## 進捗ログ
 - 2025-11-17 01:13:08 +0900: タスク作成。
-- 2025-11-17 01:21:30 +0900: 原因を「ユーザRepo(JSONUserRepo) 初期化失敗時に nil ポインタのまま Table() を呼んでいた」ことと特定。`NewUIAppGame` で JSON ロード失敗時に Repo を nil インターフェースとして扱い、ユーザデータが無いときはサンプルユニットで起動する方針を採用。将来のユーザ永続化は docs/DB_NOTES.md にて Desktop(SQLite)/WebGL(デモ) 方針として整理。
+- 2025-11-17 01:21:30 +0900: 原因を「ユーザRepo(JSONUserRepo) 初期化失敗時に nil ポインタのまま Table() を呼んでいた」ことと特定。`NewUIAppGame` で JSON ロード失敗時に Repo を nil インターフェースとして扱い、ユーザデータが無いときはサンプルユニットで起動する方針を採用。将来のユーザ永続化は docs/KNOWLEDGE/data/db-notes.md にて Desktop(SQLite)/WebGL(デモ) 方針として整理。
 
 ## 依存／ブロッカー
 - `02_investigate_logs` の調査結果。

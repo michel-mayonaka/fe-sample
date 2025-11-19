@@ -9,5 +9,5 @@
 - 変換関数はユニット/装備ごとに最小APIへ分解（テスト可能な純関数）。
 
 ## 成果物
-- ルール追記: `docs/ARCHITECTURE.md` / `docs/API.md`。（済）
+- ルール追記: `docs/architecture/README.md` / `docs/SPECS/reference/api.md`。（済）
 - 置換計画の簡易表（対象/対応/影響）。

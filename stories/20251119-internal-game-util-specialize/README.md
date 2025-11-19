@@ -11,7 +11,7 @@
 ## スコープ（成果）
 - `internal/game/util` 配下の現状（ファイル有無/使われ方）を確認し、不要なものは削除する方針をまとめる。
 - 必要な機能がある場合は、役割に応じて `rng`/`rect`/`debug` など責務特化サブパッケージへの再配置案を検討する。
-- docs/NAMING.md や docs/ARCHITECTURE.md と整合する形で、util 系ディレクトリの扱い方針を整理する。
+- docs/KNOWLEDGE/engineering/naming.md や docs/architecture/README.md と整合する形で、util 系ディレクトリの扱い方針を整理する。
 
 ## 受け入れ基準（Definition of Done）
 - [x] `internal/game/util` の現状と利用状況が整理されたメモがある。
@@ -31,7 +31,7 @@
 - 2025-11-19 00:28:16 +0900: ストーリー作成（discovery: 2025-09-30-migrated-07 から昇格）
  - 2025-11-19 00:33:53 +0900: README とサブタスクを整備し、`internal/game/util` の整理方針検討の下準備が整ったためステータスを[準備完了]へ更新。
 - 2025-11-18 22:55 JST: 現状調査を実施し、`internal/game/util` が削除済であること、`internal/game/rng` へ機能移設済であることを確認。
-- 2025-11-18 23:05 JST: 再配置方針・命名ガイド追記・Backlog 整理を完了。util 系ディレクトリの再導入禁止方針を docs/NAMING.md へ明文化し、本ストーリーを完了へ移行。
+- 2025-11-18 23:05 JST: 再配置方針・命名ガイド追記・Backlog 整理を完了。util 系ディレクトリの再導入禁止方針を docs/KNOWLEDGE/engineering/naming.md へ明文化し、本ストーリーを完了へ移行。
 
 ## リスク・懸念
 - 既存コードが util 配下のヘルパーに依存している場合、移動に伴う import 調整やテスト修正が必要になる可能性。
@@ -39,4 +39,4 @@
 ## 関連
 - PR: #
 - Issue: #
-- Docs: `docs/NAMING.md`, `docs/ARCHITECTURE.md`
+- Docs: `docs/KNOWLEDGE/engineering/naming.md`, `docs/architecture/README.md`

@@ -14,7 +14,7 @@
 
 ## 作業手順（概略）
 - `01_現状調査` の結果をもとに、役割ごとにグルーピングする。
-- docs/NAMING.md と照らし合わせて、妥当なパッケージ名を検討する。
+- docs/KNOWLEDGE/engineering/naming.md と照らし合わせて、妥当なパッケージ名を検討する。
 - 再配置案と削除候補をテキストでまとめる。
 
 ## 進捗ログ
@@ -36,7 +36,7 @@
 ### 注意点・前提
 - `internal/game/rng` は現在 `Ctx` でのみ掴まれており、Scene 側は `math/rand` を使っている。循環依存を避けるため、`scenes.Env.RNG` を `*rng.Rand` に置き換える場合は `scenes` → `game` の import を新たに増やさないよう、`rng` を最下層 package（`internal/game/rng`）として保つ。
 - `internal/usecase` 層は `pkg/game` と `math/rand` を直接扱っているため、`internal/game/rng` を共有化するかは別ストーリーの設計判断に委ねる（アプリケーション層に閉じた util であるため、強制置換は不要）。
-- util 名を再導入しないよう docs/NAMING.md で今回の整理内容を明文化し、ストーリー完了後に Backlog から項目を除去しておく。
+- util 名を再導入しないよう docs/KNOWLEDGE/engineering/naming.md で今回の整理内容を明文化し、ストーリー完了後に Backlog から項目を除去しておく。
 
 ## 依存／ブロッカー
 - `01_現状調査` の完了。

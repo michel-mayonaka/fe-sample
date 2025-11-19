@@ -6,8 +6,8 @@
 - 仕様をドキュメントに反映し、最低限のユニットテストでリグレッションを抑止する。
 
 ## 対象
-- `docs/ARCHITECTURE.md`（UIメトリクスの所在と読み込みタイミング）
-- `docs/API.md`（必要なら Ctx/サービスの項に言及）
+- `docs/architecture/README.md`（UIメトリクスの所在と読み込みタイミング）
+- `docs/SPECS/reference/api.md`（必要なら Ctx/サービスの項に言及）
 - `stories/BACKLOG.md`（当該エントリを整理）
 - テスト: `internal/config/uimetrics`（ロード/フォールバック/優先順位）
 - テスト: `internal/game/service/ui`（`ApplyMetrics` の部分適用）

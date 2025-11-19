@@ -9,8 +9,8 @@
 - 今後の Story で参照しやすい「見本 spec」を用意する。
 
 ## 完了条件（DoD）
-- [x] 少なくとも 1 つの system spec（例: `docs/specs/system/battle_basic.md`）にメタ情報が追加されている。
-- [x] 少なくとも 1 つの ui spec（例: `docs/specs/ui/status_screen.md`）にメタ情報が追加されている。
+- [x] 少なくとも 1 つの system spec（例: `docs/SPECS/gameplay/battle_basic.md`）にメタ情報が追加されている。
+- [x] 少なくとも 1 つの ui spec（例: `docs/SPECS/ui/status_screen.md`）にメタ情報が追加されている。
 - [x] 付与したメタ情報が、設計したメタキー・状態のルールに沿っている。
 
 ## 作業手順（概略）
@@ -20,11 +20,11 @@
 
 ## 進捗ログ
 - 2025-11-17 00:35:10 +0900: タスク作成。
-- 2025-11-17 00:38:00 +0900: `docs/specs/ui/status_screen.md` と `docs/specs/system/battle_basic.md` の先頭に、状態/主な実装/最新ストーリーのメタ情報ブロックを追加。
+- 2025-11-17 00:38:00 +0900: `docs/SPECS/ui/status_screen.md` と `docs/SPECS/gameplay/battle_basic.md` の先頭に、状態/主な実装/最新ストーリーのメタ情報ブロックを追加。
 
 ## 依存／ブロッカー
 - `stories/20251117-spec-status-metadata/tasks/01_spec_metadata_design.md` の内容（メタキー設計）。
 
 ## 成果物リンク
-- `docs/specs/system/battle_basic.md`
-- `docs/specs/ui/status_screen.md`
+- `docs/SPECS/gameplay/battle_basic.md`
+- `docs/SPECS/ui/status_screen.md`

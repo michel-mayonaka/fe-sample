@@ -17,7 +17,7 @@
 - [ ] `make mcp` がグリーン（vet/build/lint/test）
 - [ ] 代表画面が外部メトリクス経由で描画され、既存見た目と実質同等
 - [ ] 設定不在時は既定値で正常動作（パニックなし）
-- [ ] ドキュメント（docs/ARCHITECTURE.md, docs/API.md）に反映
+- [ ] ドキュメント（docs/architecture/README.md, docs/SPECS/reference/api.md）に反映
 
 ## 工程（サブタスク）
 - [x] 01: 現状調査と対象画面決定（`tasks/01_discovery.md`）
@@ -45,4 +45,4 @@
 ## 関連
 - PR: #
 - Issue: #
-- Docs: `docs/ARCHITECTURE.md`, `docs/API.md`, `docs/NAMING.md`, `stories/BACKLOG.md`
+- Docs: `docs/architecture/README.md`, `docs/SPECS/reference/api.md`, `docs/KNOWLEDGE/engineering/naming.md`, `stories/BACKLOG.md`

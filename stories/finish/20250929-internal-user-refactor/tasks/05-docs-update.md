@@ -4,8 +4,8 @@
 - 目的: 変更内容をドキュメントへ反映し、規約/構成の整合性を最終確認する。
 
 ## スコープ
-- docs/ARCHITECTURE.md に層/依存方向の図と例を追記。
-- docs/NAMING.md に `helper/util/common` を避ける規約と代替命名例を追記。
+- docs/architecture/README.md に層/依存方向の図と例を追記。
+- docs/KNOWLEDGE/engineering/naming.md に `helper/util/common` を避ける規約と代替命名例を追記。
 - README.md（ルート概要）から該当箇所の整合を確認/更新。
 
 ## 非スコープ

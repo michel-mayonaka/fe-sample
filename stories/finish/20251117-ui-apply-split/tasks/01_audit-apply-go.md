@@ -38,7 +38,7 @@
 ### 呼び出し元／入力元
 - ランタイム適用: `internal/game/app/core.go` と `internal/game/app/game.go` が `config/uimetrics.LoadOrDefault` → `uicore.Metrics` へコピー → `ApplyMetrics` を呼び出す経路（初期化時とホットリロード）。
 - テスト: `internal/game/service/ui/apply_test.go` が既定値スナップショット＋部分適用のリグレッションをカバー。
-- ドキュメント参照: `docs/API.md` / `docs/ARCHITECTURE.md` で「ApplyMetrics がビルトイン変数を上書きする」と明記されており、公開 API として扱われている。
+- ドキュメント参照: `docs/SPECS/reference/api.md` / `docs/architecture/README.md` で「ApplyMetrics がビルトイン変数を上書きする」と明記されており、公開 API として扱われている。
 
 ### 出力先／依存先
 - `layout.go` のグローバル変数群（約 70 フィールド）を直接更新。これらは `metrics.go` でスケール済みアクセサ `ListMarginPx()` などにラップされ、UI 実装全体から参照される。
@@ -57,7 +57,7 @@
 3. スライスコピー: `append([]int(nil), ...)` を各セクションで忘れると、ロード済み設定の可変参照を保持してしまう。共有ヘルパを定義する案あり。
 4. ビルドタグ: 分割ファイルも `//go:build !headless` を付与し、headless ビルドでの欠落を防ぐ。
 5. テスト: 現状テストは単一ファイルを前提（`DefaultMetrics` と `ApplyMetrics` 同居）。分割時はテストの import 循環を避けるため、テスト用の共通 `_test.go` から各セクションを exercise する形が望ましい。
-6. ドキュメント更新: `docs/API.md` / `docs/ARCHITECTURE.md` に記載されている参照先パス（`ui/apply.go`）が変わる場合は追随が必要。
+6. ドキュメント更新: `docs/SPECS/reference/api.md` / `docs/architecture/README.md` に記載されている参照先パス（`ui/apply.go`）が変わる場合は追随が必要。
 
 ### 依存関係サマリ表
 | ドメイン | 更新対象フィールド数 | 主利用ファイル例 | 補足 |

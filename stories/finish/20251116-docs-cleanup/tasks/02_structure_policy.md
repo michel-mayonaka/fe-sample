@@ -6,26 +6,26 @@
 
 ## 目的
 - `docs/` 全体のディレクトリ構成・ファイル命名・役割分担のポリシーを定義する。
-- システム仕様・画面仕様などを集約する `docs/specs/` のディレクトリ構成と運用ルールを決め、人間/コーディングエージェントが仕様駆動で開発できるベースを整える。
+- システム仕様・画面仕様などを集約する `docs/SPECS/` のディレクトリ構成と運用ルールを決め、人間/コーディングエージェントが仕様駆動で開発できるベースを整える。
 - 仕様本文は人間/エージェント共通の1セットとし、エージェント向け仕様ガイドは別ドキュメントとして位置付けを決める。
 
 ## 完了条件（DoD）
-- [ ] `docs/specs/` の構成方針（例: `system/`, `ui/` などのカテゴリ）が文書化されている。
+- [ ] `docs/SPECS/` の構成方針（例: `system/`, `ui/` などのカテゴリ）が文書化されている。
 - [x] 仕様ドキュメントのフォーマット（前提・ユースケース・振る舞い・制約・非機能など）のテンプレート案が決まっている。
 - [x] 仕様ドキュメントの命名ルール（ID/スラッグ/ファイル名）が定義されている。
 - [x] コーディングエージェントがどのディレクトリ/ファイルを優先して読むべきかが明示されている。
-- [x] エージェント向け仕様ガイドの構成案と設置場所（例: `docs/specs/AGENTS.md` など）が決まっている。
+- [x] エージェント向け仕様ガイドの構成案と設置場所（例: `docs/SPECS/AGENTS.md` など）が決まっている。
 - [x] レビューまたは簡易合意（コメントなど）が得られている。
 
 ## 作業手順（概略）
-- 棚卸し結果と現状の `docs/` を踏まえて、`docs/specs/` を含む構成案を下書きする。
+- 棚卸し結果と現状の `docs/` を踏まえて、`docs/SPECS/` を含む構成案を下書きする。
 - 「システム仕様」「画面仕様」などカテゴリごとのディレクトリ構成案を作る。
 - 人間/エージェント双方にとって読みやすい仕様テンプレートと命名ルールを検討する。
 - エージェント向けの読み方ガイドに何を書くか（優先して読む spec、矛盾時の扱いなど）を箇条書きで整理する。
 - ポリシー文書を Story 配下または `docs/` 配下に作成し、レビューを依頼する。
 
 ## 進捗ログ
-- 2025-11-16: docs/DOCS_STRUCTURE.md と docs/specs/README.md/AGENTS.md/_TEMPLATE を追加し、構成ポリシーの初版を作成。
+- 2025-11-16: docs/KNOWLEDGE/meta/docs-structure.md と docs/SPECS/README.md/AGENTS.md/_TEMPLATE を追加し、構成ポリシーの初版を作成。
 - 2025-11-16 20:26:57 +0900: タスク作成
 
 ## 依存／ブロッカー
@@ -39,51 +39,51 @@
 
 ### 1. カテゴリ別の役割整理
 - アーキテクチャ/設計思想系
-  - `docs/ARCHITECTURE.md`: レイヤ構造・依存方向・設計判断を記載する「思想/設計」ドキュメント。
-  - 仕様のうち、実装に直結する振る舞いは可能な限り `docs/specs/` に切り出し、ARCHITECTURE 側は「なぜそう設計するか」の背景を中心にする。
+  - `docs/architecture/README.md`: レイヤ構造・依存方向・設計判断を記載する「思想/設計」ドキュメント。
+  - 仕様のうち、実装に直結する振る舞いは可能な限り `docs/SPECS/` に切り出し、ARCHITECTURE 側は「なぜそう設計するか」の背景を中心にする。
 - 命名/スタイル/ルール系
-  - `docs/NAMING.md`, `docs/COMMENT_STYLE.md`: 命名規約とコメントスタイル。ここには仕様は書かず、「どう書くか（スタイル）」に絞る。
+  - `docs/KNOWLEDGE/engineering/naming.md`, `docs/KNOWLEDGE/engineering/comment-style.md`: 命名規約とコメントスタイル。ここには仕様は書かず、「どう書くか（スタイル）」に絞る。
 - 仕様系
-  - `docs/specs/` 配下: 実装とテストの根拠となる振る舞い・画面仕様を集約するハブ。
-  - `docs/specs/system/`: ユースケース/ドメイン/シーケンスなどシステム仕様。
-  - `docs/specs/ui/`: 画面単位の仕様。
+  - `docs/SPECS/` 配下: 実装とテストの根拠となる振る舞い・画面仕様を集約するハブ。
+  - `docs/SPECS/gameplay/`: ユースケース/ドメイン/シーケンスなどシステム仕様。
+  - `docs/SPECS/ui/`: 画面単位の仕様。
   - 将来 `domain/`, `api/` 等を追加する場合も、このカテゴリに含める。
 - ワークフロー/運用系
   - `docs/workflow/*.md`: ストーリー運用/ローカル開発/CI/Vibe-kanban など開発プロセス。
-  - `docs/AI_OPERATIONS.md`: AI エージェント連携や自動化の内部メモ。
-  - `docs/CODEX_CLOUD.md`, `docs/OFFLINE.md`: codex-cloud/オフライン前提での実行手順。
+  - `docs/KNOWLEDGE/ops/ai-operations.md`: AI エージェント連携や自動化の内部メモ。
+  - `docs/KNOWLEDGE/ops/codex-cloud.md`, `docs/KNOWLEDGE/ops/offline.md`: codex-cloud/オフライン前提での実行手順。
   - `docs/MIGRATION_*.md`: 過去の移行ノート（履歴/背景）。
 - 構成ポリシー/メタ系
-  - `docs/DOCS_STRUCTURE.md`: 本タスクで策定する docs 全体の構成ポリシー。
+  - `docs/KNOWLEDGE/meta/docs-structure.md`: 本タスクで策定する docs 全体の構成ポリシー。
 - API/外部公開系
-  - `docs/API.md`: 外部 API 観点の仕様。将来 `docs/specs/api/` を追加する場合は連携方針を決める。
+  - `docs/SPECS/reference/api.md`: 外部 API 観点の仕様。将来 `docs/SPECS/api/` を追加する場合は連携方針を決める。
 
 ### 2. 既存ドキュメントの整理方針
 - `README.md`
   - プロジェクトのトップレベル概要と、主要ドキュメントへの入口のみを持つ。
-  - 振る舞いの詳細（戦闘ルール等）は、将来的に `docs/specs/system/` へ移し、README からリンクする形に寄せる。
-- `docs/ARCHITECTURE.md`
-  - 現在含まれている「戦闘シーケンス」や「Port 分割方針」のうち、仕様として扱いたい部分は、今後 `docs/specs/system/` に対応する spec を追加したうえで、ARCHITECTURE 側は「設計判断の理由」に寄せていく。
-- `docs/API.md`
-  - API 一覧/型一覧を記述する位置づけを維持しつつ、将来 API 指向の仕様が増えた場合は `docs/specs/api/` を新設し、`API.md` は索引/入口として整理する。
+  - 振る舞いの詳細（戦闘ルール等）は、将来的に `docs/SPECS/gameplay/` へ移し、README からリンクする形に寄せる。
+- `docs/architecture/README.md`
+  - 現在含まれている「戦闘シーケンス」や「Port 分割方針」のうち、仕様として扱いたい部分は、今後 `docs/SPECS/gameplay/` に対応する spec を追加したうえで、ARCHITECTURE 側は「設計判断の理由」に寄せていく。
+- `docs/SPECS/reference/api.md`
+  - API 一覧/型一覧を記述する位置づけを維持しつつ、将来 API 指向の仕様が増えた場合は `docs/SPECS/api/` を新設し、`API.md` は索引/入口として整理する。
 - `docs/workflow/*.md`
-  - 仕様ではなく「どう開発するか」のルール。docs/specs からは必要に応じて参照のみ（内容を重複させない）。
-- `docs/AI_OPERATIONS.md`/`CODEX_CLOUD.md`/`OFFLINE.md`/`MIGRATION_*.md`
+  - 仕様ではなく「どう開発するか」のルール。docs/SPECS からは必要に応じて参照のみ（内容を重複させない）。
+- `docs/KNOWLEDGE/ops/ai-operations.md`/`CODEX_CLOUD.md`/`OFFLINE.md`/`MIGRATION_*.md`
   - すべて運用/移行ドキュメントとして扱い、specs には取り込まない。
   - specs 側から参照する場合も「実行環境の前提」としてリンクに留める。
 
 ### 3. 仕様ドキュメントの命名・粒度（案）
 - ファイル名: 小文字スネーク + 短いスラッグ。
-  - 例: `docs/specs/system/battle_basic.md`, `docs/specs/ui/status_screen.md`。
+  - 例: `docs/SPECS/gameplay/battle_basic.md`, `docs/SPECS/ui/status_screen.md`。
 - 粒度:
   - system: ユースケース or サブドメイン単位（例: 戦闘、在庫操作、レベルアップ）。
   - ui: 画面 or 画面グループ単位（例: ステータス画面、在庫画面、戦闘プレビュー）。
 - テンプレート: 既存の `_TEMPLATE.md` をコピーし、「概要/範囲/用語/ユースケース/振る舞い/データ/テスト観点」を最低限埋める。
 
 ### 4. 今後の TODO（構成ポリシー観点）
-- `docs/specs/system/` / `docs/specs/ui/` に最初の具体 spec（ステータス画面、戦闘基本ルール など）を書き始め、運用感を確認する。
-- `docs/ARCHITECTURE.md`／`README.md` から、仕様寄りの記述を徐々に specs 側へ寄せていく方針を決める（完全移行 or 部分的な重複を許容するか）。
-- `docs/API.md` と将来の `docs/specs/api/` の役割分担を検討する（必要になったタイミングで Backlog/Story 化）。
+- `docs/SPECS/gameplay/` / `docs/SPECS/ui/` に最初の具体 spec（ステータス画面、戦闘基本ルール など）を書き始め、運用感を確認する。
+- `docs/architecture/README.md`／`README.md` から、仕様寄りの記述を徐々に specs 側へ寄せていく方針を決める（完全移行 or 部分的な重複を許容するか）。
+- `docs/SPECS/reference/api.md` と将来の `docs/SPECS/api/` の役割分担を検討する（必要になったタイミングで Backlog/Story 化）。
 
 ## 進捗ログ（追記）
-- 2025-11-16: docs/DOCS_STRUCTURE.md と docs/specs/README.md/AGENTS.md/_TEMPLATE を追加し、構成ポリシーの初版を作成。
+- 2025-11-16: docs/KNOWLEDGE/meta/docs-structure.md と docs/SPECS/README.md/AGENTS.md/_TEMPLATE を追加し、構成ポリシーの初版を作成。

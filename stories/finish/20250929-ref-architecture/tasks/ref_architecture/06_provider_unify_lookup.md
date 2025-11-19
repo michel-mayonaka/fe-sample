@@ -32,4 +32,4 @@
 - 2025-09-28: WeaponsTable は scenes 全箇所 Provider 経由を確認（N/A: Items は次工程でProvider拡張予定）
 
 ## 関連
-- `docs/ARCHITECTURE.md` 2章/7章
+- `docs/architecture/README.md` 2章/7章

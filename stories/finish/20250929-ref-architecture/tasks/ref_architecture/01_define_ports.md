@@ -39,4 +39,4 @@
 - 2025-09-28: Port定義追加・mcp通過
 
 ## 関連
-- `docs/ARCHITECTURE.md` 3章/4章/12章
+- `docs/architecture/README.md` 3章/4章/12章

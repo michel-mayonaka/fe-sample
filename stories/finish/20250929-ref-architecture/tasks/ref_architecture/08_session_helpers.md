@@ -32,4 +32,4 @@
 - 2025-09-28: `Session.Selected/SetSelected` 実装・Envメソッド撤去・mcp通過
 
 ## 関連
-- `docs/ARCHITECTURE.md` 5章/12.1
+- `docs/architecture/README.md` 5章/12.1

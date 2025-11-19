@@ -11,12 +11,12 @@
 ## スコープ（成果）
 - `internal/app` 配下に公開ファサード（仮: `bootstrap.Config`, `runtime.Runtime`）を追加し、repo/usecase/metrics/scene 初期化を一箇所で完了させる。
 - `cmd/ui_sample` から `internal/game/app` への直接 import を排除し、`make mcp` が通る状態で新 API を適用する。
-- docs/ARCHITECTURE.md などの構成記述を更新し、開発者が新しい起動フローを参照できるようにする。
+- docs/architecture/README.md などの構成記述を更新し、開発者が新しい起動フローを参照できるようにする。
 
 ## 受け入れ基準（Definition of Done）
 - [ ] `cmd/ui_sample/main.go` の責務が「設定収集→app.Run」で完結し、アプリ固有の初期化コードが残っていない。
 - [ ] 新しい `internal/app` ファサードが repo/usecase/Env/Session/metrics 初期化とウィンドウ設定を担い、`make mcp` がグリーンである。
-- [ ] docs/ARCHITECTURE.md（および関連ドキュメント）が最新のレイヤリング/起動フローを説明している。
+- [ ] docs/architecture/README.md（および関連ドキュメント）が最新のレイヤリング/起動フローを説明している。
 
 ## 工程（サブタスク）
 - [ ] 設計: `internal/app` ファサードの API と責務整理 — `stories/20251119-app-bootstrap-facade/tasks/01_design-bootstrap-facade.md`
@@ -37,4 +37,4 @@
 ## 関連
 - PR: #
 - Issue: #
-- Docs: `docs/ARCHITECTURE.md`, `docs/CODEX_CLOUD.md`
+- Docs: `docs/architecture/README.md`, `docs/KNOWLEDGE/ops/codex-cloud.md`

@@ -5,7 +5,7 @@
 
 ## 1. 現状の役割と設計意図
 
-- `docs/ARCHITECTURE.md` では `pkg/game` を「ドメインロジック（テスト対象）」として、UI やインフラから切り離した公開層に置く方針が記載されている。
+- `docs/architecture/README.md` では `pkg/game` を「ドメインロジック（テスト対象）」として、UI やインフラから切り離した公開層に置く方針が記載されている。
 - 現在 `pkg/game` 配下には、主に次のサブドメインが含まれる。
   - 戦闘ロジック本体: `pkg/game`（`Unit/Stats/Weapon/Terrain` と `Forecast*/Resolve*/AttackSpeed/DoubleAdvantage` 等）
   - 幾何ユーティリティ: `pkg/game/geom`（矩形内判定など、UI 非依存のロジック）
@@ -54,7 +54,7 @@
 
 - 型のフィールド追加は許容するが、既存フィールドの削除や意味の大きな変更は Story/Spec レベルの合意が必要。
 - 関数のシグネチャ変更（引数/戻り値の追加・削除）は互換性破壊として扱う。
-- 挙動の変更は `docs/specs/system/battle_basic.md` 等のドメイン仕様と整合をとったうえで行い、`pkg/game` のテストで後方互換性を確認する。
+- 挙動の変更は `docs/SPECS/gameplay/battle_basic.md` 等のドメイン仕様と整合をとったうえで行い、`pkg/game` のテストで後方互換性を確認する。
 
 ## 4. バージョニング/互換性ポリシー（案）
 

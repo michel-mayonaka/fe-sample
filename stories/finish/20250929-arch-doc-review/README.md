@@ -4,16 +4,16 @@
 担当: @yourname
 
 ## 目的・背景
-- 現行実装（Scene/Service/Provider/Usecase/Model）と `docs/ARCHITECTURE.md` の不整合を解消し、境界・依存方向・責務を最新状態へ明確化する。
+- 現行実装（Scene/Service/Provider/Usecase/Model）と `docs/architecture/README.md` の不整合を解消し、境界・依存方向・責務を最新状態へ明確化する。
 
 ## スコープ（成果）
-- `docs/ARCHITECTURE.md` の更新（Scene ライフサイクル: input→intent→advance→render の明記、永続は `Env.Data` 経由に統一）。
-- 関連ドキュメントの整合（`docs/NAMING.md`、`README.md` の該当箇所）。
+- `docs/architecture/README.md` の更新（Scene ライフサイクル: input→intent→advance→render の明記、永続は `Env.Data` 経由に統一）。
+- 関連ドキュメントの整合（`docs/KNOWLEDGE/engineering/naming.md`、`README.md` の該当箇所）。
 - 主要な設計図/関係図のアップデート（テキスト/ASCII 図で可）。
 
 ## 受け入れ基準（Definition of Done）
 - [ ] 差分の洗い出しメモが残る（不整合一覧 / 採用・却下の判断を記録）
-- [ ] `docs/ARCHITECTURE.md` 更新 PR が作成され、リンク/参照整合が取れている
+- [ ] `docs/architecture/README.md` 更新 PR が作成され、リンク/参照整合が取れている
 - [ ] `make mcp` がグリーン
 - [ ] 後続リファクタ（inventory/status/character_list）に向けた設計チェックリストが共有される
 
@@ -40,4 +40,4 @@
 - PR: #
 - 資料: `artifacts/architecture_review.md`
 - Issue: #
-- Docs: `docs/ARCHITECTURE.md`, `docs/NAMING.md`, `README.md`
+- Docs: `docs/architecture/README.md`, `docs/KNOWLEDGE/engineering/naming.md`, `README.md`

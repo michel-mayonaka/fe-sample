@@ -3,7 +3,7 @@
 ステータス: [完了]
 - 作成: 2025-10-13
 - オーナー: TBD
-- 関連: README.md, docs/WORKFLOW.md, docs/NAMING.md, docs/REF_STORIES.md
+- 関連: README.md, docs/WORKFLOW.md, docs/KNOWLEDGE/engineering/naming.md, docs/REF_STORIES.md
 
 ## 目的
 codex-cloud（ワークスペース書込のみ・ネットワーク制限・承認制実行）環境で、開発/検証が滞りなく行えるよう、リポジトリ構成・Make タスク・ドキュメントを整備する。
@@ -25,7 +25,7 @@ codex-cloud（ワークスペース書込のみ・ネットワーク制限・承
 
 ## 成果物（Deliverables）
 - 整理後のタスク設計案（Make/スクリプトの変更提案）。
-- codex-cloud 実行ガイド（README 追記、必要なら `docs/CODEX_CLOUD.md`）。
+- codex-cloud 実行ガイド（README 追記、必要なら `docs/KNOWLEDGE/ops/codex-cloud.md`）。
 - スモークチェック手順（コマンド例）と期待結果。
 
 ## 完了の定義（DoD）
@@ -35,7 +35,7 @@ codex-cloud（ワークスペース書込のみ・ネットワーク制限・承
 
 ## 進捗メモ（2025-10-13）
 - Make: `smoke`/`offline`/`clean`/`build-out` を追加し `out/` 集約。
-- Docs: `docs/CODEX_CLOUD.md` 追加、`README`/`AGENTS` 更新。
+- Docs: `docs/KNOWLEDGE/ops/codex-cloud.md` 追加、`README`/`AGENTS` 更新。
 - CI: `smoke-offline` ジョブ追加、README にフロー追記。
 
 ## 進捗メモ（2025-11-16）

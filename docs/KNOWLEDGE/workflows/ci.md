@@ -24,4 +24,4 @@
 
 ## 補足
 - ワークフロー定義ファイル: `.github/workflows/ci.yml`
-- ローカルとの対応関係は `docs/workflows/local-dev.md` を参照。
+- ローカルとの対応関係は `docs/KNOWLEDGE/workflows/local-dev.md` を参照。

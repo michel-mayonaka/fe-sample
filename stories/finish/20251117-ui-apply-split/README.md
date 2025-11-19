@@ -11,7 +11,7 @@
 ## スコープ（成果）
 - `internal/game/service/ui/apply.go` の責務を整理し、用途別ファイル（例: `apply_list.go`/`apply_status.go`/`apply_sim.go`/`apply_popup.go`/`apply_widgets.go`）への分割方針を決める。
 - 分割後も外部 API（呼び出し元の関数シグネチャや公開 I/F）を極力不変に保つ設計案を用意する。
-- 命名規約やアーキテクチャドキュメント（docs/NAMING.md, docs/ARCHITECTURE.md）と整合する構成を検討する。
+- 命名規約やアーキテクチャドキュメント（docs/KNOWLEDGE/engineering/naming.md, docs/architecture/README.md）と整合する構成を検討する。
 
 ## 受け入れ基準（Definition of Done）
 - [x] 現状の `apply.go` の責務と依存関係が整理されたメモがある。
@@ -41,7 +41,7 @@
 ## 関連
 - PR: #
 - Issue: #
-- Docs: `docs/NAMING.md`, `docs/ARCHITECTURE.md`
+- Docs: `docs/KNOWLEDGE/engineering/naming.md`, `docs/architecture/README.md`
 
 - 2025-11-19 01:42:14 +0900: アーカイブ（finish へ移動）
 

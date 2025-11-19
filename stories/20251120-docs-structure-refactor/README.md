@@ -1,6 +1,6 @@
 # 20251120-docs-structure-refactor — docs 構成の再設計と整理
 
-ステータス: [準備完了]
+ステータス: [進行中]
 担当: @tkg-engineer
 開始: 2025-11-20 01:54:51 +0900
 
@@ -19,7 +19,7 @@
 - [ ] `docs/ops-overview.md` に、開発フロー・ストーリー運用・テスト戦略・Codex 連携の概要がまとまっている。
 - [ ] `docs/architecture/` / `docs/KNOWLEDGE/` / `docs/SPECS/` の構成と命名方針が README または既存ガイドに明記されている。
 - [ ] 既存 docs が新構成に沿って移動されており、壊れたリンクや参照がない（`rg` で旧パスを確認）。
-- [ ] `make mcp` が成功し、必要に応じて `docs/specs/README.md` や AGENTS の記述も更新されている。
+- [ ] `make mcp` が成功し、必要に応じて `docs/SPECS/README.md` や AGENTS の記述も更新されている。
 
 ## 工程（サブタスク）
 - [ ] docs 現状構成の棚卸しとターゲット構成の詳細設計（`tasks/01_design-docs-structure.md`）
@@ -31,6 +31,7 @@
 - マイルストン: 構成設計 → 移行実施 → ガイド/インデックス更新
 
 ## 進捗・決定事項（ログ）
+- 2025-11-19 17:05:00 +0900: Codex 作業開始指示に伴いステータスを[進行中]へ更新し、ターゲット構成と移行計画の実装に着手。
 - 2025-11-20 01:54:51 +0900: ストーリー作成
 - 2025-11-20 01:56:59 +0900: README とサブタスク構成を整備し、docs 構成再設計ストーリーの下準備が整ったためステータスを[準備完了]へ更新。
 
@@ -41,4 +42,4 @@
 ## 関連
 - PR: #
 - Issue: #
-- Docs: `docs/DOCS_STRUCTURE.md`, `docs/specs/README.md`, `AGENTS.md`
+- Docs: `docs/KNOWLEDGE/meta/docs-structure.md`, `docs/SPECS/README.md`, `AGENTS.md`

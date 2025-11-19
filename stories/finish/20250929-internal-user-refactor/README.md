@@ -2,7 +2,7 @@
 
 ステータス: [完了]
 - 日付: 2025-09-29
-- 参照: docs/ARCHITECTURE.md, docs/NAMING.md, docs/REF_STORIES.md
+- 参照: docs/architecture/README.md, docs/KNOWLEDGE/engineering/naming.md, docs/REF_STORIES.md
 
 ## 背景
 `internal/user` にモデル・入出力・境界が混在し、依存関係の明確化と再利用性が阻害されている可能性がある。

@@ -10,7 +10,7 @@
 ## 完了条件（DoD）
 - [ ] Config 構造体と公開関数（例: `NewRuntime`, `Run`）のインタフェース案が記述されている。
 - [ ] 依存挿入の流れ（config→usecase→game/app）とエラーハンドリング方針が決まっている。
-- [ ] docs/ARCHITECTURE.md との整合点や更新対象がリストアップされている。
+- [ ] docs/architecture/README.md との整合点や更新対象がリストアップされている。
 
 ## 成果物
 - 設計メモ（このファイル末尾 or README 参照）

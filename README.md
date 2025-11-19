@@ -131,17 +131,19 @@ MCP_STRICT=1 make check-ui
   - 役割: 現在値を保持（Lv/Exp/HP/能力値/装備残耐久 など）
 - 表示: UI はユーザテーブルのみで構築（usr_）。マスタは初期投入用。
 
-将来: SQLite へ移行予定（`docs/DB_NOTES.md` 参照）
+将来: SQLite へ移行予定（`docs/KNOWLEDGE/data/db-notes.md` 参照）
 
 ## ドキュメント
-- 仕様ハブ: `docs/specs/README.md`
-- エージェント向け仕様ガイド: `docs/specs/AGENTS.md`
-- 命名規約: `docs/NAMING.md`
-- コメント記法: `docs/COMMENT_STYLE.md`
-- アーキテクチャ: `docs/ARCHITECTURE.md`
-- ストーリー運用: `docs/workflows/stories.md`
-- ワークフロー: `docs/workflows/overview.md`
-- DB メモ: `docs/DB_NOTES.md`
+- ops 1枚絵: `docs/ops-overview.md`
+- 仕様ハブ: `docs/SPECS/README.md`
+- エージェント向け仕様ガイド: `docs/SPECS/AGENTS.md`
+- ナレッジ目次: `docs/KNOWLEDGE/README.md`
+- 命名規約: `docs/KNOWLEDGE/engineering/naming.md`
+- コメント記法: `docs/KNOWLEDGE/engineering/comment-style.md`
+- アーキテクチャ: `docs/architecture/README.md`
+- ストーリー運用: `docs/KNOWLEDGE/workflows/stories.md`
+- ワークフロー: `docs/KNOWLEDGE/workflows/overview.md`
+- DB メモ: `docs/KNOWLEDGE/data/db-notes.md`
 
 ## 戦闘画面（簡易）
 - ステータス画面右下の「戦闘へ」→ 戦闘プレビュー
@@ -163,4 +165,4 @@ MCP_OFFLINE=1 make offline
 GOPROXY=off MCP_OFFLINE=1 make mcp
 ```
 
-codex-cloud 環境の詳細手順は `docs/CODEX_CLOUD.md` を参照してください。
+codex-cloud 環境の詳細手順は `docs/KNOWLEDGE/ops/codex-cloud.md` を参照してください。

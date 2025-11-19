@@ -9,5 +9,5 @@
 ## 作業
 - `internal/game/ui/input/types.go` を追加（GoDoc 1行必須）。
 - 既存 `service.Input` が `Reader` を満たすことを確認（メソッド互換）。
-- 命名は docs/NAMING.md に従う（公開: UpperCamel）。
+- 命名は docs/KNOWLEDGE/engineering/naming.md に従う（公開: UpperCamel）。
 

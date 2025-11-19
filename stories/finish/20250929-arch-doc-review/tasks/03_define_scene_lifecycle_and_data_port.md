@@ -16,7 +16,7 @@
 - [ ] インタフェース/型名の最終案を NAMING と突合
 
 ## 成果物
-- `docs/ARCHITECTURE.md` に「Scene ライフサイクル（共通約束）」節を追記（input→intent→advance→render）。
+- `docs/architecture/README.md` に「Scene ライフサイクル（共通約束）」節を追記（input→intent→advance→render）。
 
 ## DoD
 - [x] 最低 1 画面で規範に合わせた適用検証計画が示される（inventory/status で適用済み）

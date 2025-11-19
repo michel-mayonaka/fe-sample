@@ -9,7 +9,7 @@
 ## スコープ
 - 代表的なポートの確認（`UserRepo`, `InventoryRepo`, `WeaponsRepo`）。
 - 必要最小のメソッドセットの再確認（保存/取得/一覧 等）。
-- 命名・可視性の整合（docs/NAMING.md に準拠）。
+- 命名・可視性の整合（docs/KNOWLEDGE/engineering/naming.md に準拠）。
 
 ## 非スコープ
 - 具体実装の作成（タスク04で実施）。

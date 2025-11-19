@@ -1,24 +1,26 @@
-# specs/AGENTS — 仕様の読み方ガイド（エージェント向け）
+# SPECS/AGENTS — 仕様の読み方ガイド（エージェント向け）
 
-この文書は、コーディングエージェントが `docs/specs/` 配下の仕様をどのように参照し、実装やリファクタリングに反映するかのガイドです。人間の開発者も参照できますが、特にエージェント向けの前提・優先順位を明示します。
+この文書は、コーディングエージェントが `docs/SPECS/` 配下の仕様をどのように参照し、実装やリファクタリングに反映するかのガイドです。人間の開発者も参照できますが、特にエージェント向けの前提・優先順位を明示します。
 
 ## 1. 参照の優先順位
 1. ストーリー/タスク: `stories/YYYYMMDD-slug/README.md` および `tasks/*.md`
-2. 仕様: `docs/specs/system/`, `docs/specs/ui/` など該当カテゴリ
-3. アーキテクチャ/命名: `docs/ARCHITECTURE.md`, `docs/NAMING.md`, `docs/COMMENT_STYLE.md`
-4. その他ドキュメント: `docs/AI_OPERATIONS.md`, `docs/DB_NOTES.md` など
+2. 仕様: `docs/SPECS/world|gameplay|ui|reference` の該当カテゴリ
+3. アーキテクチャ/命名: `docs/architecture/README.md`, `docs/KNOWLEDGE/engineering/naming.md`, `docs/KNOWLEDGE/engineering/comment-style.md`
+4. その他ドキュメント: `docs/KNOWLEDGE/ops/ai-operations.md`, `docs/KNOWLEDGE/data/db-notes.md` など
 5. コード本体: `cmd/`, `internal/`, `pkg/` 等
 
 - 仕様とコードが矛盾する場合は、**まず仕様（specs）側を優先しつつ、矛盾を検出した旨をコメントで残す** ことを推奨します。
 - specs に該当する情報が無い場合は、ストーリー/タスク側の意図や既存コードの挙動を尊重しつつ、必要に応じて specs へ追記できるよう提案してください。
 
 ## 2. 仕様ドキュメントの読み方
-- system: `docs/specs/system/`
-  - システム全体のユースケース、シーケンス、ドメインルールなどが記述されます。
-  - ここから「何ができるシステムか」「どんな制約があるか」を把握してください。
-- ui: `docs/specs/ui/`
-  - 画面単位の構成・状態・入力と反応を記述します。
-  - ここから「どの画面でどの情報をどう見せるか」「どの入力にどう振る舞うか」を把握してください。
+- world: `docs/SPECS/world/`
+  - 世界観・マスターデータの背景設定。gameplay/ui の文脈を補完します。
+- gameplay: `docs/SPECS/gameplay/`
+  - ユースケースや戦闘ルールなどロジック中心の仕様。Port/Usecase の根拠になります。
+- ui: `docs/SPECS/ui/`
+  - 画面単位の構成・状態・入力と反応。描画や入力挙動を定義します。
+- reference: `docs/SPECS/reference/`
+  - API などの補助資料。コード参照時の型/メソッドの要約に使用します。
 
 仕様に記載されていない挙動や端ケースは、勝手に拡張せず、保守的（安全側）に判断してください。
 
@@ -31,7 +33,7 @@
 
 ## 4. 仕様追従時の方針
 - 仕様変更に伴いコードを修正する際は、**必ず関連する specs を先に更新し、そのうえでコード側を変更** してください。
-- 仕様に大きな変更が入る場合は、ストーリーを切ってから対応し、`docs/specs/` の更新と実装を同一ストーリーで追跡できるようにします。
+- 仕様に大きな変更が入る場合は、ストーリーを切ってから対応し、`docs/SPECS/` の更新と実装を同一ストーリーで追跡できるようにします。
 
 ## 5. spec の状態メタデータ
 - 各 spec ファイルの先頭付近に、次のようなメタ情報ブロックを置くことを推奨します（例）:
@@ -58,7 +60,8 @@
   - DoD に「対象 spec の `状態` をどこまで引き上げるか」を明記し、完了時に spec 側のメタ情報（`状態`/`最新ストーリー` など）を更新してください。
 
 ## 6. 今後の拡張
-- `docs/specs/system/` や `docs/specs/ui/` にテンプレートやサンプルを追加し、仕様の粒度や書き方を統一していきます。
-- 必要に応じて `docs/specs/domain/`, `docs/specs/api/` などのカテゴリを追加し、参照しやすく整理します。
+- `docs/SPECS/world/` の充実（勢力・クラス体系・時間軸）。
+- `docs/SPECS/gameplay/` と `docs/SPECS/ui/` にテンプレートやサンプルを追加し、粒度を統一。
+- `docs/SPECS/reference/` に API・テレメトリ・外部連携仕様を追加。
 
 エージェントは、ここで定義された優先順位と方針に従って仕様を解釈し、過度な推測を避けつつ、足りない部分はストーリー/Discovery への提案という形で補完してください。

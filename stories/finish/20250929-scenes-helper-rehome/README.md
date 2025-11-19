@@ -2,7 +2,7 @@
 
 ステータス: [完了]
 - 日付: 2025-09-29
-- 参照: docs/NAMING.md, docs/ARCHITECTURE.md
+- 参照: docs/KNOWLEDGE/engineering/naming.md, docs/architecture/README.md
 
 ## 背景
 `scenes/helper` は汎用名かつ多責務化しやすく、規約上も避けるべき。役割単位に分割して再配置する。
@@ -22,7 +22,7 @@
 ## 成果物 / DoD
 - `scenes/helper` への依存が解消され、具体パッケージへ置換されている。
 - `make mcp` 成功、動作回帰確認が完了。
-- docs/NAMING.md にパッケージ命名例を追記（`helper` 禁止の明文化）。
+- docs/KNOWLEDGE/engineering/naming.md にパッケージ命名例を追記（`helper` 禁止の明文化）。
 
 ## 影響範囲
 - `scenes/*`（呼び出し差し替え）

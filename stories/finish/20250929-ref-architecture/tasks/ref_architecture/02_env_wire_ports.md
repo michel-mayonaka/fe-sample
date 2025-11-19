@@ -35,4 +35,4 @@
 - 2025-09-28: 配線・起動確認（`Env.Data/Battle/Inv` に `usecase.App` を注入、`make mcp` 成功）
 
 ## 関連
-- `docs/ARCHITECTURE.md` 4章/5章/12.4
+- `docs/architecture/README.md` 4章/5章/12.4

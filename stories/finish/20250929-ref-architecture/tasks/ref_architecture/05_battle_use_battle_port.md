@@ -32,4 +32,4 @@
 - 2025-09-28: 本番戦闘導線が未実装のためスキップ（Simは模擬戦のみ）。
 
 ## 関連
-- `docs/ARCHITECTURE.md` 3章/6.3
+- `docs/architecture/README.md` 3章/6.3

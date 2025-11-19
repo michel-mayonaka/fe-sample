@@ -18,15 +18,15 @@
   - CI/ビルド/開発環境・ワークフロー改善系
   - 上記以外に必要と判断したカテゴリ（例: データ移行・一時検証など）
 - 作業カテゴリごとに、ストーリーディレクトリのスラグ先頭に付与する prefix ルール案を定義する（例: `spec-...`/`research-...`/`impl-...`/`docs-...`/`workflow-...`）。
-- 作業カテゴリごとに、想定スコープ・DoD の観点・注意点（例: 仕様策定なら「実装に踏み込みすぎない」、実装なら「DoD に mcp/テストを必ず含める」など）を整理し、ナレッジドキュメント案（`docs/workflows/story_categories.md` など）として構成を決める。
-- 既存ドキュメント（`docs/workflows/stories.md`, `AGENTS.md` 等）に、作業カテゴリと prefix 運用の簡単な説明・参照リンクを追加する方針案をまとめる。
+- 作業カテゴリごとに、想定スコープ・DoD の観点・注意点（例: 仕様策定なら「実装に踏み込みすぎない」、実装なら「DoD に mcp/テストを必ず含める」など）を整理し、ナレッジドキュメント案（`docs/KNOWLEDGE/workflows/story_categories.md` など）として構成を決める。
+- 既存ドキュメント（`docs/KNOWLEDGE/workflows/stories.md`, `AGENTS.md` 等）に、作業カテゴリと prefix 運用の簡単な説明・参照リンクを追加する方針案をまとめる。
 - 既存ストーリーに対する適用方針（新規ストーリーのみ prefix 必須とするか、過去ストーリーを段階的にリネームするか等）の案を整理し、別ストーリー/Backlog として切り出す。
 
 ## 受け入れ基準（Definition of Done）
 - [ ] stories/finish 配下の代表的なストーリーを踏まえた作業カテゴリ一覧があり、各カテゴリの日本語説明と例が整理されている。
 - [ ] ストーリーディレクトリ名の prefix ルール（`YYYYMMDD-<category>-<slug>` 形式で、`<category>` は限定された集合から選ぶ）が文章として定義されている。
-- [ ] 作業カテゴリごとの注意事項・推奨 DoD 観点をまとめたナレッジドキュメント案（章立て・項目）があり、配置場所（例: `docs/workflows/story_categories.md`）が決まっている。
-- [ ] `docs/workflows/stories.md` や `AGENTS.md` 等に、作業カテゴリと prefix 運用への言及を追加する方針が整理されている（どこに何を書くかが決まっている）。
+- [ ] 作業カテゴリごとの注意事項・推奨 DoD 観点をまとめたナレッジドキュメント案（章立て・項目）があり、配置場所（例: `docs/KNOWLEDGE/workflows/story_categories.md`）が決まっている。
+- [ ] `docs/KNOWLEDGE/workflows/stories.md` や `AGENTS.md` 等に、作業カテゴリと prefix 運用への言及を追加する方針が整理されている（どこに何を書くかが決まっている）。
 - [ ] Backlog `ストーリーに作業カテゴリの追加` と本ストーリー、該当 discovery (`stories/discovery/accepted/20251119-020924-story-work-categories.md`) の相互リンク状況が整理されている（必要なら後続ストーリー/Backlog も作成）。
 
 ## 工程（サブタスク）
@@ -49,5 +49,5 @@
 ## 関連
 - PR: #
 - Issue: #
-- Docs: `docs/workflows/stories.md`, `docs/workflows/story_categories.md`（新設案）, `AGENTS.md`
+- Docs: `docs/KNOWLEDGE/workflows/stories.md`, `docs/KNOWLEDGE/workflows/story_categories.md`（新設案）, `AGENTS.md`
 - Discovery: `stories/discovery/accepted/20251119-020924-story-work-categories.md`

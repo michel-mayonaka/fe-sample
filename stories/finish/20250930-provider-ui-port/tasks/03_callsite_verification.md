@@ -9,7 +9,7 @@
 ## ToDo
 - UI サービス/シーンでの `UserUnitByID` 依存を新 API へ差し替える。
 - `make mcp` を実行し、ビルド/テストが成功することを確認する。
-- 必要に応じて `docs/ARCHITECTURE.md` 等ドキュメントを更新する。
+- 必要に応じて `docs/architecture/README.md` 等ドキュメントを更新する。
 - 進捗ログとステータスを README と同期させる。
 
 ## 進捗ログ

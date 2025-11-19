@@ -12,7 +12,7 @@
 - Provider が返す型を `model/*`/`user/*` に限定（UI型ゼロ）。
 - UI 変換は `internal/game/ui/adapter` に集約（ユニット/装備表示など）。
 - 呼び出し箇所を見直し、必要に応じて Adapter 経由へ差し替え。
-- 最小のドキュメント整合（`docs/ARCHITECTURE.md`/`docs/API.md`）。
+- 最小のドキュメント整合（`docs/architecture/README.md`/`docs/SPECS/reference/api.md`）。
 
 ## 受け入れ基準（Definition of Done）
 - [x] `internal/game/data/` 直下で `uicore.` を参照していない（`rg -n 'uicore\.' internal/game/data` が 0）。
@@ -43,6 +43,6 @@
 
 ## 関連
 - Discovery: `stories/discovery/consumed/2025-09-30-migrated-03.md`
-- 実装箇所: `internal/game/data/provider.go`, `internal/game/ui/adapter/`, `docs/ARCHITECTURE.md`
+- 実装箇所: `internal/game/data/provider.go`, `internal/game/ui/adapter/`, `docs/architecture/README.md`
 
 - 2025-11-17 00:48:21 +0900: アーカイブ（finish へ移動）

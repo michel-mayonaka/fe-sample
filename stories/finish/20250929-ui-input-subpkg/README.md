@@ -2,7 +2,7 @@
 
 ステータス: [完了]
 - 日付: 2025-09-29
-- 参照: docs/ARCHITECTURE.md, docs/NAMING.md, stories/BACKLOG.md
+- 参照: docs/architecture/README.md, docs/KNOWLEDGE/engineering/naming.md, stories/BACKLOG.md
 
 ## 背景
 現状、抽象入力は `internal/game/service/input.go` にあり、Scenes は `gamesvc.Action` と `(*Input).Press/Down` を直接参照している。UI 補助の責務分割（`ui/layout|draw|view|adapter`）に揃えるなら、入力→意図(Intent)の解釈も UI 側のサブパッケージとして明示し、依存方向と命名を整えたい。

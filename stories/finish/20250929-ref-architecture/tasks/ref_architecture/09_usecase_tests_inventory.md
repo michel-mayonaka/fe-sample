@@ -34,4 +34,4 @@
 - 2025-09-28: 最小テスト追加（inventory_test.go）。`make mcp` 成功。
 
 ## 関連
-- `docs/ARCHITECTURE.md` 8章
+- `docs/architecture/README.md` 8章

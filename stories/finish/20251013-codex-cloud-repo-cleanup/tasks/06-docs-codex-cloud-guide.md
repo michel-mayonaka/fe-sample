@@ -9,8 +9,8 @@
 - トラブルシュート: 依存解決に失敗、UI ビルドがスキップされる等
 
 ## 成功条件（DoD）
-- README または `docs/CODEX_CLOUD.md` に必要情報がまとまっている。
+- README または `docs/KNOWLEDGE/ops/codex-cloud.md` に必要情報がまとまっている。
 
 ## 実装メモ（結果）
-- 新規: `docs/CODEX_CLOUD.md` を追加（環境変数、最短手順、出力/クリーン、トラブルシュート）。
+- 新規: `docs/KNOWLEDGE/ops/codex-cloud.md` を追加（環境変数、最短手順、出力/クリーン、トラブルシュート）。
 - README に `smoke/offline` の使い方と CI フロー追記。

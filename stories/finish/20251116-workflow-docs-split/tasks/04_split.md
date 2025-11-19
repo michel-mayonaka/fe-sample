@@ -1,14 +1,14 @@
 # 04_split — WORKFLOW 分割と内容移行
 
 ## 目的
-- 決定した構成案と分割ポリシーに従い、`docs/WORKFLOW.md` の内容を `docs/workflows/` 配下の複数ファイルへ移行する。
+- 決定した構成案と分割ポリシーに従い、`docs/WORKFLOW.md` の内容を `docs/KNOWLEDGE/workflows/` 配下の複数ファイルへ移行する。
 
 ## 作業項目
-- `docs/workflows/` ディレクトリを作成し、設計済みのファイルを追加する。
+- `docs/KNOWLEDGE/workflows/` ディレクトリを作成し、設計済みのファイルを追加する。
 - 各ファイルに対応するセクション/内容を移し、必要に応じて軽微な表現調整を行う。
 - 旧 `docs/WORKFLOW.md` は入口としての役割を残すか、案内用の内容に差し替えるかを決定する。
 
 ## アウトプット
-- 新しい `docs/workflows/` 配下の分割済みドキュメント一式。
+- 新しい `docs/KNOWLEDGE/workflows/` 配下の分割済みドキュメント一式。
 - 移行後の `docs/WORKFLOW.md`（入口/案内としての最小構成）。
 

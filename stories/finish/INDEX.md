@@ -1,12 +1,14 @@
 # 完了ストーリー索引
 
-生成: 2025-11-19 01:58:56 +0900
-件数: 29
+生成: 2025-11-20 02:18:35 +0900
+件数: 31
 
+- 20251119-ui-apply-refactor — 20251119-ui-apply-refactor — `internal/game/service/ui/apply.go` の分割実装 | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-11-19 01:36:42 +0900 | 更新: 2025-11-20 01:51:37 +0900
+- 20251119-layering-main-to-app — 20251119-layering-main-to-app — レイヤリング/依存の整理（main→app 移譲） | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-11-19 00:22:47 +0900 | 更新: 2025-11-19 02:14:05 +0900
 - 20251117-webgl-dark-screen — 20251117-webgl-dark-screen — WebGL暗転不具合の調査 | ステータス: [完了] | 担当: @kyosuke_tsubo | 日付: N/A | 開始: 2025-11-17 01:13:08 +0900 | 更新: 2025-11-17 02:07:06 +0900
-- 20251117-ui-apply-split — 20251117-ui-apply-split — `internal/game/service/ui/apply.go` の分割検討 | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-11-17 02:11:34 +0900 | 更新: 
+- 20251117-ui-apply-split — 20251117-ui-apply-split — `internal/game/service/ui/apply.go` の分割検討 | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-11-17 02:11:34 +0900 | 更新: 2025-11-19 01:59:17 +0900
 - 20251117-spec-status-metadata — 20251117-spec-status-metadata — specs 状態メタデータ整備 | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-11-17 00:29:58 +0900 | 更新: 2025-11-17 00:48:58 +0900
-- 20251117-ci-story-index — 20251117-ci-story-index — CI にストーリー検証/索引生成を統合 | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-11-17 01:58:08 +0900 | 更新: 
+- 20251117-ci-story-index — 20251117-ci-story-index — CI にストーリー検証/索引生成を統合 | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-11-17 01:58:08 +0900 | 更新: 2025-11-19 01:59:17 +0900
 - 20251116-workflow-docs-split — docs/WORKFLOW.md のディレクトリ化と細分化 | ステータス: [完了] | 担当: @yourname | 日付: N/A | 開始: 2025-11-16 19:17:24 +0900 | 更新: 2025-11-17 00:22:42 +0900
 - 20251116-docs-cleanup — 20251116-docs-cleanup — docs ディレクトリ内の整理 | ステータス: [完了] | 担当: @tkg-engineer | 日付: N/A | 開始: 2025-11-16 20:26:57 +0900 | 更新: 2025-11-17 00:18:02 +0900
 - 20251013-gh-pages-webgl-demo — 2025-10-13 — GitHub Pages で WebGL デモを公開（`20251013-gh-pages-webgl-demo`） | ステータス: [完了] | 担当: 不明 | 日付: N/A | 開始: N/A | 更新: 2025-11-16 18:02:26 +0900

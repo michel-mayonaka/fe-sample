@@ -10,11 +10,11 @@
 
 ## 成果物
 - 設計メモ（本ファイルの更新）。
-- ドキュメント更新案（`docs/ARCHITECTURE.md` 差分案）。
+- ドキュメント更新案（`docs/architecture/README.md` 差分案）。
 
 ## 受け入れ基準
 - [x] 依存方向が UI → アダプタ → ドメイン の一方向であることを図で説明。
-- [x] 主要型/関数の命名とパッケージ配置が `docs/NAMING.md` に整合。
+- [x] 主要型/関数の命名とパッケージ配置が `docs/KNOWLEDGE/engineering/naming.md` に整合。
 - [x] 拡張（新入力デバイス追加）の手順が 3 ステップで説明可能。
 
 ## 作業メモ
@@ -78,9 +78,9 @@ Domain（pkg/game/input）
 - `internal/game/ui/*`（draw/view/adapter）は描画系で `*ebiten.Image` を参照（本ストーリーの対象外）。
 
 ### Docs 差分案
-- `docs/ARCHITECTURE.md`: 「UI 補助サブパッケージ」の入力節を `pkg/game/input`（Domain）＋ Adapter に再記述。
-- `docs/API.md`: 公開 I/F（`Action/Event/ControlState/Source/Reader`）を追記。列挙は `ActionUnknown` を 0 に据える方針を明記。
-- `docs/NAMING.md`: 列挙・パッケージ命名の整合を確認（型接頭辞・Unknown=0）。
+- `docs/architecture/README.md`: 「UI 補助サブパッケージ」の入力節を `pkg/game/input`（Domain）＋ Adapter に再記述。
+- `docs/SPECS/reference/api.md`: 公開 I/F（`Action/Event/ControlState/Source/Reader`）を追記。列挙は `ActionUnknown` を 0 に据える方針を明記。
+- `docs/KNOWLEDGE/engineering/naming.md`: 列挙・パッケージ命名の整合を確認（型接頭辞・Unknown=0）。
 
 ### マイグレーション計画（段階適用）
 M1: Domain 型と Adapter の土台を追加（互換レイヤを維持）。

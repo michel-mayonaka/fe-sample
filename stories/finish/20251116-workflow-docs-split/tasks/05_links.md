@@ -5,7 +5,7 @@
 
 ## 作業項目
 - `README.md` や `docs/*` を検索し、`docs/WORKFLOW.md` へのリンクを洗い出す。
-- 必要に応じてリンク先を `docs/workflows/` 配下の適切なファイルに更新する。
+- 必要に応じてリンク先を `docs/KNOWLEDGE/workflows/` 配下の適切なファイルに更新する。
 - 旧 `docs/WORKFLOW.md` を入口として残す場合は、そこからも新構成への導線が張れているか確認する。
 
 ## アウトプット

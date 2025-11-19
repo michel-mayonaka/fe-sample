@@ -17,6 +17,6 @@
 - UI の厳格ビルドが必要な場合は Linux に X11/GL 依存を導入し、`MCP_STRICT=1 make check-ui` を使用。
 
 ## 参考
-- codex-cloud ガイド: `docs/CODEX_CLOUD.md`
+- codex-cloud ガイド: `docs/KNOWLEDGE/ops/codex-cloud.md`
 - オフラインガイド: `docs/OFFLINE.md`
 - CI 設定: `.github/workflows/ci.yml`

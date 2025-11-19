@@ -2,7 +2,7 @@
 
 ステータス: [完了]
 - 日付: 2025-09-29
-- 参照: docs/ARCHITECTURE.md, docs/NAMING.md
+- 参照: docs/architecture/README.md, docs/KNOWLEDGE/engineering/naming.md
 
 ## 背景
 `scenes/list_layout` には再利用可能な UI レイアウト処理が含まれ、シーン層（オーケストレーション）から分離した方が責務が明確になる。
@@ -23,7 +23,7 @@
 - `scenes` 直下からレイアウト処理が排出され、`internal/game/ui/layout/list` に集約されている。
 - 既存シーンは UI レイアウトAPIを経由して利用し、重複コードが削減されている。
 - `make mcp` 成功、主要シーンの動作回帰テストがグリーン。
-- docs/ARCHITECTURE.md に層の説明と参照例を追記。
+- docs/architecture/README.md に層の説明と参照例を追記。
 
 ## 影響範囲
 - `scenes/*`（参照更新）

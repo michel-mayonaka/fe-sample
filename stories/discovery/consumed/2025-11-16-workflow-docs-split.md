@@ -8,14 +8,14 @@
 関連ストーリー: 20251116-workflow-docs-split
 
 ## 目的
-- `docs/WORKFLOW.md` を章単位に分割し、`docs/workflows/` 配下へ整理して参照性・更新性を高める。
+- `docs/WORKFLOW.md` を章単位に分割し、`docs/KNOWLEDGE/workflows/` 配下へ整理して参照性・更新性を高める。
 
 ## 背景
 - 単一ファイルに多くの内容が集約され肥大化しており、章内リンクや関連ドキュメントとの整合が取りづらい。
 
 ## DoD候補
-- `docs/workflows/` ディレクトリを新設し、主要章（概要/ローカル検証/CI方針/変数運用/MCP_STRICT・MCP_OFFLINE/ストーリー運用フロー など）に分割。
-- 目次（索引）ファイル `docs/workflows/README.md` を用意し、分割先へのリンクを集約。
+- `docs/KNOWLEDGE/workflows/` ディレクトリを新設し、主要章（概要/ローカル検証/CI方針/変数運用/MCP_STRICT・MCP_OFFLINE/ストーリー運用フロー など）に分割。
+- 目次（索引）ファイル `docs/KNOWLEDGE/workflows/README.md` を用意し、分割先へのリンクを集約。
 - 既存参照（`AGENTS.md`/`README.md`/`docs/REF_STORIES.md`）のリンクを新構成へ更新。
 - `make mcp` がグリーン、`make check-all` も成功（UI ビルドは既定運用に従う）。
 - 変更履歴をコミットメッセージに記録（目的/影響範囲/検証手順）。

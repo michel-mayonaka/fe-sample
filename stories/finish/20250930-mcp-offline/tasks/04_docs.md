@@ -14,4 +14,4 @@
 
 ## 進捗ログ
 - 2025-09-30: 作成。
-- 2025-09-30: `docs/OFFLINE.md` 追加、README に「オフライン実行」を追記。
+- 2025-09-30: `docs/KNOWLEDGE/ops/offline.md` 追加、README に「オフライン実行」を追記。

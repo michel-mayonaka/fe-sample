@@ -15,7 +15,7 @@
 - [x] `vendor/` をリポジトリに追加し、`MCP_OFFLINE=1 make mcp` がネットワーク不要で実行可能（テスト結果は現状のロジックに依存）。
 - [x] `Makefile` に `MCP_OFFLINE` 分岐と `vendor-sync` を追加（`go mod vendor`）。
 - [x] 検証手順: `.gomodcache` を空にせずとも `GOPROXY=off MCP_OFFLINE=1 make mcp` が `vet/build` まで完走。
-- [x] ドキュメント: `README.md` と `docs/OFFLINE.md` にオフライン手順を追記。
+- [x] ドキュメント: `README.md` と `docs/KNOWLEDGE/ops/offline.md` にオフライン手順を追記。
 
 ## 工程（サブタスク）
 - [ ] 設計: オフライン方針と適用範囲（`pkg/...`/UI） — `tasks/01_outline.md`

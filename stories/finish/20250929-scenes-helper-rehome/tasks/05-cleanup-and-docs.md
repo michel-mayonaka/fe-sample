@@ -6,7 +6,7 @@
 ## スコープ
 - 参照掃除: `rg scenes/helper|PointIn` が 0 件であることの確認。
 - Lint/ビルド/テストの通過（`make mcp`）。
-- ドキュメント更新: `docs/NAMING.md` に `helper` 禁止と代替命名例の追記、`docs/ARCHITECTURE.md` に層の責務例追記。
+- ドキュメント更新: `docs/KNOWLEDGE/engineering/naming.md` に `helper` 禁止と代替命名例の追記、`docs/architecture/README.md` に層の責務例追記。
 
 ## 非スコープ
 - 新機能追加。

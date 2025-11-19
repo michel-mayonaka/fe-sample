@@ -10,7 +10,7 @@
 ## 完了条件（DoD）
 - [ ] 共通の `reload.Trigger`（仮）が導入され、初期化時と Backspace 長押し時の処理が同じコードを通る。
 - [ ] 副作用順序（Repo→Asset→Session→Metrics）がドキュメント化されている。
-- [ ] docs/ARCHITECTURE.md にグローバルトグル/リロードの流れが追記されている。
+- [ ] docs/architecture/README.md にグローバルトグル/リロードの流れが追記されている。
 
 ## 進捗ログ
 - 2025-11-19 02:06:50 +0900: タスク登録。

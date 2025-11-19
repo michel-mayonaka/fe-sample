@@ -8,7 +8,7 @@ import (
 )
 
 // Metrics は外部ファイルで定義する UI メトリクスです。
-// JSON キーは lowerCamel とし、docs/NAMING.md に整合します。
+// JSON キーは lowerCamel とし、docs/KNOWLEDGE/engineering/naming.md に整合します。
 type Metrics struct {
 	Base struct {
 		W int `json:"w"`

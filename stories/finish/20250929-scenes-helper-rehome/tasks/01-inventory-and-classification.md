@@ -5,7 +5,7 @@
 
 ## 入力
 - 対象コード: `internal/game/scenes/*.go`（特に `rect_helpers.go`）
-- 規約: `docs/NAMING.md`, `docs/ARCHITECTURE.md`
+- 規約: `docs/KNOWLEDGE/engineering/naming.md`, `docs/architecture/README.md`
 
 ## スコープ
 - 関数/型の一覧化（定義/参照箇所、依存パッケージ、純粋性）。

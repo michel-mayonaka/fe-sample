@@ -30,7 +30,7 @@
   - ローカル検証（codex-cloud/オフライン対応）
     - `make smoke` / `MCP_OFFLINE=1 make offline` / `make mcp` / `MCP_STRICT=1 make check-ui` の役割
     - 出力先ディレクトリ（`out/bin`, `out/logs`, `out/coverage`）
-    - 詳細は `docs/CODEX_CLOUD.md` 参照
+    - 詳細は `docs/KNOWLEDGE/ops/codex-cloud.md` 参照
   - CI 構成（概要）
     - ジョブ構成: `smoke-offline` → `build-and-lint` → `ui-build-strict`
     - 各ジョブの目的（smoke/offline, build+lint, UI 厳格）
@@ -49,5 +49,5 @@
 
 ## 分割時の注意点メモ
 - `docs/REF_STORIES.md` と「Codex/ストーリー作成」の説明が重複気味なので、ストーリー運用の詳細は workflow/stories 側に集約し、WORKFLOW の「Codex」節は入口程度にとどめる方向が良さそう。
-- ローカル検証と CI の説明は、将来的に `docs/workflows/local-dev.md` と `docs/workflows/ci.md` 等に分ける候補。
+- ローカル検証と CI の説明は、将来的に `docs/KNOWLEDGE/workflows/local-dev.md` と `docs/KNOWLEDGE/workflows/ci.md` 等に分ける候補。
 - Vibe‑kanban の説明はツール/運用寄りで、ストーリー運用やローカル開発と横断するため、どのファイルからリンクするかを 03_policy で整理する必要がある。

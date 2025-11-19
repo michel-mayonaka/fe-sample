@@ -16,7 +16,7 @@
 - [x] `internal/game/data.TableProvider` から `UserUnitByID` を撤去し、代替 Port/API が導入されている。
 - [x] UI 側でユーザモデルから `uicore.Unit` への変換が完結し、呼び出し元が新 API に移行している（`inventory.refreshUnitByID`）。
 - [x] `make mcp` が成功し、影響範囲のテストがグリーン（ヘッドレス環境では `TEST_TAGS=headless` を付与）。
-- [x] 必要に応じて `docs/API.md` / `docs/ARCHITECTURE.md` へ設計更新が反映されている。
+- [x] 必要に応じて `docs/SPECS/reference/api.md` / `docs/architecture/README.md` へ設計更新が反映されている。
 
 ## 工程（サブタスク）
 - [x] `stories/20250930-provider-ui-port/tasks/01_port_api.md`
@@ -37,7 +37,7 @@
 - UI Adapter での変換ロジックが肥大化する可能性。
 
 ## 関連
-- Docs: `docs/ARCHITECTURE.md`
+- Docs: `docs/architecture/README.md`
 - 参考: `internal/game/data/provider.go`, `internal/game/service/ui/adapter`
 
 - 2025-09-30 18:47:31 +0900: アーカイブ（finish へ移動）

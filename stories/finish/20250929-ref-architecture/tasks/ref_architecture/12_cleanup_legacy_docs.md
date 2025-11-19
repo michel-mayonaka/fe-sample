@@ -33,4 +33,4 @@
 - 2025-09-28: 完了（小文字版なしを確認・リンクは `ARCHITECTURE.md` に統一済み）
 
 ## 関連
-- `docs/ARCHITECTURE.md`
+- `docs/architecture/README.md`

@@ -5,13 +5,13 @@
 開始: 2025-11-17 00:29:58 +0900
 
 ## 目的・背景
-- `docs/specs/` 配下の仕様ごとに「実装・テストの反映状況」が分かるようにメタデータを整理し、仕様と実装のズレを早期に検知しやすくする。
+- `docs/SPECS/` 配下の仕様ごとに「実装・テストの反映状況」が分かるようにメタデータを整理し、仕様と実装のズレを早期に検知しやすくする。
 - 「Backlog/Story = 未完の仕事」「spec = 振る舞いの単一ソース＋状態」という役割分担を明確にし、運用コストを下げる。
 
 ## スコープ（成果）
 - system/ui specs に共通のメタキー（例: `状態`, `主な実装`, `最新ストーリー`）を定義したガイドを用意する。
-- 代表的な既存 spec（例: `docs/specs/ui/status_screen.md`）にメタ情報を実際に付与し、運用イメージを示す。
-- Story/Discovery/Backlog から spec のメタ情報をどう更新するかの軽いワークフローを整理する（docs/specs/AGENTS.md 等への追記を含む）。
+- 代表的な既存 spec（例: `docs/SPECS/ui/status_screen.md`）にメタ情報を実際に付与し、運用イメージを示す。
+- Story/Discovery/Backlog から spec のメタ情報をどう更新するかの軽いワークフローを整理する（docs/SPECS/AGENTS.md 等への追記を含む）。
 
 ## 受け入れ基準（Definition of Done）
 - [x] specs 用メタキー（`状態: [spec-only|impl-partial|impl-done|impl-tested]` など）がドキュメントとして明文化されている。
@@ -36,7 +36,7 @@
 - 状態の粒度を細かくしすぎると更新コストが高くなるため、最小限の段階に抑える必要がある。
 
 ## 関連
-- Docs: `docs/specs/AGENTS.md`, `docs/specs/README.md`, `docs/workflows/stories.md`
+- Docs: `docs/SPECS/AGENTS.md`, `docs/SPECS/README.md`, `docs/KNOWLEDGE/workflows/stories.md`
 
 - 2025-11-17 00:38:01 +0900: アーカイブ（finish へ移動）
 

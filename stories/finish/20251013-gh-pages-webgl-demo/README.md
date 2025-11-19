@@ -3,7 +3,7 @@
 ステータス: [完了]
 - 作成: 2025-10-13
 - オーナー: TBD
-- 関連: README.md, docs/ARCHITECTURE.md, docs/NAMING.md, docs/REF_STORIES.md, docs/WORKFLOW.md
+- 関連: README.md, docs/architecture/README.md, docs/KNOWLEDGE/engineering/naming.md, docs/REF_STORIES.md, docs/WORKFLOW.md
 
 ## 目的
 GitHub Pages 上で本リポジトリの WebGL（WASM）デモを一般公開し、ブラウザで手早く試せる導線を提供する。

@@ -15,13 +15,13 @@
 
 ## 受け入れ基準（Definition of Done）
 - [ ] PR テンプレートに Story/DoD/検証手順の項目が追加され、実際の PR で利用できる状態になっている。
-- [ ] AGENTS.md または docs/workflows/stories.md に、PR/コミットとストーリーの紐づけルールが追記されている。
+- [ ] AGENTS.md または docs/KNOWLEDGE/workflows/stories.md に、PR/コミットとストーリーの紐づけルールが追記されている。
 - [ ] Backlog 上の discovery `PR テンプレ/Story 参照の必須化（軽量）` が consumed になり、本ストーリーと相互リンクされている。
 
 ## 工程（サブタスク）
 - [ ] 現行のコミット/PR 運用と Story 参照の実態を確認 — `stories/20251117-pr-template-story-ref/tasks/01_current-pr-workflow.md`
 - [ ] PR テンプレ案の作成と運用ルールのドラフト — `stories/20251117-pr-template-story-ref/tasks/02_pr-template-design.md`
-- [ ] AGENTS.md / docs/workflows/stories.md への反映と Backlog の更新 — `stories/20251117-pr-template-story-ref/tasks/03_docs-and-backlog-update.md`
+- [ ] AGENTS.md / docs/KNOWLEDGE/workflows/stories.md への反映と Backlog の更新 — `stories/20251117-pr-template-story-ref/tasks/03_docs-and-backlog-update.md`
 
 ## 計画（目安）
 - 見積: 1 セッション程度
@@ -37,4 +37,4 @@
 ## 関連
 - PR: #
 - Issue: #
-- Docs: `AGENTS.md`, `docs/workflows/stories.md`, `.github/PULL_REQUEST_TEMPLATE.md`
+- Docs: `AGENTS.md`, `docs/KNOWLEDGE/workflows/stories.md`, `.github/PULL_REQUEST_TEMPLATE.md`

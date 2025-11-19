@@ -1,6 +1,6 @@
 # ローカル開発・検証フロー
 
-ローカル環境でのビルド/テスト/検証手順をまとめます。codex-cloud の詳細な設定や挙動は `docs/CODEX_CLOUD.md` を参照してください。
+ローカル環境でのビルド/テスト/検証手順をまとめます。codex-cloud の詳細な設定や挙動は `docs/KNOWLEDGE/ops/codex-cloud.md` を参照してください。
 
 ## よく使う make ターゲット
 - 最短スモーク（論理層のみ・vendor 前提）: `make smoke`
@@ -13,5 +13,4 @@
 - ログ: `out/logs/`
 - カバレッジ: `out/coverage/`
 
-詳細なオプションや codex-cloud 周りの情報は `docs/CODEX_CLOUD.md` を参照してください。
-
+詳細なオプションや codex-cloud 周りの情報は `docs/KNOWLEDGE/ops/codex-cloud.md` を参照してください。

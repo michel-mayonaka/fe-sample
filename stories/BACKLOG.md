@@ -20,8 +20,8 @@
 ## [P1] 2025-11-19: ストーリー運用について再整理
 - 目的: ストーリー駆動開発と Codex 連携を前提に、実際の運用ルールとツール群を整理し、開発体験を安定・高速化する。
 - 背景: 現状のストーリー運用には、ナレッジやスクリプトに落とし切れていない暗黙のフローが残っており、Codex と人間が協調する際に手作業や判断の揺れが発生している。
-- DoD: `stories/AGENTS.md` や `docs/workflows/stories.md` などに最新の運用ルール/パターンが反映され、主要フロー（ストーリー起票〜完了、Discovery 取り込み、Codex との分担など）がスクリプト/テンプレートで再現可能になっている（`make story-index` 等のツールも更新済み、`make mcp` グリーン）。
-- 参考/関連: docs/workflows/stories.md, AGENTS.md, docs/CODEX_CLOUD.md, stories/BACKLOG.md
+- DoD: `stories/AGENTS.md` や `docs/KNOWLEDGE/workflows/stories.md` などに最新の運用ルール/パターンが反映され、主要フロー（ストーリー起票〜完了、Discovery 取り込み、Codex との分担など）がスクリプト/テンプレートで再現可能になっている（`make story-index` 等のツールも更新済み、`make mcp` グリーン）。
+- 参考/関連: docs/KNOWLEDGE/workflows/stories.md, AGENTS.md, docs/KNOWLEDGE/ops/codex-cloud.md, stories/BACKLOG.md
 
 ## [P2] 2025-11-19: claudecodeのsubagents的な機能をcodexで実現のためのナレッジ追加
 - 目的: （discovery参照）
@@ -94,7 +94,7 @@
   （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-14.md)）
 - 将来の性能/整合性要件に備える。\n
   （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-14.md)）
-- `internal/repo` に SQLite 実装の雛形を追加（`modernc.org/sqlite`）、ビルドタグで切替。`docs/DB_NOTES.md` に移行手順とトランザクション方針を追記。\n
+- `internal/repo` に SQLite 実装の雛形を追加（`modernc.org/sqlite`）、ビルドタグで切替。`docs/KNOWLEDGE/data/db-notes.md` に移行手順とトランザクション方針を追記。\n
   （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-14.md)）
 
 ## [P2] 2025-09-27: UI スケーリング調整
@@ -118,7 +118,7 @@
   （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-12.md)）
 - README/API/DB_NOTES に旧記述が残存。\n
   （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-12.md)）
-- README/`docs/API.md`/`docs/DB_NOTES.md` を現行構成に同期、リンク整合、`make mcp` グリーン。\n
+- README/`docs/SPECS/reference/api.md`/`docs/KNOWLEDGE/data/db-notes.md` を現行構成に同期、リンク整合、`make mcp` グリーン。\n
   （[→ Discovery](stories/discovery/accepted/2025-09-27-migrated-12.md)）
 
 ## [P2] 2025-09-27: ドメインロジックの整理（UI色/文言生成）
@@ -152,13 +152,13 @@
 - DoD: 旧API削除・テスト追加・`make mcp` グリーン。
 
 ## [P2] 2025-11-16: specs/system ディレクトリの細分化
-- 目的: `docs/specs/system/` をユースケース/ドメイン単位などで整理し、システム仕様を見通しよく分割する。
+- 目的: `docs/SPECS/gameplay/` をユースケース/ドメイン単位などで整理し、システム仕様を見通しよく分割する。
 - 背景: system 配下に仕様が増えた際に、一箇所に集約しすぎると参照性が下がるため。
-- DoD: `docs/specs/system/` のサブディレクトリ/命名方針が決まり、最初のいくつかの仕様が新構成に沿って配置されている（`make mcp` グリーン）。
-- 参考/関連: docs/specs/README.md, docs/DOCS_STRUCTURE.md
+- DoD: `docs/SPECS/gameplay/` のサブディレクトリ/命名方針が決まり、最初のいくつかの仕様が新構成に沿って配置されている（`make mcp` グリーン）。
+- 参考/関連: docs/SPECS/README.md, docs/KNOWLEDGE/meta/docs-structure.md
 
 ## [P2] 2025-11-16: specs/ui ディレクトリの細分化
-- 目的: `docs/specs/ui/` を画面種別やフロー単位で整理し、画面仕様を見つけやすくする。
+- 目的: `docs/SPECS/ui/` を画面種別やフロー単位で整理し、画面仕様を見つけやすくする。
 - 背景: UI 画面数や状態が増えたときに、単一階層だとどの spec がどの画面か判別しづらくなるため。
-- DoD: `docs/specs/ui/` のサブディレクトリ/命名方針が決まり、ステータス画面など代表的な画面仕様が新構成に沿って配置されている（`make mcp` グリーン）。
-- 参考/関連: docs/specs/README.md, docs/DOCS_STRUCTURE.md
+- DoD: `docs/SPECS/ui/` のサブディレクトリ/命名方針が決まり、ステータス画面など代表的な画面仕様が新構成に沿って配置されている（`make mcp` グリーン）。
+- 参考/関連: docs/SPECS/README.md, docs/KNOWLEDGE/meta/docs-structure.md

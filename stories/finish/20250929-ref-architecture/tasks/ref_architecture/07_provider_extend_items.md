@@ -33,4 +33,4 @@
 - 2025-09-28: Provider拡張・置換完了（`ItemsTable` 提供/参照統一）
 
 ## 関連
-- `docs/ARCHITECTURE.md` 4章/7章
+- `docs/architecture/README.md` 4章/7章

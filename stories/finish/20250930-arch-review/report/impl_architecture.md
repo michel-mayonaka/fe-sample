@@ -411,8 +411,8 @@ func (b *Battle) Update(ctx *game.Ctx) (game.Scene, error) {
   - 追加: `internal/game/{ctx.go, scene.go, actor/actor.go, service/{input.go,assets.go,audio.go,camera.go,ui.go,hotload.go}, render/layers.go, util/rng.go}`
   - 目的: Scene/Actor/Service の最小 API を先行追加し、既存 UI と併存可能に。
 - ドキュメント（完了）
-  - `docs/ARCHITECTURE.md`: 本ファイルの方針を現状に合わせて整理（更新順序契約/移行計画/現状→目標マッピング）。
-  - `docs/API.md`: `Ctx/Scene/SceneStack/IActor/service.Input` を追記。
+  - `docs/architecture/README.md`: 本ファイルの方針を現状に合わせて整理（更新順序契約/移行計画/現状→目標マッピング）。
+  - `docs/SPECS/reference/api.md`: `Ctx/Scene/SceneStack/IActor/service.Input` を追記。
 - 軽い実配線（着手）
   - `cmd/ui_sample/main.go`: 抽象入力 `service.Input` を導入し、Backspace リロードのみ置換（`BindKey(Backspace→Menu)`→`Down(Menu)`）。従来の挙動を維持。
   - ビルド確認: `go build ./internal/game/...` と `go build ./cmd/ui_sample` 成功。
@@ -422,7 +422,7 @@ func (b *Battle) Update(ctx *game.Ctx) (game.Scene, error) {
 - 入力: `updateList/Status/SimBattle` 内の一部キー操作を `service.Input` へ段階移行（Press/Down 切替ルールを明文化）。
 - リロード導線: `updateGlobalToggles` の Backspace リロードを `App.ReloadData()` に寄せ、画像キャッシュ `assets.Clear()` と一括化（UI層の直接I/O削減）。
 - 画面遷移: 小径で `SceneStack` を導入（Title→List または List→SimBattle）し、契約運用を実地化。
-- ドキュメント更新: 本ログ追記の継続、`docs/ARCHITECTURE.md` に Press/Down の運用表を追加。
+- ドキュメント更新: 本ログ追記の継続、`docs/architecture/README.md` に Press/Down の運用表を追加。
 
 進捗ログ（2025-09-28 午前・Phase1 一部適用）
 
@@ -453,7 +453,7 @@ func (b *Battle) Update(ctx *game.Ctx) (game.Scene, error) {
     - 一覧: W/I → `OpenWeapons/OpenItems` に置換。
     - ステータス: E → `EquipToggle`、数字1..5 → `Slot1..5`、装備解除 → `Unassign`（Delete）。
   - 地形切替（1/2/3）は暫定で直接キーのまま（今後検討）。
-- ドキュメント更新：`docs/ARCHITECTURE.md`/`docs/API.md` に拡張アクションを追記。
+- ドキュメント更新：`docs/architecture/README.md`/`docs/SPECS/reference/api.md` に拡張アクションを追記。
 - ビルド確認: `go build ./cmd/ui_sample` 成功。
 
 ドキュメント移管（2025-09-28）
@@ -510,7 +510,7 @@ func (b *Battle) Update(ctx *game.Ctx) (game.Scene, error) {
    - 画面ヘルプ文言（W/I/E/DELETE）を抽象アクション名・説明に同期。
 
 3) ドキュメント
-   - `docs/ARCHITECTURE.md`: Ctx/Scene/Update順序の簡易図を追加（図示のみ、進捗は記載しない）。
+   - `docs/architecture/README.md`: Ctx/Scene/Update順序の簡易図を追加（図示のみ、進捗は記載しない）。
 
 4) テスト
    - `service.Input` の `Snapshot/Press/Down` のユニットテスト（長押し/連打境界）。
@@ -529,7 +529,7 @@ func (b *Battle) Update(ctx *game.Ctx) (game.Scene, error) {
   - `internal/game/service/input_test.go`: 
     - `Confirm` の Press/Down 挙動、`Menu` 長押しの Press 一度きり性、`Shift+2`→`TerrainDef2`/`2`→`TerrainAtt2` のマッピングを検証。
 - ドキュメント更新：
-  - `docs/API.md`: 新アクション群と `SnapshotWith` を追記。
+  - `docs/SPECS/reference/api.md`: 新アクション群と `SnapshotWith` を追記。
 
 残タスク（Phase2 準備継続）
 - SceneStack 管理の `internal/game/app` への移譲（ランナー追加）

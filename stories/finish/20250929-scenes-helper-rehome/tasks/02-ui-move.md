@@ -5,7 +5,7 @@
 
 ## 入力
 - タスク01の分類表（UI系に分類された項目）
-- 規約: `docs/NAMING.md`（役割+領域で命名、`helper` 禁止）
+- 規約: `docs/KNOWLEDGE/engineering/naming.md`（役割+領域で命名、`helper` 禁止）
 
 ## スコープ
 - 新設候補: `internal/game/ui/draw`, `internal/game/ui/input`

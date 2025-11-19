@@ -168,7 +168,7 @@ Provider と Repository の役割の違い:
 - `func main()`: ウィンドウ作成とゲームループ開始。
 
 ## 参考
-- 全体設計と移行計画は `docs/ARCHITECTURE.md` を参照。
+- 全体設計と移行計画は `docs/architecture/README.md` を参照。
 
 ## 変更時の指針
 - 新規/変更した公開要素（型/関数/定数/フィールド）は本ファイルを必ず更新。

@@ -13,4 +13,4 @@
 
 ## 実装メモ（結果）
 - 追加: `docs/MIGRATION_20251013_CODEX_CLOUD.md`（置き換え表・注意点）。
-- 参照: `docs/CODEX_CLOUD.md`, `docs/OFFLINE.md`, `.github/workflows/ci.yml`。
+- 参照: `docs/KNOWLEDGE/ops/codex-cloud.md`, `docs/KNOWLEDGE/ops/offline.md`, `.github/workflows/ci.yml`。

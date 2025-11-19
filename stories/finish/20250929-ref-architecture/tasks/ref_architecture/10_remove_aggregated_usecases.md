@@ -34,4 +34,4 @@
 - 2025-09-28: 置換/削除完了（Env.App/UseCases撤去、core配線更新、`go build` OK）
 
 ## 関連
-- `docs/ARCHITECTURE.md` 12.4
+- `docs/architecture/README.md` 12.4

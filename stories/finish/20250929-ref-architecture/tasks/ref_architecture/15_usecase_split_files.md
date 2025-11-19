@@ -41,5 +41,5 @@
 - 2025-09-28: 分割実施・mcp通過（facade/data/battle/inventoryへ分離）
 
 ## 関連
-- `docs/ARCHITECTURE.md` 4章（Usecase実装の分割方針）
+- `docs/architecture/README.md` 4章（Usecase実装の分割方針）
 - `tasks/ref_architecture/index.md`

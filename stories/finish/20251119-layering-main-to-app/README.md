@@ -40,6 +40,6 @@
 ## 関連
 - PR: #
 - Issue: #
-- Docs: `docs/ARCHITECTURE.md`, `docs/workflows/stories.md`
+- Docs: `docs/architecture/README.md`, `docs/KNOWLEDGE/workflows/stories.md`
 
 - 2025-11-19 02:13:10 +0900: アーカイブ（finish へ移動）

@@ -12,7 +12,7 @@
 - `internal/repo/items.go`（仮）に `ItemsRepo` を追加（`Table()/Reload()` を提供）。
 - `usecase.App` に `Items ItemsRepo` を保持し、`ItemsTable()` を Repo 経由へ切替。
 - 既存呼び出し箇所の整合（UI/Scene は `gdata.Provider().ItemsTable()` を利用）。
-- 最小のドキュメント更新（`docs/DB_NOTES.md`/`docs/API.md`）。
+- 最小のドキュメント更新（`docs/KNOWLEDGE/data/db-notes.md`/`docs/SPECS/reference/api.md`）。
 
 ## 受け入れ基準（Definition of Done）
 - [x] `internal/usecase/data.go` に JSON 直読みが残っていない（`rg -n 'LoadItemsJSON'` が 0）。
@@ -33,7 +33,7 @@
 ## 進捗・決定事項（ログ）
 - 2025-09-30 00:00:00 +0900: ストーリー作成（BACKLOG昇格）
 - 2025-10-01 05:11:00 +0900: ステータスを[準備完了]へ更新（レビュー完了）
-- 2025-11-16 00:00:00 +0900: ItemsRepo 実装・App 配線・ItemsTable の Repo 化、および docs/API.md・docs/DB_NOTES.md を更新（AIエージェントによる実装）。
+- 2025-11-16 00:00:00 +0900: ItemsRepo 実装・App 配線・ItemsTable の Repo 化、および docs/SPECS/reference/api.md・docs/KNOWLEDGE/data/db-notes.md を更新（AIエージェントによる実装）。
 - 2025-11-16 00:00:00 +0900: `go test ./internal/usecase` まで確認済。`go test ./...` では既存の sim/levelup テストが失敗しており、本ストーリーでは未対応。
 
 ## リスク・懸念
@@ -43,6 +43,6 @@
 ## 関連
 - Discovery: `stories/discovery/consumed/2025-09-30-migrated-04.md`
 - 実装候補: `internal/usecase/data.go`, `internal/repo/`, `internal/game/data/provider.go`
-- Docs: `docs/DB_NOTES.md`, `docs/API.md`
+- Docs: `docs/KNOWLEDGE/data/db-notes.md`, `docs/SPECS/reference/api.md`
 
 - 2025-11-17 01:23:03 +0900: アーカイブ（finish へ移動）

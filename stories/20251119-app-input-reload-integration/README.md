@@ -37,4 +37,4 @@
 ## 関連
 - PR: #
 - Issue: #
-- Docs: `docs/ARCHITECTURE.md`, `docs/CONFIG.md` (追加予定)
+- Docs: `docs/architecture/README.md`, `docs/CONFIG.md` (追加予定)

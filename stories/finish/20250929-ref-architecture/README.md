@@ -31,4 +31,4 @@
 ## 関連
 - タスク: `tasks/ref_architecture/index.md`, `tasks/ref_architecture/14_final_audit.md`
 - 既知課題: `tasks/known_issues.md`
-- 設計: `docs/ARCHITECTURE.md`, `docs/API.md`
+- 設計: `docs/architecture/README.md`, `docs/SPECS/reference/api.md`

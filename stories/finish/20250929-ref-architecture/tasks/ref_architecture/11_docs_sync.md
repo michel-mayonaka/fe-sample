@@ -4,8 +4,8 @@
 - 実装変更（Port/Provider/依存図）をドキュメントへ反映し、学習コストと齟齬を減らす。
 
 ## 作業項目（変更点）
-- `docs/ARCHITECTURE.md` の更新（依存図・ディレクトリ構成の最終化）。
-- `docs/API.md` に主要Portの簡単な利用例を追記。
+- `docs/architecture/README.md` の更新（依存図・ディレクトリ構成の最終化）。
+- `docs/SPECS/reference/api.md` に主要Portの簡単な利用例を追記。
 - `README.md` にアーキテクチャへのリンクと開発コマンド（`make mcp`）を追記。
 
 ## 完了条件
@@ -32,4 +32,4 @@
 - 2025-09-28: 完了（ARCHITECTURE/API 同期、Env.App撤去の注記、ProviderにItemsTable追記）
 
 ## 関連
-- `docs/ARCHITECTURE.md`
+- `docs/architecture/README.md`

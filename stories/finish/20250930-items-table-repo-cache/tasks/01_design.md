@@ -12,4 +12,4 @@
 ## ToDo
 - [x] IF 定義案を作成（`internal/repo/items.go`）。
 - [x] キャッシュ戦略（常駐/遅延/TTL）の比較と決定（今回は常駐）。
-- [x] `docs/DB_NOTES.md` へ参照経路の更新メモ。
+- [x] `docs/KNOWLEDGE/data/db-notes.md` へ参照経路の更新メモ。

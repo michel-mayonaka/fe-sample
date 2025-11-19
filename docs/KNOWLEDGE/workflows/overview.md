@@ -1,6 +1,6 @@
 # 開発者向けワークフロー概要
 
-本プロジェクトの開発フロー全体像と、関連するドキュメント/ツールの位置づけをまとめます。詳細な手順や運用ルールは `docs/workflows/*.md` を参照してください。
+本プロジェクトの開発フロー全体像と、関連するドキュメント/ツールの位置づけをまとめます。詳細な手順や運用ルールは `docs/KNOWLEDGE/workflows/*.md` を参照してください。
 
 ## コンポーネント一覧
 - Codex（AI コーディングエージェント）
@@ -18,8 +18,7 @@
 6. DoD を満たしたらストーリーを完了し、必要に応じて `make finish-story` でアーカイブする。
 
 各フェーズの詳細は以下を参照してください:
-- ストーリー/Discovery/Backlog 運用: `docs/workflows/stories.md`
-- ローカル開発・検証フロー: `docs/workflows/local-dev.md`
-- CI 構成と検証内容: `docs/workflows/ci.md`
-- Vibe‑kanban を用いた日々の運用: `docs/workflows/vibe-kanban.md`
-
+- ストーリー/Discovery/Backlog 運用: `docs/KNOWLEDGE/workflows/stories.md`
+- ローカル開発・検証フロー: `docs/KNOWLEDGE/workflows/local-dev.md`
+- CI 構成と検証内容: `docs/KNOWLEDGE/workflows/ci.md`
+- Vibe‑kanban を用いた日々の運用: `docs/KNOWLEDGE/workflows/vibe-kanban.md`

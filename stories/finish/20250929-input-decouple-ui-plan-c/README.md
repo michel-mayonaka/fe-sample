@@ -23,7 +23,7 @@
 - [ ] `make mcp` が成功（`vet/build/lint/test`）。
 - [x] `pkg/game` と `internal/usecase` のユニットテストが入力マッピングを検証（usecase 側は pkg のマッピングを間接検証）。
 - [x] `cmd/ui_sample` の実行で、従来と同等の基本操作（移動/決定/キャンセル）が機能（ビルド確認済み）。
-- [x] `docs/ARCHITECTURE.md` に依存関係の更新、`docs/API.md` に公開 I/F 追記、`docs/NAMING.md` との整合が確認できる。
+- [x] `docs/architecture/README.md` に依存関係の更新、`docs/SPECS/reference/api.md` に公開 I/F 追記、`docs/KNOWLEDGE/engineering/naming.md` との整合が確認できる。
 
 ## 工程（サブタスク）
 - [x] 001 設計固め（案Cの具体化と命名）: `tasks/001-design.md`
@@ -45,4 +45,4 @@
 - キーマッピング仕様が未確定の場合の再作業。
 
 ## 関連
-- Docs: `docs/ARCHITECTURE.md`, `docs/API.md`, `docs/NAMING.md`, `AGENTS.md`
+- Docs: `docs/architecture/README.md`, `docs/SPECS/reference/api.md`, `docs/KNOWLEDGE/engineering/naming.md`, `AGENTS.md`

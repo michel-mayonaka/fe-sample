@@ -4,7 +4,7 @@
 担当: @tkg-engineer
 
 ## 目的・背景
-- 設計ドキュメント（`docs/ARCHITECTURE.md` 等）と現行実装の乖離を可視化し、改善候補を抽出して Backlog を最新化する。
+- 設計ドキュメント（`docs/architecture/README.md` 等）と現行実装の乖離を可視化し、改善候補を抽出して Backlog を最新化する。
 - 今後の変更衝突・リワークを抑制し、優先度付きの改善計画に反映する。
 
 ## スコープ（成果）
@@ -18,7 +18,7 @@
 - [ ] `stories/20250930-arch-review/report/current_state.md` を作成し、主要コンポーネント/依存/データフローを記述。
 - [ ] 乖離と論点を `report/gaps_and_issues.md` に列挙（影響/優先度/根拠を付与）。
 - [ ] 改善提案（アーキテクチャ見直しを含む）を `report/proposals.md` に整理し、Backlog に3件以上を新規追加（目的/背景/DoD/関連を含む）。
-- [ ] 必要に応じて `docs/ARCHITECTURE.md`/`docs/NAMING.md`/`docs/API.md` を最小修正。
+- [ ] 必要に応じて `docs/architecture/README.md`/`docs/KNOWLEDGE/engineering/naming.md`/`docs/SPECS/reference/api.md` を最小修正。
 - [ ] `make mcp` がグリーン（オフライン対応時は `MCP_OFFLINE=1` も確認）。
 
 ## 工程（サブタスク）

@@ -40,4 +40,4 @@
 - 2025-09-29: `internal/usecase` に `RunBattleRound/ReloadData/PersistUnit/Equip(Weapon|Item)` のテストを追加（反撃射程外/追撃/スロット拡張/エラー伝播を網羅）。
 
 ## 関連
-- `docs/ARCHITECTURE.md`
+- `docs/architecture/README.md`

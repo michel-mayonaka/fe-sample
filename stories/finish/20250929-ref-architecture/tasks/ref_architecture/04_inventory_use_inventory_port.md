@@ -33,4 +33,4 @@
 - 2025-09-28: 切替・mcp通過（在庫→Port）
 
 ## 関連
-- `docs/ARCHITECTURE.md` 3章/6.1/7章/12.3
+- `docs/architecture/README.md` 3章/6.1/7章/12.3

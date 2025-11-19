@@ -19,7 +19,7 @@
 
 ## 進捗ログ
 - 2025-11-17 02:02:11 +0900: タスク作成。
-- 2025-11-19 01:52:18 +0900: `scripts/gen_story_index.sh` / `scripts/validate_meta.sh` の入出力と前提条件を確認し、validate_meta.sh から古い bash 依存の `mapfile` を除去したメモを docs/workflows/ci.md に反映。
+- 2025-11-19 01:52:18 +0900: `scripts/gen_story_index.sh` / `scripts/validate_meta.sh` の入出力と前提条件を確認し、validate_meta.sh から古い bash 依存の `mapfile` を除去したメモを docs/KNOWLEDGE/workflows/ci.md に反映。
 
 ## 依存／ブロッカー
 - スクリプト実行環境（ローカル or CI 相当）へのアクセス。

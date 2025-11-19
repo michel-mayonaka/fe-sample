@@ -35,13 +35,13 @@
   - コンフリクト削減: List/Status/Sim など個別領域の改修が多く、ファイル分割で差分衝突を緩和できる。
   - 可読性向上: 各画面のメトリクスが独立し、レビュー範囲を明確化できる。
   - テスト容易化: `metricsTargets` や共通ヘルパ導入により、将来的に単体テストで各領域を個別検証しやすくなる。
-  - 既存 API 維持: 呼び出し元変更を避け、docs/API.md の整合性を保てる。
+  - 既存 API 維持: 呼び出し元変更を避け、docs/SPECS/reference/api.md の整合性を保てる。
 
 ## 実装ステップ（推奨）
 1. `apply_helpers.go` を追加し、`assignPositive`/`copyInts`/`metricsTargets` などの共通処理を集約。
 2. `apply.go` 内のロジックを段階的に `apply_list.go` / `apply_status.go` / `apply_sim.go` / `apply_popup.go` / `apply_widgets.go` へ移し、`ApplyMetrics` は各関数の呼び出しに専念させる。
 3. `apply_test.go` を拡張し、ドメイン別の適用テストと `metricsTargets` のモックテストを追加。
-4. ドキュメント更新: `docs/API.md` と `docs/ARCHITECTURE.md` に「実装が複数ファイルへ分割された」旨を追記し、参照パスを最新化。
+4. ドキュメント更新: `docs/SPECS/reference/api.md` と `docs/architecture/README.md` に「実装が複数ファイルへ分割された」旨を追記し、参照パスを最新化。
 5. 移行後に `make mcp` を通し、UI ホットリロード経路（`internal/game/app/game.go`, `core.go`）でリグレッションが無いことを確認。
 
 ## Backlog/フォローアップ
